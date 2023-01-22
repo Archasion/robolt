@@ -2,7 +2,6 @@ use reqwest::{Client, Method};
 use reqwest::header::HeaderMap;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
-use serde_json::Value;
 
 #[derive(Deserialize)]
 struct RobloxResponseError {
@@ -42,7 +41,7 @@ impl HttpClient {
     pub(crate) async fn req<T>(&self, method: Method, url: &str, headers: Option<HeaderMap>) -> Result<T, String>
         where T: DeserializeOwned
     {
-        let res = self.client.request(method, format!("https://{}", url))
+        let res = self.client.request(method, format!("https://{url}"))
             .headers(headers.unwrap_or_default())
             .send()
             .await;
@@ -74,6 +73,7 @@ impl HttpClient {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::Value;
     use super::*;
 
     const ENDPOINT_GET: &str = "httpbin.org/get";

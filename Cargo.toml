@@ -6,13 +6,13 @@ edition = "2021"
 [dependencies]
 serde = "1.0.152"
 
-[dev-dependencies]
-serde_json = "1.0.91"
-tokio-test = "0.4.2"
-
 [dependencies.reqwest]
 version = "0.11.14"
 features = ["json", "cookies"]
+
+[dev-dependencies]
+serde_json = "1.0.91"
+
 
 [dev-dependencies.tokio]
 version = "1.24.2"
