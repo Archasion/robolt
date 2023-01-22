@@ -1,17 +1,8 @@
 use reqwest::{Client, Method};
 use reqwest::header::HeaderMap;
 use serde::de::DeserializeOwned;
-use serde::Deserialize;
 
-#[derive(Deserialize)]
-struct RobloxResponseError {
-    message: String
-}
-
-#[derive(Deserialize)]
-struct RobloxResponseErrors {
-    errors: Vec<RobloxResponseError>,
-}
+use crate::errors::RobloxAPIResponseErrors;
 
 pub(crate) struct HttpClient {
     client: Client,
@@ -55,7 +46,7 @@ impl HttpClient {
                         Err(_) => Err("Failed to deserialize response body".to_string()),
                     }
                 } else {
-                    let body = res.json::<RobloxResponseErrors>().await;
+                    let body = res.json::<RobloxAPIResponseErrors>().await;
                     match body {
                         Ok(body) => {
                             let errors = body.errors;
