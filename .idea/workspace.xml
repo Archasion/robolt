@@ -52,8 +52,9 @@
     "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
     "org.rust.disableDetachedFileInspection/Users/amusingdev/Documents/Projects/roblox-rs/src/api.rs": "true",
     "org.rust.disableDetachedFileInspection/Users/amusingdev/Documents/Projects/roblox-rs/src/badges.rs": "true",
+    "org.rust.disableDetachedFileInspection/Users/amusingdev/Documents/Projects/roblox-rs/src/main.rs": "true",
     "org.rust.disableDetachedFileInspection/Users/amusingdev/Documents/Projects/roblox-rs/src/tests/users.rs": "true",
-    "settings.editor.selected.configurable": "editor.preferences.appearance",
+    "settings.editor.selected.configurable": "language.rust.cargo.check",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -172,7 +173,7 @@
       <updated>1674205137491</updated>
       <workItem from="1674205139317" duration="56145000" />
       <workItem from="1674342123373" duration="96000" />
-      <workItem from="1674342394401" duration="26573000" />
+      <workItem from="1674342394401" duration="31019000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <created>1674205183592</created>
