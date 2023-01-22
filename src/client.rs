@@ -77,10 +77,10 @@ impl HttpClient {
 mod tests {
     use super::*;
 
-    const ENDPOINT_GET: &str = "https://httpbin.org/get";
-    const ENDPOINT_POST: &str = "https://httpbin.org/post";
-    const ENDPOINT_404: &str = "https://httpbin.org/status/404";
-    const ENDPOINT_ROBLOX: &str = "https://users.roblox.com/v1/users/0"; // Intentionally invalid user ID
+    const ENDPOINT_GET: &str = "httpbin.org/get";
+    const ENDPOINT_POST: &str = "httpbin.org/post";
+    const ENDPOINT_404: &str = "httpbin.org/status/404";
+    const ENDPOINT_ROBLOX: &str = "users.roblox.com/v1/users/0"; // Intentionally invalid user ID
 
     #[tokio::test]
     async fn ok_get_req() {
