@@ -39,9 +39,9 @@ impl HttpClient {
 
         match res {
             Ok(res) => {
-                let status_code = res.status();
+                let status = res.status();
 
-                if res.status().is_success() {
+                if status.is_success() {
                     let body = res.json::<T>();
                     match body {
                         Ok(body) => Ok(body),
@@ -55,7 +55,7 @@ impl HttpClient {
                             let error = errors.first().unwrap();
                             Err(error.message.to_string())
                         }
-                        Err(_) => Err(status_code.to_string())
+                        Err(_) => Err(status.to_string())
                     }
                 }
             },
