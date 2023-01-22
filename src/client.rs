@@ -10,6 +10,12 @@ pub(crate) struct HttpClient {
 
 impl Default for HttpClient {
     fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl HttpClient {
+    pub(crate) fn new() -> Self {
         let user_agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
         Self {
@@ -18,14 +24,6 @@ impl Default for HttpClient {
                 .cookie_store(true)
                 .build()
                 .expect("Failed to build reqwest client"),
-        }
-    }
-}
-
-impl HttpClient {
-    pub(crate) fn new() -> Self {
-        Self {
-            client: Client::new(),
         }
     }
 
