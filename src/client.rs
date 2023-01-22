@@ -1,8 +1,9 @@
-use tokio_test::{assert_ok, assert_err};
+// use tokio_test::{assert_ok, assert_err};
 use reqwest::{Client, Method};
 use reqwest::header::HeaderMap;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use serde_json::Value;
 
 #[derive(Deserialize)]
 struct RobloxResponseError {
@@ -42,7 +43,7 @@ impl HttpClient {
     pub(crate) async fn req<T>(&self, method: Method, url: &str, headers: Option<HeaderMap>) -> Result<T, String>
         where T: DeserializeOwned
     {
-        let res = self.client.request(method, url)
+        let res = self.client.request(method, format!("https://{}", url))
             .headers(headers.unwrap_or_default())
             .send()
             .await;
@@ -76,17 +77,16 @@ impl HttpClient {
 mod tests {
     use super::*;
 
+    const ENDPOINT_GET: &str = "https://httpbin.org/get";
+    const ENDPOINT_POST: &str = "https://httpbin.org/post";
+    const ENDPOINT_404: &str = "https://httpbin.org/status/404";
+    const ENDPOINT_ROBLOX: &str = "https://users.roblox.com/v1/users/0"; // Intentionally invalid user ID
+
     #[tokio::test]
     async fn ok_get_req() {
         let client = HttpClient::new();
-
-        let res = client.req::<serde_json::Value>(
-            Method::GET,
-            "https://httpbin.org/get",
-            None
-        ).await;
-
-        assert_ok!(res);
+        let res = client.req::<Value>(Method::GET, ENDPOINT_GET, None).await;
+        assert!(res.is_ok());
     }
 
     #[tokio::test]
@@ -96,25 +96,15 @@ mod tests {
 
         headers.insert("Content-Type", "application/json".parse().unwrap());
 
-        let res = client.req::<serde_json::Value>(
-            Method::POST,
-            "https://httpbin.org/post",
-            Some(headers)
-        ).await;
-
-        assert_ok!(res);
+        let res = client.req::<Value>(Method::POST, ENDPOINT_POST, Some(headers)).await;
+        assert!(res.is_ok());
     }
 
     #[tokio::test]
     async fn err_get_req() {
         let client = HttpClient::new();
-        let res = client.req::<serde_json::Value>(
-            Method::GET,
-            "https://httpbin.org/status/404",
-            None
-        ).await;
-
-        assert_err!(res);
+        let res = client.req::<Value>(Method::GET, ENDPOINT_404, None).await;
+        assert!(res.is_err());
     }
 
     #[tokio::test]
@@ -124,26 +114,16 @@ mod tests {
 
         headers.insert("Content-Type", "application/json".parse().unwrap());
 
-        let res = client.req::<serde_json::Value>(
-            Method::POST,
-            "https://httpbin.org/status/404",
-            Some(headers)
-        ).await;
-
-        assert_err!(res);
+        let res = client.req::<Value>(Method::POST, ENDPOINT_404, Some(headers)).await;
+        assert!(res.is_err());
     }
 
     #[tokio::test]
     async fn roblox_err_res() {
         let client = HttpClient::new();
+        let res = client.req::<String>(Method::GET, ENDPOINT_ROBLOX, None).await;
 
-        let res = client.req::<String>(
-            Method::GET,
-            "https://users.roblox.com/v1/users/0",
-            None
-        ).await;
-
-        assert_err!(&res);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), "The user id is invalid.");
     }
 }
