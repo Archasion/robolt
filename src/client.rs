@@ -39,6 +39,8 @@ impl HttpClient {
 
         match res {
             Ok(res) => {
+                let status_code = res.status();
+
                 if res.status().is_success() {
                     let body = res.json::<T>();
                     match body {
@@ -53,7 +55,7 @@ impl HttpClient {
                             let error = errors.first().unwrap();
                             Err(error.message.to_string())
                         }
-                        Err(_) => Err("Failed to deserialize response body".to_string()),
+                        Err(_) => Err(status_code.to_string())
                     }
                 }
             },
@@ -94,7 +96,7 @@ mod tests {
     fn err_get_req() {
         let client = HttpClient::new();
         let res = client.req::<Value>(Method::GET, ENDPOINT_404, None);
-        assert!(res.is_err());
+        assert_eq!(res.unwrap_err(), "404 Not Found");
     }
 
     #[test]
@@ -105,7 +107,7 @@ mod tests {
         headers.insert("Content-Type", "application/json".parse().unwrap());
 
         let res = client.req::<Value>(Method::POST, ENDPOINT_404, Some(headers));
-        assert!(res.is_err());
+        assert_eq!(res.unwrap_err(), "404 Not Found");
     }
 
     #[test]
