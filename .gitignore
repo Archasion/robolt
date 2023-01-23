@@ -16,3 +16,6 @@ Cargo.lock
 
 # IDE files and directories
 .idea
+
+# Other
+.env

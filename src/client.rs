@@ -2,9 +2,10 @@
 
 use lazy_static::lazy_static;
 use serde::de::DeserializeOwned;
-use reqwest::header::HeaderMap;
+use reqwest::cookie::{CookieStore, Jar};
+use reqwest::header::{HeaderMap, HeaderValue, self};
 use reqwest::blocking::Client;
-use reqwest::Method;
+use reqwest::{Method, Url};
 use std::sync::RwLock;
 
 use crate::errors::RobloxAPIResponseErrors;
@@ -17,7 +18,7 @@ lazy_static! {
 }
 
 pub(crate) struct HttpClient {
-    client: Client,
+    client: Client
 }
 
 impl Default for HttpClient {
@@ -38,11 +39,46 @@ impl HttpClient {
                 .expect("Failed to build reqwest client"),
         }
     }
+}
 
-    pub(crate) fn req<T>(&self, method: Method, url: &str, headers: Option<HeaderMap>) -> Result<T, String>
+pub(crate) trait HttpClientExt {
+    fn set_cookie(&self, cookie: &str) -> Result<(), &str>;
+    fn req<T>(&self, method: Method, url: &str, headers: Option<HeaderMap>) -> Result<T, String>
+        where T: DeserializeOwned;
+}
+
+impl HttpClientExt for RwLock<HttpClient> {
+    fn set_cookie(&self, cookie: &str) -> Result<(), &str> {
+        let mut headers = HeaderMap::new();
+        headers.insert(header::COOKIE, HeaderValue::from_str(cookie).unwrap());
+
+        let res = Client::new()
+            .get("https://users.roblox.com/v1/users/authenticated")
+            .headers(headers.clone())
+            .send()
+            .unwrap();
+
+        if !res.status().is_success() {
+            return Err("Invalid cookie");
+        }
+
+        self.write().unwrap().client = Client::builder()
+            .default_headers(headers)
+            .cookie_store(true)
+            .build()
+            .expect("Failed to build reqwest client");
+
+        Ok(())
+    }
+
+    fn req<T>(&self, method: Method, url: &str, mut headers: Option<HeaderMap>) -> Result<T, String>
         where T: DeserializeOwned
     {
-        let res = self.client.request(method, format!("https://{url}"))
+        let res = self
+            .read()
+            .unwrap()
+            .client
+            .request(method, format!("https://{url}"))
             .headers(headers.unwrap_or_default())
             .send();
 
@@ -54,7 +90,7 @@ impl HttpClient {
                     let body = res.json::<T>();
                     match body {
                         Ok(body) => Ok(body),
-                        Err(_) => Err("Failed to deserialize response body".to_string()),
+                        Err(err) => Err(err.to_string()),
                     }
                 } else {
                     let body = res.json::<RobloxAPIResponseErrors>();
@@ -68,7 +104,7 @@ impl HttpClient {
                     }
                 }
             },
-            Err(_) => Err("Failed to send request".to_string()),
+            Err(err) => Err(err.to_string()),
         }
     }
 }
@@ -85,11 +121,7 @@ mod tests {
 
     #[test]
     fn ok_get_req() {
-        let res = HTTP
-            .read()
-            .unwrap()
-            .req::<Value>(Method::GET, ENDPOINT_GET, None);
-
+        let res = HTTP.req::<Value>(Method::GET, ENDPOINT_GET, None);
         assert!(res.is_ok());
     }
 
@@ -98,44 +130,28 @@ mod tests {
         let mut headers = HeaderMap::new();
         headers.insert("Content-Type", "application/json".parse().unwrap());
 
-        let res = HTTP
-            .read()
-            .unwrap()
-            .req::<Value>(Method::POST, ENDPOINT_POST, Some(headers));
-
+        let res = HTTP.req::<Value>(Method::POST, ENDPOINT_POST, Some(headers));
         assert!(res.is_ok());
     }
 
     #[test]
     fn err_get_req() {
-        let res = HTTP
-            .read()
-            .unwrap()
-            .req::<Value>(Method::GET, ENDPOINT_404, None);
-
+        let res = HTTP.req::<Value>(Method::GET, ENDPOINT_404, None);
         assert!(res.is_err());
     }
 
     #[test]
     fn err_post_req() {
         let mut headers = HeaderMap::new();
-
         headers.insert("Content-Type", "application/json".parse().unwrap());
 
-        let res = HTTP
-            .read()
-            .unwrap()
-            .req::<Value>(Method::POST, ENDPOINT_404, Some(headers));
-
+        let res = HTTP.req::<Value>(Method::POST, ENDPOINT_404, Some(headers));
         assert_eq!(res.unwrap_err(), "404 Not Found");
     }
 
     #[test]
     fn roblox_err_res() {
-        let res = HTTP
-            .read()
-            .unwrap()
-            .req::<String>(Method::GET, ENDPOINT_ROBLOX, None);
+        let res = HTTP.req::<String>(Method::GET, ENDPOINT_ROBLOX, None);
 
         assert!(res.is_err());
         assert_eq!(res.unwrap_err(), "The user id is invalid.");
