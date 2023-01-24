@@ -1,14 +1,15 @@
 #![allow(dead_code)]
 
 use serde::Deserialize;
+use reqwest::Method;
 
-use crate::client::{HTTP, HttpClientExt};
+use crate::client::{HTTP, HttpClientExt, HttpRequest};
 use crate::web::ENDPOINTS;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct AuthenticatedUser {
-    #[serde(rename = "UserId")]
+    #[serde(rename = "UserID")]
     id: u64,
     #[serde(rename = "UserName")]
     username: String,
@@ -18,10 +19,21 @@ pub struct AuthenticatedUser {
 }
 
 pub fn login(cookie: &str) -> Result<(), &str> {
-    HTTP.set_cookie(cookie)
+    let cookie = format!(".ROBLOSECURITY={cookie}");
+    HTTP.set_cookie(&cookie)
+}
+
+pub fn logout() {
+    HTTP.remove_cookie();
 }
 
 pub fn me() -> Result<AuthenticatedUser, String> {
-    let url = format!("{}/mobileapi/userinfo", ENDPOINTS.web);
-    HTTP.req::<AuthenticatedUser>(reqwest::Method::GET, &url, None)
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!("{}/mobileapi/userinfo", ENDPOINTS.web),
+        headers: None,
+        body: None,
+    };
+
+    HTTP.request::<AuthenticatedUser>(req)
 }

@@ -1,8 +1,9 @@
 #![allow(unused)]
 
 use serde::Deserialize;
+use reqwest::Method;
 
-use crate::client::{HTTP, HttpClientExt};
+use crate::client::{HTTP, HttpClientExt, HttpRequest};
 use crate::web::ENDPOINTS;
 
 #[derive(Deserialize, Debug)]
@@ -41,8 +42,14 @@ pub struct PartialUser {
 /// println!("{:?}", user);
 /// ```
 pub fn fetch(id: u64) -> Result<User, String> {
-    let url = format!("{}/v1/users/{}", ENDPOINTS.users, id);
-    HTTP.req(reqwest::Method::GET, &url, None)
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!("{}/v1/users/{}", ENDPOINTS.users, id),
+        headers: None,
+        body: None,
+    };
+
+    HTTP.request(req)
 }
 
 /// Returns a [`PartialUser`] struct, only containing the username and ID
@@ -61,13 +68,25 @@ pub fn fetch(id: u64) -> Result<User, String> {
 /// println!("{:?}", user);
 /// ```
 pub fn partial(id: u64) -> Result<PartialUser, String> {
-    let url = format!("{}/users/{}", ENDPOINTS.base, id);
-    HTTP.req(reqwest::Method::GET, &url, None)
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!("{}/users/{}", ENDPOINTS.base, id),
+        headers: None,
+        body: None,
+    };
+
+    HTTP.request(req)
 }
 
 pub fn find(username: &str) -> Result<PartialUser, String> {
-    let url = format!("{}/users/get-by-username?username={}", ENDPOINTS.base, username);
-    HTTP.req(reqwest::Method::GET, &url, None)
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!("{}/users/get-by-username?username={}", ENDPOINTS.base, username),
+        headers: None,
+        body: None,
+    };
+
+    HTTP.request(req)
 }
 
 impl PartialUser {

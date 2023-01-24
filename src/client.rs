@@ -7,6 +7,7 @@ use reqwest::header::{HeaderMap, HeaderValue, self};
 use reqwest::blocking::Client;
 use reqwest::{Method, Url};
 use std::sync::RwLock;
+use serde::Deserialize;
 
 use crate::errors::RobloxAPIResponseErrors;
 
@@ -17,8 +18,15 @@ lazy_static! {
     };
 }
 
+pub(crate) struct HttpRequest {
+    pub(crate) method: Method,
+    pub(crate) url: String,
+    pub(crate) headers: Option<HeaderMap>,
+    pub(crate) body: Option<String>
+}
+
 pub(crate) struct HttpClient {
-    client: Client
+    pub(crate) client: Client
 }
 
 impl Default for HttpClient {
@@ -29,21 +37,14 @@ impl Default for HttpClient {
 
 impl HttpClient {
     pub(crate) fn new() -> Self {
-        let user_agent = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
-
-        Self {
-            client: Client::builder()
-                .user_agent(user_agent)
-                .cookie_store(true)
-                .build()
-                .expect("Failed to build reqwest client"),
-        }
+        Self { client: Client::new() }
     }
 }
 
 pub(crate) trait HttpClientExt {
     fn set_cookie(&self, cookie: &str) -> Result<(), &str>;
-    fn req<T>(&self, method: Method, url: &str, headers: Option<HeaderMap>) -> Result<T, String>
+    fn remove_cookie(&self);
+    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
         where T: DeserializeOwned;
 }
 
@@ -52,13 +53,14 @@ impl HttpClientExt for RwLock<HttpClient> {
         let mut headers = HeaderMap::new();
         headers.insert(header::COOKIE, HeaderValue::from_str(cookie).unwrap());
 
-        let mut res = Client::new()
-            .get("https://auth.roblox.com/v2/logout")
+        let res = Client::new()
+            .post("https://auth.roblox.com/v2/logout")
+            .body("")
             .headers(headers.clone())
             .send()
             .unwrap();
 
-        if !res.status().is_success() {
+        if !res.status().is_success() && res.status().as_u16() != 403 {
             return Err("Invalid cookie");
         }
 
@@ -69,24 +71,29 @@ impl HttpClientExt for RwLock<HttpClient> {
         }
 
         headers.insert("X-CSRF-TOKEN", csrf.unwrap().to_owned());
-        self.write().unwrap().client = Client::builder()
+        self.write().expect("Failed to modify HTTP client").client = Client::builder()
             .default_headers(headers)
             .cookie_store(true)
             .build()
-            .expect("Failed to build reqwest client");
+            .expect("Failed to build HTTP client");
 
         Ok(())
     }
 
-    fn req<T>(&self, method: Method, url: &str, mut headers: Option<HeaderMap>) -> Result<T, String>
+    fn remove_cookie(&self) {
+        self.write().expect("Failed to modify HTTP client").client = Client::new();
+    }
+
+    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
         where T: DeserializeOwned
     {
         let res = self
             .read()
-            .unwrap()
+            .expect("Failed to read HTTP client")
             .client
-            .request(method, format!("https://{url}"))
-            .headers(headers.unwrap_or_default())
+            .request(data.method, format!("https://{}", data.url))
+            .body(data.body.unwrap_or_default())
+            .headers(data.headers.unwrap_or_default())
             .send();
 
         match res {
@@ -104,7 +111,10 @@ impl HttpClientExt for RwLock<HttpClient> {
                     match body {
                         Ok(body) => {
                             let errors = body.errors;
-                            let error = errors.first().unwrap();
+                            let error = errors
+                                .first()
+                                .expect("Unknown error");
+
                             Err(error.message.to_string())
                         }
                         Err(_) => Err(status.to_string())
@@ -119,48 +129,51 @@ impl HttpClientExt for RwLock<HttpClient> {
 #[cfg(test)]
 mod tests {
     use serde_json::Value;
+    use tokio_test::{assert_err, assert_ok};
     use super::*;
 
     const ENDPOINT_GET: &str = "httpbin.org/get";
-    const ENDPOINT_POST: &str = "httpbin.org/post";
     const ENDPOINT_404: &str = "httpbin.org/status/404";
     const ENDPOINT_ROBLOX: &str = "users.roblox.com/v1/users/0"; // Intentionally invalid user ID
 
     #[test]
-    fn ok_get_req() {
-        let res = HTTP.req::<Value>(Method::GET, ENDPOINT_GET, None);
-        assert!(res.is_ok());
+    fn ok_req() {
+        let req = HttpRequest {
+            method: Method::GET,
+            url: ENDPOINT_GET.to_string(),
+            headers: None,
+            body: None
+        };
+
+        let res = HTTP.request::<Value>(req);
+        assert_ok!(res);
     }
 
     #[test]
-    fn ok_post_req() {
-        let mut headers = HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
+    fn err_req() {
+        let req = HttpRequest {
+            method: Method::GET,
+            url: ENDPOINT_404.to_string(),
+            headers: None,
+            body: None
+        };
 
-        let res = HTTP.req::<Value>(Method::POST, ENDPOINT_POST, Some(headers));
-        assert!(res.is_ok());
+        let res = HTTP.request::<Value>(req);
+        assert_err!(res);
     }
 
     #[test]
-    fn err_get_req() {
-        let res = HTTP.req::<Value>(Method::GET, ENDPOINT_404, None);
-        assert!(res.is_err());
-    }
+    fn roblox_err() {
+        let req = HttpRequest {
+            method: Method::GET,
+            url: ENDPOINT_ROBLOX.to_string(),
+            headers: None,
+            body: None
+        };
 
-    #[test]
-    fn err_post_req() {
-        let mut headers = HeaderMap::new();
-        headers.insert("Content-Type", "application/json".parse().unwrap());
+        let res = HTTP.request::<String>(req);
 
-        let res = HTTP.req::<Value>(Method::POST, ENDPOINT_404, Some(headers));
-        assert_eq!(res.unwrap_err(), "404 Not Found");
-    }
-
-    #[test]
-    fn roblox_err_res() {
-        let res = HTTP.req::<String>(Method::GET, ENDPOINT_ROBLOX, None);
-
-        assert!(res.is_err());
+        assert_err!(&res);
         assert_eq!(res.unwrap_err(), "The user id is invalid.");
     }
 }
