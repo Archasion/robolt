@@ -10,12 +10,12 @@ use crate::web::ENDPOINTS;
 #[serde(rename_all = "PascalCase")]
 pub struct AuthenticatedUser {
     #[serde(rename = "UserID")]
-    id: u64,
+    pub id: u64,
     #[serde(rename = "UserName")]
-    username: String,
-    robux_balance: u64,
-    thumbnail_url: String,
-    is_premium: bool
+    pub username: String,
+    pub robux_balance: u64,
+    pub thumbnail_url: String,
+    pub is_premium: bool
 }
 
 pub fn login(cookie: &str) -> Result<(), &str> {

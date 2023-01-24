@@ -12,21 +12,21 @@ use serde::Deserialize;
 use crate::errors::RobloxAPIResponseErrors;
 
 lazy_static! {
-    pub(crate) static ref HTTP: RwLock<HttpClient> = {
+    pub static ref HTTP: RwLock<HttpClient> = {
         let client = HttpClient::new();
         RwLock::new(client)
     };
 }
 
-pub(crate) struct HttpRequest {
-    pub(crate) method: Method,
-    pub(crate) url: String,
-    pub(crate) headers: Option<HeaderMap>,
-    pub(crate) body: Option<String>
+pub struct HttpRequest {
+    pub method: Method,
+    pub url: String,
+    pub headers: Option<HeaderMap>,
+    pub body: Option<String>
 }
 
-pub(crate) struct HttpClient {
-    pub(crate) client: Client
+pub struct HttpClient {
+    pub client: Client
 }
 
 impl Default for HttpClient {
@@ -36,12 +36,12 @@ impl Default for HttpClient {
 }
 
 impl HttpClient {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self { client: Client::new() }
     }
 }
 
-pub(crate) trait HttpClientExt {
+pub trait HttpClientExt {
     fn set_cookie(&self, cookie: &str) -> Result<(), &str>;
     fn remove_cookie(&self);
     fn request<T>(&self, data: HttpRequest) -> Result<T, String>

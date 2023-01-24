@@ -10,21 +10,21 @@ use crate::web::ENDPOINTS;
 #[serde(rename_all = "camelCase")]
 pub struct User {
     #[serde(rename = "name")]
-    username: String,
-    display_name: String,
-    is_banned: bool,
-    description: String,
-    created: String,
-    has_verified_badge: bool,
-    external_app_display_name: Option<String>,
-    id: u64
+    pub username: String,
+    pub display_name: String,
+    pub is_banned: bool,
+    pub description: String,
+    pub created: String,
+    pub has_verified_badge: bool,
+    pub external_app_display_name: Option<String>,
+    pub id: u64
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct PartialUser {
-    username: String,
-    id: u64
+    pub username: String,
+    pub id: u64
 }
 
 /// Returns a [`User`] struct containing information about the user with the given ID.
