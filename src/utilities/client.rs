@@ -9,7 +9,7 @@ use reqwest::{Method, Url};
 use std::sync::RwLock;
 use serde::Deserialize;
 
-use crate::errors::RobloxAPIResponseErrors;
+use crate::utilities::errors::RobloxAPIResponseErrors;
 
 lazy_static! {
     pub static ref HTTP: RwLock<HttpClient> = {

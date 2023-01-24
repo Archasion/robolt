@@ -3,7 +3,7 @@
 use serde::Deserialize;
 use reqwest::Method;
 
-use crate::client::{HTTP, HttpClientExt, HttpRequest};
+use crate::utilities::client::{HTTP, HttpClientExt, HttpRequest};
 use crate::web::ENDPOINTS;
 
 #[derive(Deserialize, Debug)]
