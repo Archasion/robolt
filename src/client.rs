@@ -52,8 +52,8 @@ impl HttpClientExt for RwLock<HttpClient> {
         let mut headers = HeaderMap::new();
         headers.insert(header::COOKIE, HeaderValue::from_str(cookie).unwrap());
 
-        let res = Client::new()
-            .get("https://users.roblox.com/v1/users/authenticated")
+        let mut res = Client::new()
+            .get("https://auth.roblox.com/v2/logout")
             .headers(headers.clone())
             .send()
             .unwrap();
@@ -62,6 +62,13 @@ impl HttpClientExt for RwLock<HttpClient> {
             return Err("Invalid cookie");
         }
 
+        let csrf = res.headers().get("x-csrf-token");
+
+        if csrf.is_none() {
+            return Err("Failed to fetch X-CSRF-TOKEN");
+        }
+
+        headers.insert("X-CSRF-TOKEN", csrf.unwrap().to_owned());
         self.write().unwrap().client = Client::builder()
             .default_headers(headers)
             .cookie_store(true)
