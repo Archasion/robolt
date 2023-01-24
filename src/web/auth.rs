@@ -27,7 +27,7 @@ pub fn logout() {
     HTTP.remove_cookie();
 }
 
-pub fn me() -> Result<AuthenticatedUser, String> {
+pub fn authenticated() -> Result<AuthenticatedUser, String> {
     let req = HttpRequest {
         method: Method::GET,
         url: format!("{}/mobileapi/userinfo", ENDPOINTS.web),
