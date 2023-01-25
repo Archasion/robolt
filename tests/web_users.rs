@@ -1,4 +1,4 @@
-use arlox::web::users::{self, UserMethods};
+use robolt::web::users::{self, UserMethods};
 use tokio_test::{assert_err, assert_ok};
 
 #[test]

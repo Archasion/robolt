@@ -1,4 +1,4 @@
-use arlox::web::badges;
+use robolt::web::badges;
 use tokio_test::assert_ok;
 
 #[test]

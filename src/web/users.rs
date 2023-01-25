@@ -58,7 +58,7 @@ pub struct Data<T> {
 /// # Examples
 ///
 /// ```rust
-/// use arlox::web::users;
+/// use robolt::web::users;
 ///
 /// let user = users::fetch(1);
 /// println!("{:?}", user);
@@ -84,7 +84,7 @@ pub fn fetch(id: u64) -> Result<User, String> {
 /// # Examples
 ///
 /// ```rust
-/// use arlox::web::users;
+/// use robolt::web::users;
 ///
 /// let user = users::partial(1);
 /// println!("{:?}", user);

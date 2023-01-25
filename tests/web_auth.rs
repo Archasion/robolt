@@ -1,4 +1,4 @@
-use arlox::web::auth;
+use robolt::web::auth;
 use tokio_test::assert_err;
 
 #[test]
