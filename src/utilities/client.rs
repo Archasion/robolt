@@ -44,14 +44,46 @@ impl HttpClient {
 }
 
 pub trait HttpClientExt {
-    fn set_cookie(&self, cookie: &str) -> Result<(), &str>;
-    fn remove_cookie(&self);
     fn request<T>(&self, data: HttpRequest) -> Result<T, String>
     where
         T: DeserializeOwned;
+
+    fn set_cookie(&self, cookie: &str) -> Result<(), &str>;
+    fn remove_cookie(&self);
 }
 
 impl HttpClientExt for RwLock<HttpClient> {
+    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
+    where
+        T: DeserializeOwned,
+    {
+        let res = self
+            .read()
+            .expect("Failed to read HTTP client")
+            .client
+            .request(data.method, format!("https://{}", data.url))
+            .body(data.body.unwrap_or_default())
+            .headers(data.headers.unwrap_or_default())
+            .send()
+            .map_err(|e| e.to_string())?;
+
+        let status = res.status();
+
+        if !status.is_success() {
+            let err_res = res.json::<RobloxAPIResponseErrors>();
+
+            return match err_res {
+                Ok(body) => {
+                    let error = body.errors.first().expect("Unknown error");
+                    Err(error.message.to_string())
+                }
+                Err(_) => Err(status.to_string()),
+            };
+        }
+
+        res.json::<T>().map_err(|e| e.to_string())
+    }
+
     fn set_cookie(&self, cookie: &str) -> Result<(), &str> {
         let mut headers = HeaderMap::new();
         headers.insert(header::COOKIE, HeaderValue::from_str(cookie).unwrap());
@@ -85,46 +117,6 @@ impl HttpClientExt for RwLock<HttpClient> {
 
     fn remove_cookie(&self) {
         self.write().expect("Failed to modify HTTP client").client = Client::new();
-    }
-
-    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
-    where
-        T: DeserializeOwned,
-    {
-        let res = self
-            .read()
-            .expect("Failed to read HTTP client")
-            .client
-            .request(data.method, format!("https://{}", data.url))
-            .body(data.body.unwrap_or_default())
-            .headers(data.headers.unwrap_or_default())
-            .send();
-
-        match res {
-            Ok(res) => {
-                let status = res.status();
-
-                if status.is_success() {
-                    let body = res.json::<T>();
-                    match body {
-                        Ok(body) => Ok(body),
-                        Err(err) => Err(err.to_string()),
-                    }
-                } else {
-                    let body = res.json::<RobloxAPIResponseErrors>();
-                    match body {
-                        Ok(body) => {
-                            let errors = body.errors;
-                            let error = errors.first().expect("Unknown error");
-
-                            Err(error.message.to_string())
-                        }
-                        Err(_) => Err(status.to_string()),
-                    }
-                }
-            }
-            Err(err) => Err(err.to_string()),
-        }
     }
 }
 
