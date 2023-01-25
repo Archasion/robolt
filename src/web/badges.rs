@@ -62,3 +62,11 @@ pub fn fetch(id: u64) -> Result<Badge, String> {
 
     HTTP.request::<Badge>(req)
 }
+
+pub fn update() {
+    todo!();
+}
+
+pub fn remove() {
+    todo!();
+}
