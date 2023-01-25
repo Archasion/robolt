@@ -1,4 +1,4 @@
-use arlox::web::users;
+use arlox::web::users::{self, UserMethods};
 use tokio_test::{assert_err, assert_ok};
 
 #[test]
@@ -29,4 +29,20 @@ fn find_user_by_username() {
 #[test]
 fn find_user_by_invalid_username() {
     assert_err!(users::find(""));
+}
+
+#[test]
+fn check_username_history() {
+    assert_ok!(users::username_history(1));
+}
+
+#[test]
+fn check_username_history_of_user() {
+    let user = users::partial(1).unwrap();
+    assert_eq!(user.username_history().len(), 0);
+}
+
+#[test]
+fn search_users() {
+    assert_ok!(users::search("roblox"));
 }

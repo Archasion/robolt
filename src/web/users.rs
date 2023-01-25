@@ -4,6 +4,7 @@ use reqwest::Method;
 use serde::Deserialize;
 
 use crate::utilities::client::{HttpClientExt, HttpRequest, HTTP};
+use crate::web::auth::AuthenticatedUser;
 use crate::web::ENDPOINTS;
 
 #[derive(Deserialize, Debug)]
@@ -25,6 +26,27 @@ pub struct User {
 pub struct PartialUser {
     pub username: String,
     pub id: u64,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UserSearchResult {
+    #[serde(rename = "name")]
+    pub username: String,
+    pub display_name: String,
+    pub id: u64,
+    pub has_verified_badge: bool,
+    pub previous_usernames: Vec<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Username {
+    name: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Data<T> {
+    data: Vec<T>,
 }
 
 /// Returns a [`User`] struct containing information about the user with the given ID.
@@ -49,7 +71,7 @@ pub fn fetch(id: u64) -> Result<User, String> {
         body: None,
     };
 
-    HTTP.request(req)
+    HTTP.request::<User>(req)
 }
 
 /// Returns a [`PartialUser`] struct, only containing the username and ID
@@ -75,7 +97,7 @@ pub fn partial(id: u64) -> Result<PartialUser, String> {
         body: None,
     };
 
-    HTTP.request(req)
+    HTTP.request::<PartialUser>(req)
 }
 
 pub fn find(username: &str) -> Result<PartialUser, String> {
@@ -89,11 +111,70 @@ pub fn find(username: &str) -> Result<PartialUser, String> {
         body: None,
     };
 
-    HTTP.request(req)
+    HTTP.request::<PartialUser>(req)
 }
 
-impl PartialUser {
-    pub fn fetch(&self) -> Result<User, String> {
-        fetch(self.id)
+pub fn username_history(id: u64) -> Result<Vec<String>, String> {
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!("{}/v1/users/{}/username-history", ENDPOINTS.users, id),
+        headers: None,
+        body: None,
+    };
+
+    match HTTP.request::<Data<Username>>(req) {
+        Ok(res) => Ok(res.data.into_iter().map(|u| u.name).collect()),
+        Err(e) => Err(e),
+    }
+}
+
+pub fn search(query: &str) -> Result<Vec<UserSearchResult>, String> {
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!(
+            "{}/v1/users/search?keyword={}&limit=100",
+            ENDPOINTS.users, query
+        ),
+        headers: None,
+        body: None,
+    };
+
+    match HTTP.request::<Data<UserSearchResult>>(req) {
+        Ok(res) => Ok(res.data),
+        Err(e) => Err(e),
+    }
+}
+
+pub trait UserMethods {
+    fn id(&self) -> u64;
+    fn username_history(&self) -> Vec<String> {
+        username_history(self.id()).unwrap()
+    }
+    fn fetch(&self) -> Result<User, String> {
+        fetch(self.id())
+    }
+}
+
+impl UserMethods for User {
+    fn id(&self) -> u64 {
+        self.id
+    }
+}
+
+impl UserMethods for PartialUser {
+    fn id(&self) -> u64 {
+        self.id
+    }
+}
+
+impl UserMethods for AuthenticatedUser {
+    fn id(&self) -> u64 {
+        self.id
+    }
+}
+
+impl UserMethods for UserSearchResult {
+    fn id(&self) -> u64 {
+        self.id
     }
 }
