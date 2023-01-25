@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use serde::Deserialize;
 use reqwest::Method;
+use serde::Deserialize;
 
-use crate::utilities::client::{HTTP, HttpClientExt, HttpRequest};
+use crate::utilities::client::{HttpClientExt, HttpRequest, HTTP};
 use crate::web::ENDPOINTS;
 
 #[derive(Deserialize, Debug)]
@@ -15,7 +15,7 @@ pub struct AuthenticatedUser {
     pub username: String,
     pub robux_balance: u64,
     pub thumbnail_url: String,
-    pub is_premium: bool
+    pub is_premium: bool,
 }
 
 pub fn login(cookie: &str) -> Result<(), &str> {

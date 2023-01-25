@@ -1,9 +1,9 @@
 #![allow(unused)]
 
-use serde::Deserialize;
 use reqwest::Method;
+use serde::Deserialize;
 
-use crate::utilities::client::{HTTP, HttpClientExt, HttpRequest};
+use crate::utilities::client::{HttpClientExt, HttpRequest, HTTP};
 use crate::web::ENDPOINTS;
 
 #[derive(Deserialize, Debug)]
@@ -17,14 +17,14 @@ pub struct User {
     pub created: String,
     pub has_verified_badge: bool,
     pub external_app_display_name: Option<String>,
-    pub id: u64
+    pub id: u64,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct PartialUser {
     pub username: String,
-    pub id: u64
+    pub id: u64,
 }
 
 /// Returns a [`User`] struct containing information about the user with the given ID.
@@ -81,7 +81,10 @@ pub fn partial(id: u64) -> Result<PartialUser, String> {
 pub fn find(username: &str) -> Result<PartialUser, String> {
     let req = HttpRequest {
         method: Method::GET,
-        url: format!("{}/users/get-by-username?username={}", ENDPOINTS.base, username),
+        url: format!(
+            "{}/users/get-by-username?username={}",
+            ENDPOINTS.base, username
+        ),
         headers: None,
         body: None,
     };

@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct RobloxAPIResponseErrorMessage {
-    pub message: String
+    pub message: String,
 }
 
 #[derive(Deserialize)]

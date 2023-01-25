@@ -1,5 +1,5 @@
 use arlox::web::users;
-use tokio_test::{assert_ok, assert_err};
+use tokio_test::{assert_err, assert_ok};
 
 #[test]
 fn fetch_user_by_id() {

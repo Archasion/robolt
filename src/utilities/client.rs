@@ -1,13 +1,13 @@
 #![allow(unused)]
 
 use lazy_static::lazy_static;
-use serde::de::DeserializeOwned;
-use reqwest::cookie::{CookieStore, Jar};
-use reqwest::header::{HeaderMap, HeaderValue, self};
 use reqwest::blocking::Client;
+use reqwest::cookie::{CookieStore, Jar};
+use reqwest::header::{self, HeaderMap, HeaderValue};
 use reqwest::{Method, Url};
-use std::sync::RwLock;
+use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use std::sync::RwLock;
 
 use crate::utilities::errors::RobloxAPIResponseErrors;
 
@@ -22,11 +22,11 @@ pub struct HttpRequest {
     pub method: Method,
     pub url: String,
     pub headers: Option<HeaderMap>,
-    pub body: Option<String>
+    pub body: Option<String>,
 }
 
 pub struct HttpClient {
-    pub client: Client
+    pub client: Client,
 }
 
 impl Default for HttpClient {
@@ -37,7 +37,9 @@ impl Default for HttpClient {
 
 impl HttpClient {
     pub fn new() -> Self {
-        Self { client: Client::new() }
+        Self {
+            client: Client::new(),
+        }
     }
 }
 
@@ -45,7 +47,8 @@ pub trait HttpClientExt {
     fn set_cookie(&self, cookie: &str) -> Result<(), &str>;
     fn remove_cookie(&self);
     fn request<T>(&self, data: HttpRequest) -> Result<T, String>
-        where T: DeserializeOwned;
+    where
+        T: DeserializeOwned;
 }
 
 impl HttpClientExt for RwLock<HttpClient> {
@@ -85,7 +88,8 @@ impl HttpClientExt for RwLock<HttpClient> {
     }
 
     fn request<T>(&self, data: HttpRequest) -> Result<T, String>
-        where T: DeserializeOwned
+    where
+        T: DeserializeOwned,
     {
         let res = self
             .read()
@@ -111,16 +115,14 @@ impl HttpClientExt for RwLock<HttpClient> {
                     match body {
                         Ok(body) => {
                             let errors = body.errors;
-                            let error = errors
-                                .first()
-                                .expect("Unknown error");
+                            let error = errors.first().expect("Unknown error");
 
                             Err(error.message.to_string())
                         }
-                        Err(_) => Err(status.to_string())
+                        Err(_) => Err(status.to_string()),
                     }
                 }
-            },
+            }
             Err(err) => Err(err.to_string()),
         }
     }
@@ -128,9 +130,9 @@ impl HttpClientExt for RwLock<HttpClient> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use serde_json::Value;
     use tokio_test::{assert_err, assert_ok};
-    use super::*;
 
     const ENDPOINT_GET: &str = "httpbin.org/get";
     const ENDPOINT_404: &str = "httpbin.org/status/404";
@@ -142,7 +144,7 @@ mod tests {
             method: Method::GET,
             url: ENDPOINT_GET.to_string(),
             headers: None,
-            body: None
+            body: None,
         };
 
         let res = HTTP.request::<Value>(req);
@@ -155,7 +157,7 @@ mod tests {
             method: Method::GET,
             url: ENDPOINT_404.to_string(),
             headers: None,
-            body: None
+            body: None,
         };
 
         let res = HTTP.request::<Value>(req);
@@ -168,7 +170,7 @@ mod tests {
             method: Method::GET,
             url: ENDPOINT_ROBLOX.to_string(),
             headers: None,
-            body: None
+            body: None,
         };
 
         let res = HTTP.request::<String>(req);
