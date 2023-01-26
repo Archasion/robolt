@@ -62,6 +62,28 @@ pub struct AwardingUniverse {
     pub root_place_id: u64,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BadgeMetadata {
+    pub badge_creation_price: Badge,
+    pub max_badge_name_length: AwardingUniverse,
+    pub max_badge_description_length: AwardingUniverse,
+}
+
+pub fn metadata() -> BadgeMetadata {
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!("{}/v1/badges/metadata", ENDPOINTS.badges),
+        headers: None,
+        body: None,
+        response: true,
+    };
+
+    HTTP.send::<BadgeMetadata>(req)
+        .expect("Failed to fetch badge metadata")
+        .unwrap()
+}
+
 pub fn fetch(id: u64) -> Result<Badge, String> {
     let req = HttpRequest {
         method: Method::GET,

@@ -18,6 +18,26 @@ pub struct AuthenticatedUser {
     pub is_premium: bool,
 }
 
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthMetadata {
+    pub cookie_law_notice_timeout: u64,
+}
+
+pub fn metadata() -> AuthMetadata {
+    let req = HttpRequest {
+        method: Method::GET,
+        url: format!("{}/mobileapi/user/authentication-metadata", ENDPOINTS.web),
+        headers: None,
+        body: None,
+        response: true,
+    };
+
+    HTTP.send::<AuthMetadata>(req)
+        .expect("Failed to fetch authentication metadata")
+        .unwrap()
+}
+
 pub fn login(cookie: &str) -> Result<(), &str> {
     let cookie = format!(".ROBLOSECURITY={cookie}");
     HTTP.set_cookie(&cookie)
