@@ -23,6 +23,7 @@ pub struct HttpRequest {
     pub url: String,
     pub headers: Option<HeaderMap>,
     pub body: Option<String>,
+    pub response: bool,
 }
 
 pub struct HttpClient {
@@ -44,7 +45,7 @@ impl HttpClient {
 }
 
 pub trait HttpClientExt {
-    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
+    fn send<T>(&self, data: HttpRequest) -> Result<Option<T>, String>
     where
         T: DeserializeOwned;
 
@@ -53,7 +54,7 @@ pub trait HttpClientExt {
 }
 
 impl HttpClientExt for RwLock<HttpClient> {
-    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
+    fn send<T>(&self, data: HttpRequest) -> Result<Option<T>, String>
     where
         T: DeserializeOwned,
     {
@@ -81,12 +82,17 @@ impl HttpClientExt for RwLock<HttpClient> {
             };
         }
 
-        res.json::<T>().map_err(|e| e.to_string())
+        if !data.response {
+            return Ok(None);
+        }
+
+        res.json::<T>().map_err(|e| e.to_string()).map(Some)
     }
 
     fn set_cookie(&self, cookie: &str) -> Result<(), &str> {
         let mut headers = HeaderMap::new();
         headers.insert(header::COOKIE, HeaderValue::from_str(cookie).unwrap());
+        headers.insert(header::CONTENT_TYPE, HeaderValue::from_static("text/json"));
 
         let res = Client::new()
             .post("https://auth.roblox.com/v2/logout")
@@ -137,9 +143,10 @@ mod tests {
             url: ENDPOINT_GET.to_string(),
             headers: None,
             body: None,
+            response: false,
         };
 
-        let res = HTTP.request::<Value>(req);
+        let res = HTTP.send::<serde_json::Value>(req);
         assert_ok!(res);
     }
 
@@ -150,9 +157,10 @@ mod tests {
             url: ENDPOINT_404.to_string(),
             headers: None,
             body: None,
+            response: false,
         };
 
-        let res = HTTP.request::<Value>(req);
+        let res = HTTP.send::<serde_json::Value>(req);
         assert_err!(res);
     }
 
@@ -163,9 +171,10 @@ mod tests {
             url: ENDPOINT_ROBLOX.to_string(),
             headers: None,
             body: None,
+            response: true,
         };
 
-        let res = HTTP.request::<String>(req);
+        let res = HTTP.send::<serde_json::Value>(req);
 
         assert_err!(&res);
         assert_eq!(res.unwrap_err(), "The user id is invalid.");

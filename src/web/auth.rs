@@ -33,7 +33,9 @@ pub fn authenticated() -> Result<AuthenticatedUser, String> {
         url: format!("{}/mobileapi/userinfo", ENDPOINTS.web),
         headers: None,
         body: None,
+        response: true,
     };
 
-    HTTP.request::<AuthenticatedUser>(req)
+    HTTP.send::<AuthenticatedUser>(req)
+        .map(|user| user.unwrap())
 }

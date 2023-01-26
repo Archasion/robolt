@@ -69,9 +69,10 @@ pub fn fetch(id: u64) -> Result<User, String> {
         url: format!("{}/v1/users/{}", ENDPOINTS.users, id),
         headers: None,
         body: None,
+        response: true,
     };
 
-    HTTP.request::<User>(req)
+    HTTP.send::<User>(req).map(|user| user.unwrap())
 }
 
 /// Returns a [`PartialUser`] struct, only containing the username and ID
@@ -95,9 +96,10 @@ pub fn partial(id: u64) -> Result<PartialUser, String> {
         url: format!("{}/users/{}", ENDPOINTS.base, id),
         headers: None,
         body: None,
+        response: true,
     };
 
-    HTTP.request::<PartialUser>(req)
+    HTTP.send::<PartialUser>(req).map(|user| user.unwrap())
 }
 
 pub fn find(username: &str) -> Result<PartialUser, String> {
@@ -109,9 +111,10 @@ pub fn find(username: &str) -> Result<PartialUser, String> {
         ),
         headers: None,
         body: None,
+        response: true,
     };
 
-    HTTP.request::<PartialUser>(req)
+    HTTP.send::<PartialUser>(req).map(|user| user.unwrap())
 }
 
 pub fn username_history(id: u64) -> Result<Vec<String>, String> {
@@ -120,10 +123,15 @@ pub fn username_history(id: u64) -> Result<Vec<String>, String> {
         url: format!("{}/v1/users/{}/username-history", ENDPOINTS.users, id),
         headers: None,
         body: None,
+        response: true,
     };
 
-    match HTTP.request::<Data<Username>>(req) {
-        Ok(res) => Ok(res.data.into_iter().map(|u| u.name).collect()),
+    match HTTP.send::<Data<Username>>(req) {
+        Ok(res) => {
+            let r = res.unwrap().data.into_iter().map(|u| u.name).collect();
+
+            Ok(r)
+        }
         Err(e) => Err(e),
     }
 }
@@ -137,10 +145,11 @@ pub fn search(query: &str) -> Result<Vec<UserSearchResult>, String> {
         ),
         headers: None,
         body: None,
+        response: true,
     };
 
-    match HTTP.request::<Data<UserSearchResult>>(req) {
-        Ok(res) => Ok(res.data),
+    match HTTP.send::<Data<UserSearchResult>>(req) {
+        Ok(res) => Ok(res.unwrap().data),
         Err(e) => Err(e),
     }
 }

@@ -21,10 +21,12 @@ pub enum RobloxBadge {
 
 #[derive(Debug, Serialize)]
 pub struct BadgeConfig {
-    name: &'static str,
-    description: Option<&'static str>,
-    enabled: bool,
-    return_updated_badge: bool,
+    pub name: Option<&'static str>,
+    #[serde(default)]
+    pub description: Option<&'static str>,
+    pub enabled: bool,
+    #[serde(skip_serializing)]
+    pub return_updated_badge: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -66,36 +68,37 @@ pub fn fetch(id: u64) -> Result<Badge, String> {
         url: format!("{}/v1/badges/{}", ENDPOINTS.badges, id),
         headers: None,
         body: None,
+        response: true,
     };
 
-    HTTP.request::<Badge>(req)
+    HTTP.send::<Badge>(req).map(|badge| badge.unwrap())
 }
 
-// TODO - Verify functionality with tests (NOT TESTED)
 pub fn remove(id: u64) -> Result<(), String> {
     let req = HttpRequest {
         method: Method::DELETE,
         url: format!("{}/v1/user/badges/{}", ENDPOINTS.badges, id),
         headers: None,
         body: None,
+        response: false,
     };
 
-    HTTP.request::<()>(req)
+    HTTP.send::<serde_json::Value>(req)?;
+    Ok(())
 }
 
-
-// TODO - Verify functionality with tests (NOT TESTED)
 pub fn update(id: u64, data: BadgeConfig) -> Result<Option<Badge>, String> {
-    let config = serde_json::to_string(&data).unwrap();
+    let config = serde_json::to_string(&data).expect("Failed to serialize badge configuration");
 
     let req = HttpRequest {
         method: Method::PATCH,
         url: format!("{}/v1/badges/{}", ENDPOINTS.badges, id),
         headers: None,
         body: Some(config),
+        response: false,
     };
 
-    HTTP.request::<()>(req).unwrap();
+    HTTP.send::<serde_json::Value>(req)?;
 
     if data.return_updated_badge {
         return Ok(Some(fetch(id).unwrap()));
@@ -105,12 +108,10 @@ pub fn update(id: u64, data: BadgeConfig) -> Result<Option<Badge>, String> {
 }
 
 impl Badge {
-    // TODO - Verify functionality with tests (NOT TESTED)
     pub fn remove(&self) -> Result<(), String> {
         remove(self.id)
     }
 
-    // TODO - Verify functionality with tests (NOT TESTED)
     pub fn update(&self, data: BadgeConfig) -> Result<Option<Badge>, String> {
         update(self.id, data)
     }
