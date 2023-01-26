@@ -1,5 +1,5 @@
 use reqwest::Method;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::utilities::client::{HttpClientExt, HttpRequest, HTTP};
 use crate::web::ENDPOINTS;
@@ -17,6 +17,14 @@ pub enum RobloxBadge {
     CombatInitiation,
     Warrior,
     Bloxxer,
+}
+
+#[derive(Debug, Serialize)]
+pub struct BadgeConfig {
+    name: &'static str,
+    description: Option<&'static str>,
+    enabled: bool,
+    return_updated_badge: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -63,10 +71,47 @@ pub fn fetch(id: u64) -> Result<Badge, String> {
     HTTP.request::<Badge>(req)
 }
 
-pub fn update() {
-    todo!();
+// TODO - Verify functionality with tests (NOT TESTED)
+pub fn remove(id: u64) -> Result<(), String> {
+    let req = HttpRequest {
+        method: Method::DELETE,
+        url: format!("{}/v1/user/badges/{}", ENDPOINTS.badges, id),
+        headers: None,
+        body: None,
+    };
+
+    HTTP.request::<()>(req)
 }
 
-pub fn remove() {
-    todo!();
+
+// TODO - Verify functionality with tests (NOT TESTED)
+pub fn update(id: u64, data: BadgeConfig) -> Result<Option<Badge>, String> {
+    let config = serde_json::to_string(&data).unwrap();
+
+    let req = HttpRequest {
+        method: Method::PATCH,
+        url: format!("{}/v1/badges/{}", ENDPOINTS.badges, id),
+        headers: None,
+        body: Some(config),
+    };
+
+    HTTP.request::<()>(req).unwrap();
+
+    if data.return_updated_badge {
+        return Ok(Some(fetch(id).unwrap()));
+    }
+
+    Ok(None)
+}
+
+impl Badge {
+    // TODO - Verify functionality with tests (NOT TESTED)
+    pub fn remove(&self) -> Result<(), String> {
+        remove(self.id)
+    }
+
+    // TODO - Verify functionality with tests (NOT TESTED)
+    pub fn update(&self, data: BadgeConfig) -> Result<Option<Badge>, String> {
+        update(self.id, data)
+    }
 }
