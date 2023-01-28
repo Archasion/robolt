@@ -1,11 +1,12 @@
 #![allow(dead_code)]
 
 use std::cell::RefCell;
-use reqwest::blocking::Client;
-use reqwest::header::{self, HeaderMap};
-use reqwest::{Method, StatusCode};
 use std::error::Error;
 use std::rc::Rc;
+
+use reqwest::{Method, StatusCode};
+use reqwest::blocking::Client;
+use reqwest::header::{self, HeaderMap};
 use serde::de::DeserializeOwned;
 
 use crate::models::users::UserBuilder;
@@ -35,12 +36,10 @@ impl Default for Robolt {
 
 impl Robolt {
     pub fn new() -> Self {
-        let client = Rc::new(RefCell::new(
-            RoboltClient {
-                inner: Client::new(),
-                authenticated: false,
-            }
-        ));
+        let client = Rc::new(RefCell::new(RoboltClient {
+            inner: Client::new(),
+            authenticated: false,
+        }));
 
         let client_ref = Rc::clone(&client);
 
@@ -109,7 +108,9 @@ impl RoboltClientExt for RefCell<RoboltClient> {
             T: DeserializeOwned,
     {
         let url = format!("https://{}", data.endpoint);
-        let res = self.borrow().inner
+        let res = self
+            .borrow()
+            .inner
             .request(data.method, url)
             .body(data.body.unwrap_or_default())
             .send()
@@ -117,18 +118,16 @@ impl RoboltClientExt for RefCell<RoboltClient> {
 
         let status = res.status();
         if !status.is_success() {
-            let err_res = res.json::<RobloxAPIResponseErrors>()
+            let err_res = res
+                .json::<RobloxAPIResponseErrors>()
                 .map_err(|e| e.to_string())?;
 
-            let err = err_res.errors
-                .first()
-                .ok_or(status.to_string())?;
+            let err = err_res.errors.first().ok_or(status.to_string())?;
 
             return Err(err.message.clone());
         }
 
-        let json = res.json::<T>()
-            .map_err(|e| e.to_string())?;
+        let json = res.json::<T>().map_err(|e| e.to_string())?;
 
         Ok(json)
     }
@@ -136,9 +135,10 @@ impl RoboltClientExt for RefCell<RoboltClient> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use dotenv::dotenv;
     use tokio_test::assert_ok;
+
+    use super::*;
 
     #[test]
     fn login() {
