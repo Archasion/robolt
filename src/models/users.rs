@@ -5,7 +5,7 @@ use reqwest::Method;
 use serde::Deserialize;
 
 use crate::models::ENDPOINTS;
-use crate::utilities::client::{HttpRequest, RoboltClient, RoboltClientExt};
+use crate::utilities::client::{BorrowClient, HttpRequest, RoboltClient};
 
 pub struct UserBuilder {
     pub(crate) client: Rc<RefCell<RoboltClient>>,

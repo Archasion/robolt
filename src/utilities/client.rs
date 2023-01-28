@@ -96,13 +96,13 @@ impl Robolt {
     }
 }
 
-pub(crate) trait RoboltClientExt {
+pub(crate) trait BorrowClient {
     fn request<T>(&self, data: HttpRequest) -> Result<T, String>
         where
             T: DeserializeOwned;
 }
 
-impl RoboltClientExt for RefCell<RoboltClient> {
+impl BorrowClient for RefCell<RoboltClient> {
     fn request<T>(&self, data: HttpRequest) -> Result<T, String>
         where
             T: DeserializeOwned,
