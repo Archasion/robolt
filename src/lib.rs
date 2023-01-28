@@ -1,2 +1,4 @@
 mod utilities;
-pub mod web;
+mod models;
+
+pub use utilities::client::Robolt;

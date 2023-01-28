@@ -1,11 +1,12 @@
+#![allow(dead_code)]
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub struct RobloxAPIResponseErrorMessage {
+pub(crate) struct RobloxAPIResponseErrorMessage {
     pub message: String,
 }
 
 #[derive(Deserialize)]
-pub struct RobloxAPIResponseErrors {
+pub(crate) struct RobloxAPIResponseErrors {
     pub errors: Vec<RobloxAPIResponseErrorMessage>,
 }

@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 serde = "1.0.152"
-lazy_static = "1.4.0"
 serde_json = "1.0.91"
 
 [dependencies.reqwest]
