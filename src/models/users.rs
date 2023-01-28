@@ -35,6 +35,16 @@ impl UserBuilder {
 
         self.client.request::<AuthenticatedUser>(req)
     }
+
+    pub fn find(&self, username: &str) -> Result<PartialUser, String> {
+        let req = HttpRequest {
+            method: Method::GET,
+            endpoint: format!("{}/users/get-by-username?username={}", ENDPOINTS.base, username),
+            body: None,
+        };
+
+        self.client.request::<PartialUser>(req)
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -49,6 +59,13 @@ pub struct User {
     pub has_verified_badge: bool,
     pub id: u64,
     pub display_name: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct PartialUser {
+    pub username: String,
+    pub id: u64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
