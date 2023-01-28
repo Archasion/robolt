@@ -47,7 +47,7 @@ pub struct User {
     pub is_banned: bool,
     pub external_app_display_name: Option<String>,
     pub has_verified_badge: bool,
-    pub id: i64,
+    pub id: u64,
     pub display_name: String,
 }
 
