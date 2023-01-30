@@ -4,7 +4,7 @@ use std::rc::Rc;
 use reqwest::Method;
 use serde::Deserialize;
 
-use crate::models::ENDPOINTS;
+use crate::models::{DataResponse, ENDPOINTS};
 use crate::utilities::client::{BorrowClient, HttpRequest, RoboltClient};
 
 pub struct UserBuilder {
@@ -57,6 +57,17 @@ impl UserBuilder {
         };
 
         self.client.request::<PartialUser>(req)
+    }
+
+    pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
+        let req = HttpRequest {
+            method: Method::GET,
+            endpoint: format!("{}/v1/users/{}/username-history", ENDPOINTS.users, id),
+            body: None,
+        };
+
+        self.client.request::<DataResponse<Vec<String>>>(req)
+            .map(|res| res.data)
     }
 }
 

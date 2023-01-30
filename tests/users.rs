@@ -19,3 +19,9 @@ fn find_user_by_username() {
     let client = Robolt::new();
     assert_ok!(client.users.find("roblox"));
 }
+
+#[test]
+fn check_username_history() {
+    let client = Robolt::new();
+    assert_ok!(client.users.username_history(1));
+}
