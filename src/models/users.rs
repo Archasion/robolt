@@ -36,10 +36,23 @@ impl UserBuilder {
         self.client.request::<AuthenticatedUser>(req)
     }
 
+    pub fn partial(&self, id: u64) -> Result<PartialUser, String> {
+        let req = HttpRequest {
+            method: Method::GET,
+            endpoint: format!("{}/users/{}", ENDPOINTS.base, id),
+            body: None,
+        };
+
+        self.client.request::<PartialUser>(req)
+    }
+
     pub fn find(&self, username: &str) -> Result<PartialUser, String> {
         let req = HttpRequest {
             method: Method::GET,
-            endpoint: format!("{}/users/get-by-username?username={}", ENDPOINTS.base, username),
+            endpoint: format!(
+                "{}/users/get-by-username?username={}",
+                ENDPOINTS.base, username
+            ),
             body: None,
         };
 
