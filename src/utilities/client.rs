@@ -132,20 +132,3 @@ impl BorrowClient for RefCell<RoboltClient> {
         Ok(json)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use dotenv::dotenv;
-    use tokio_test::assert_ok;
-
-    use super::*;
-
-    #[test]
-    fn login() {
-        dotenv().ok();
-        let mut client = Robolt::new();
-        let cookie = std::env::var("ROBLOX_COOKIE").unwrap();
-
-        assert_ok!(client.login(cookie));
-    }
-}

@@ -66,7 +66,8 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<DataResponse<Vec<String>>>(req)
+        self.client
+            .request::<DataResponse<Vec<String>>>(req)
             .map(|res| res.data)
     }
 }
