@@ -9,7 +9,7 @@ struct RobloxAPIEndpoints<T> {
 
 #[derive(Debug, Deserialize)]
 struct DataResponse<T> {
-    data: T,
+    data: Vec<T>,
 }
 
 const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {

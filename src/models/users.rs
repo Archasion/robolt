@@ -69,7 +69,7 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<DataResponse<Vec<UserSearchResult>>>(req)
+        self.client.request::<DataResponse<UserSearchResult>>(req)
             .map(|res| res.data)
     }
 
@@ -81,7 +81,7 @@ impl UserBuilder {
         };
 
         self.client
-            .request::<DataResponse<Vec<String>>>(req)
+            .request::<DataResponse<String>>(req)
             .map(|res| res.data)
     }
 }
