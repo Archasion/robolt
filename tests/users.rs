@@ -31,3 +31,9 @@ fn search_users_by_keyword() {
     let client = Robolt::new();
     assert_ok!(client.users.search("test", 10));
 }
+
+#[test]
+fn search_users_by_ids() {
+    let client = Robolt::new();
+    assert_ok!(client.users.fetch_many(vec![1, 2, 3], false));
+}

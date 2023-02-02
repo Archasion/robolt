@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use reqwest::Method;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::utilities::client::{BorrowClient, HttpRequest, RoboltClient};
@@ -23,7 +23,7 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<User>(req)
+        self.client.request::<(), User>(req)
     }
 
     pub fn me(&self) -> Result<AuthenticatedUser, String> {
@@ -33,7 +33,7 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<AuthenticatedUser>(req)
+        self.client.request::<(), AuthenticatedUser>(req)
     }
 
     pub fn partial(&self, id: u64) -> Result<PartialUser, String> {
@@ -43,7 +43,7 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<PartialUser>(req)
+        self.client.request::<(), PartialUser>(req)
     }
 
     pub fn find(&self, username: &str) -> Result<PartialUser, String> {
@@ -56,7 +56,7 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<PartialUser>(req)
+        self.client.request::<(), PartialUser>(req)
     }
 
     pub fn search(&self, keyword: &str, limit: u8) -> Result<Vec<UserSearchResult>, String> {
@@ -69,7 +69,23 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<DataResponse<UserSearchResult>>(req)
+        self.client.request::<(), DataResponse<UserSearchResult>>(req)
+            .map(|res| res.data)
+    }
+
+    pub fn fetch_many(&self, ids: Vec<u64>, exclude_banned: bool) -> Result<Vec<UserSearchResult>, String> {
+        let post = UserFetchMultiple {
+            user_ids: ids,
+            exclude_banned_users: exclude_banned,
+        };
+
+        let req = HttpRequest {
+            method: Method::POST,
+            endpoint: format!("{}/v1/users", ENDPOINTS.users),
+            body: Some(&post),
+        };
+
+        self.client.request::<UserFetchMultiple, DataResponse<UserSearchResult>>(req)
             .map(|res| res.data)
     }
 
@@ -81,7 +97,7 @@ impl UserBuilder {
         };
 
         self.client
-            .request::<DataResponse<String>>(req)
+            .request::<(), DataResponse<String>>(req)
             .map(|res| res.data)
     }
 }
@@ -123,6 +139,12 @@ pub struct UserSearchResult {
     pub username: String,
     pub display_name: String,
     pub has_verified_badge: bool,
-    pub previous_usernames: Vec<String>,
     pub id: u64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct UserFetchMultiple {
+    exclude_banned_users: bool,
+    user_ids: Vec<u64>,
 }

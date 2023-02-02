@@ -10,6 +10,10 @@ serde = "1.0.152"
 version = "0.11.14"
 features = ["json", "cookies", "blocking"]
 
+[dependencies.serde_json]
+version = "1.0.91"
+features = ["std"]
+
 [dev-dependencies]
 tokio-test = "0.4.2"
 dotenv = "0.15.0"

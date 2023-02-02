@@ -8,14 +8,15 @@ use reqwest::{Method, StatusCode};
 use reqwest::blocking::Client;
 use reqwest::header::{self, HeaderMap};
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 use crate::models::users::UserBuilder;
 use crate::utilities::errors::RobloxAPIResponseErrors;
 
-pub(crate) struct HttpRequest {
+pub(crate) struct HttpRequest<'a, T: Serialize> {
     pub method: Method,
     pub endpoint: String,
-    pub body: Option<String>,
+    pub body: Option<&'a T>,
 }
 
 pub struct Robolt {
@@ -97,22 +98,29 @@ impl Robolt {
 }
 
 pub(crate) trait BorrowClient {
-    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
+    fn request<U, T>(&self, data: HttpRequest<'_, U>) -> Result<T, String>
         where
-            T: DeserializeOwned;
+            T: DeserializeOwned,
+            U: Serialize;
 }
 
 impl BorrowClient for RefCell<RoboltClient> {
-    fn request<T>(&self, data: HttpRequest) -> Result<T, String>
+    fn request<U, T>(&self, data: HttpRequest<'_, U>) -> Result<T, String>
         where
             T: DeserializeOwned,
+            U: Serialize,
     {
         let url = format!("https://{}", data.endpoint);
-        let res = self
+        let mut builder = self
             .borrow()
             .inner
-            .request(data.method, url)
-            .body(data.body.unwrap_or_default())
+            .request(data.method, url);
+
+        if let Some(body) = data.body {
+            builder = builder.json(body);
+        }
+
+        let res = builder
             .send()
             .map_err(|e| e.to_string())?;
 
