@@ -25,3 +25,9 @@ fn check_username_history() {
     let client = Robolt::new();
     assert_ok!(client.users.username_history(1));
 }
+
+#[test]
+fn search_users_by_keyword() {
+    let client = Robolt::new();
+    assert_ok!(client.users.search("test", 10));
+}

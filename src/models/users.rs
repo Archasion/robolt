@@ -59,6 +59,20 @@ impl UserBuilder {
         self.client.request::<PartialUser>(req)
     }
 
+    pub fn search(&self, keyword: &str, limit: u8) -> Result<Vec<UserSearchResult>, String> {
+        let req = HttpRequest {
+            method: Method::GET,
+            endpoint: format!(
+                "{}/v1/users/search?keyword={}&limit={}",
+                ENDPOINTS.users, keyword, limit
+            ),
+            body: None,
+        };
+
+        self.client.request::<DataResponse<Vec<UserSearchResult>>>(req)
+            .map(|res| res.data)
+    }
+
     pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
         let req = HttpRequest {
             method: Method::GET,
@@ -99,5 +113,16 @@ pub struct AuthenticatedUser {
     #[serde(rename = "name")]
     pub username: String,
     pub display_name: String,
+    pub id: u64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserSearchResult {
+    #[serde(rename = "name")]
+    pub username: String,
+    pub display_name: String,
+    pub has_verified_badge: bool,
+    pub previous_usernames: Vec<String>,
     pub id: u64,
 }
