@@ -111,18 +111,13 @@ impl BorrowClient for RefCell<RoboltClient> {
             U: Serialize,
     {
         let url = format!("https://{}", data.endpoint);
-        let mut builder = self
-            .borrow()
-            .inner
-            .request(data.method, url);
+        let mut builder = self.borrow().inner.request(data.method, url);
 
         if let Some(body) = data.body {
             builder = builder.json(body);
         }
 
-        let res = builder
-            .send()
-            .map_err(|e| e.to_string())?;
+        let res = builder.send().map_err(|e| e.to_string())?;
 
         let status = res.status();
         if !status.is_success() {

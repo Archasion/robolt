@@ -69,11 +69,16 @@ impl UserBuilder {
             body: None,
         };
 
-        self.client.request::<(), DataResponse<UserSearchResult>>(req)
+        self.client
+            .request::<(), DataResponse<UserSearchResult>>(req)
             .map(|res| res.data)
     }
 
-    pub fn fetch_many(&self, ids: Vec<u64>, exclude_banned: bool) -> Result<Vec<UserSearchResult>, String> {
+    pub fn fetch_many(
+        &self,
+        ids: Vec<u64>,
+        exclude_banned: bool,
+    ) -> Result<Vec<UserSearchResult>, String> {
         let post = UserFetchMultiple {
             user_ids: ids,
             exclude_banned_users: exclude_banned,
@@ -85,7 +90,8 @@ impl UserBuilder {
             body: Some(&post),
         };
 
-        self.client.request::<UserFetchMultiple, DataResponse<UserSearchResult>>(req)
+        self.client
+            .request::<UserFetchMultiple, DataResponse<UserSearchResult>>(req)
             .map(|res| res.data)
     }
 
