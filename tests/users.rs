@@ -4,36 +4,36 @@ use robolt::Robolt;
 
 #[test]
 fn fetch_user_by_id() {
-    let client = Robolt::new();
-    assert_ok!(client.users().fetch(1));
+    let users = Robolt::new().users();
+    assert_ok!(users.fetch(1));
 }
 
 #[test]
 fn fetch_partial_user_by_id() {
-    let client = Robolt::new();
-    assert_ok!(client.users().partial(1));
+    let users = Robolt::new().users();
+    assert_ok!(users.partial(1));
 }
 
 #[test]
 fn find_user_by_username() {
-    let client = Robolt::new();
-    assert_ok!(client.users().find("roblox"));
+    let users = Robolt::new().users();
+    assert_ok!(users.find("roblox"));
 }
 
 #[test]
 fn check_username_history() {
-    let client = Robolt::new();
-    assert_ok!(client.users().username_history(1));
+    let users = Robolt::new().users();
+    assert_ok!(users.username_history(1));
 }
 
 #[test]
 fn search_users_by_keyword() {
-    let client = Robolt::new();
-    assert_ok!(client.users().search("test", 10));
+    let users = Robolt::new().users();
+    assert_ok!(users.search("test", 10));
 }
 
 #[test]
 fn search_users_by_ids() {
-    let client = Robolt::new();
-    assert_ok!(client.users().fetch_many(vec![1, 2, 3], false));
+    let users = Robolt::new().users();
+    assert_ok!(users.fetch_many(vec![1, 2, 3], false));
 }
