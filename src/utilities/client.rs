@@ -73,7 +73,7 @@ impl Robolt {
     }
 
     pub fn users(&self) -> UserBuilder {
-        UserBuilder::new(Rc::clone(&self.client))
+        UserBuilder::from(Rc::clone(&self.client))
     }
 }
 

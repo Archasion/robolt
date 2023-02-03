@@ -13,7 +13,7 @@ pub struct UserBuilder {
 }
 
 impl UserBuilder {
-    pub(crate) fn new(client: Rc<RefCell<Client>>) -> Self {
+    pub(crate) fn from(client: Rc<RefCell<Client>>) -> Self {
         Self { client }
     }
 
