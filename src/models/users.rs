@@ -1,18 +1,19 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use reqwest::blocking::Client;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
 use crate::models::{DataResponse, ENDPOINTS};
-use crate::utilities::client::{BorrowClient, HttpRequest, RoboltClient};
+use crate::utilities::client::{BorrowClient, HttpRequest};
 
 pub struct UserBuilder {
-    pub(crate) client: Rc<RefCell<RoboltClient>>,
+    pub(crate) client: Rc<RefCell<Client>>,
 }
 
 impl UserBuilder {
-    pub(crate) fn new(client: Rc<RefCell<RoboltClient>>) -> Self {
+    pub(crate) fn new(client: Rc<RefCell<Client>>) -> Self {
         Self { client }
     }
 

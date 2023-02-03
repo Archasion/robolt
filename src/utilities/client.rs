@@ -20,13 +20,7 @@ pub(crate) struct HttpRequest<'a, T: Serialize> {
 }
 
 pub struct Robolt {
-    pub users: UserBuilder,
-    client: Rc<RefCell<RoboltClient>>,
-}
-
-pub(crate) struct RoboltClient {
-    inner: Client,
-    authenticated: bool,
+    client: Rc<RefCell<Client>>,
 }
 
 impl Default for Robolt {
@@ -37,16 +31,8 @@ impl Default for Robolt {
 
 impl Robolt {
     pub fn new() -> Self {
-        let client = Rc::new(RefCell::new(RoboltClient {
-            inner: Client::new(),
-            authenticated: false,
-        }));
-
-        let client_ref = Rc::clone(&client);
-
         Self {
-            users: UserBuilder::new(client_ref),
-            client,
+            client: Rc::new(RefCell::new(Client::new())),
         }
     }
 
@@ -78,22 +64,16 @@ impl Robolt {
             .cookie_store(true)
             .build()?;
 
-        let client = RoboltClient {
-            inner: authenticated_client,
-            authenticated: true,
-        };
-
-        self.client.replace(client);
+        self.client.replace(authenticated_client);
         Ok(())
     }
 
     pub fn logout(&mut self) {
-        let client = RoboltClient {
-            inner: Client::new(),
-            authenticated: false,
-        };
+        self.client.replace(Client::new());
+    }
 
-        self.client.replace(client);
+    pub fn users(&self) -> UserBuilder {
+        UserBuilder::new(Rc::clone(&self.client))
     }
 }
 
@@ -104,14 +84,14 @@ pub(crate) trait BorrowClient {
             U: Serialize;
 }
 
-impl BorrowClient for RefCell<RoboltClient> {
+impl BorrowClient for RefCell<Client> {
     fn request<U, T>(&self, data: HttpRequest<'_, U>) -> Result<T, String>
         where
             T: DeserializeOwned,
             U: Serialize,
     {
         let url = format!("https://{}", data.endpoint);
-        let mut builder = self.borrow().inner.request(data.method, url);
+        let mut builder = self.borrow().request(data.method, url);
 
         if let Some(body) = data.body {
             builder = builder.json(body);
