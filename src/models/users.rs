@@ -27,7 +27,7 @@ impl UserBuilder {
         self.client.request::<(), User>(req)
     }
 
-    pub fn me(&self) -> Result<AuthenticatedUser, String> {
+    pub fn authenticated(&self) -> Result<AuthenticatedUser, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!("{}/v1/users/authenticated", ENDPOINTS.users),
