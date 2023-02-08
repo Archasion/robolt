@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use reqwest::blocking::Client;
@@ -27,27 +28,27 @@ impl UserClient {
         self.client.request::<(), User>(req)
     }
 
-    pub fn authenticated(&self) -> Result<AuthenticatedUser, String> {
+    pub fn authenticated(&self) -> Result<PartialUser, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!("{}/v1/users/authenticated", ENDPOINTS.users),
             body: None,
         };
 
-        self.client.request::<(), AuthenticatedUser>(req)
+        self.client.request::<(), PartialUser>(req)
     }
 
     pub fn partial(&self, id: u64) -> Result<PartialUser, String> {
         let req = HttpRequest {
             method: Method::GET,
-            endpoint: format!("{}/users/{}", ENDPOINTS.base, id),
+            endpoint: format!("{}/v1/users/{}", ENDPOINTS.users, id),
             body: None,
         };
 
         self.client.request::<(), PartialUser>(req)
     }
 
-    pub fn find(&self, username: &str) -> Result<PartialUser, String> {
+    pub fn id(&self, username: &str) -> Result<u64, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!(
@@ -57,10 +58,11 @@ impl UserClient {
             body: None,
         };
 
-        self.client.request::<(), PartialUser>(req)
+        self.client.request::<(), UserId>(req)
+            .map(|res| res.id)
     }
 
-    pub fn search(&self, keyword: &str, limit: u8) -> Result<Vec<UserSearchResult>, String> {
+    pub fn search(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!(
@@ -71,7 +73,7 @@ impl UserClient {
         };
 
         self.client
-            .request::<(), DataResponse<UserSearchResult>>(req)
+            .request::<(), DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
@@ -79,8 +81,8 @@ impl UserClient {
         &self,
         ids: Vec<u64>,
         exclude_banned: bool,
-    ) -> Result<Vec<UserSearchResult>, String> {
-        let post = UserFetchMultiple {
+    ) -> Result<HashMap<u64, String>, String> {
+        let post = FetchMany {
             user_ids: ids,
             exclude_banned_users: exclude_banned,
         };
@@ -92,8 +94,35 @@ impl UserClient {
         };
 
         self.client
-            .request::<UserFetchMultiple, DataResponse<UserSearchResult>>(req)
-            .map(|res| res.data)
+            .request::<FetchMany, DataResponse<PartialUser>>(req)
+            .map(|res| res.data
+                .into_iter()
+                .map(|user| (user.id, user.username)).collect()
+            )
+    }
+
+    pub fn find_many(
+        &self,
+        usernames: Vec<&str>,
+        exclude_banned: bool,
+    ) -> Result<HashMap<String, u64>, String> {
+        let post = FindMany {
+            exclude_banned_users: exclude_banned,
+            usernames,
+        };
+
+        let req = HttpRequest {
+            method: Method::POST,
+            endpoint: format!("{}/v1/usernames/users", ENDPOINTS.users),
+            body: Some(&post),
+        };
+
+        self.client
+            .request::<FindMany, DataResponse<PartialUser>>(req)
+            .map(|res| res.data
+                .into_iter()
+                .map(|user| (user.username, user.id)).collect()
+            )
     }
 
     pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
@@ -124,34 +153,30 @@ pub struct User {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "PascalCase")]
+#[serde(rename_all = "camelCase")]
 pub struct PartialUser {
-    pub username: String,
-    pub id: u64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthenticatedUser {
     #[serde(rename = "name")]
     pub username: String,
     pub display_name: String,
-    pub id: u64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UserSearchResult {
-    #[serde(rename = "name")]
-    pub username: String,
-    pub display_name: String,
-    pub has_verified_badge: bool,
     pub id: u64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct UserFetchMultiple {
+struct FetchMany {
     exclude_banned_users: bool,
     user_ids: Vec<u64>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct FindMany<'a> {
+    exclude_banned_users: bool,
+    usernames: Vec<&'a str>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+struct UserId {
+    id: u64,
 }
