@@ -1,5 +1,4 @@
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::rc::Rc;
 
 use reqwest::blocking::Client;
@@ -80,7 +79,7 @@ impl UserClient {
         &self,
         ids: Vec<u64>,
         exclude_banned: bool,
-    ) -> Result<HashMap<u64, String>, String> {
+    ) -> Result<Vec<PartialUser>, String> {
         let post = FetchMany {
             user_ids: ids,
             exclude_banned_users: exclude_banned,
@@ -94,19 +93,14 @@ impl UserClient {
 
         self.client
             .request::<FetchMany, DataResponse<PartialUser>>(req)
-            .map(|res| {
-                res.data
-                    .into_iter()
-                    .map(|user| (user.id, user.username))
-                    .collect()
-            })
+            .map(|res| res.data)
     }
 
     pub fn find_many(
         &self,
         usernames: Vec<&str>,
         exclude_banned: bool,
-    ) -> Result<HashMap<String, u64>, String> {
+    ) -> Result<Vec<PartialUser>, String> {
         let post = FindMany {
             exclude_banned_users: exclude_banned,
             usernames,
@@ -120,12 +114,7 @@ impl UserClient {
 
         self.client
             .request::<FindMany, DataResponse<PartialUser>>(req)
-            .map(|res| {
-                res.data
-                    .into_iter()
-                    .map(|user| (user.username, user.id))
-                    .collect()
-            })
+            .map(|res| res.data)
     }
 
     pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
