@@ -21,6 +21,7 @@ pub(crate) struct HttpRequest<'a, T: Serialize> {
 
 pub struct Robolt {
     client: Rc<RefCell<Client>>,
+    authenticated: bool,
 }
 
 impl Default for Robolt {
@@ -33,6 +34,7 @@ impl Robolt {
     pub fn new() -> Self {
         Self {
             client: Rc::new(RefCell::new(Client::new())),
+            authenticated: false,
         }
     }
 
@@ -65,15 +67,22 @@ impl Robolt {
             .build()?;
 
         self.client.replace(authenticated_client);
+        self.authenticated = true;
+
         Ok(())
     }
 
     pub fn logout(&mut self) {
         self.client.replace(Client::new());
+        self.authenticated = false;
     }
 
     pub fn users(&self) -> UserBuilder {
         UserBuilder::from(Rc::clone(&self.client))
+    }
+
+    pub fn is_authenticated(&self) -> bool {
+        self.authenticated
     }
 }
 
