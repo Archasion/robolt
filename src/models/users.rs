@@ -58,8 +58,7 @@ impl UserClient {
             body: None,
         };
 
-        self.client.request::<(), UserId>(req)
-            .map(|res| res.id)
+        self.client.request::<(), UserId>(req).map(|res| res.id)
     }
 
     pub fn search(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, String> {
@@ -95,10 +94,12 @@ impl UserClient {
 
         self.client
             .request::<FetchMany, DataResponse<PartialUser>>(req)
-            .map(|res| res.data
-                .into_iter()
-                .map(|user| (user.id, user.username)).collect()
-            )
+            .map(|res| {
+                res.data
+                    .into_iter()
+                    .map(|user| (user.id, user.username))
+                    .collect()
+            })
     }
 
     pub fn find_many(
@@ -119,10 +120,12 @@ impl UserClient {
 
         self.client
             .request::<FindMany, DataResponse<PartialUser>>(req)
-            .map(|res| res.data
-                .into_iter()
-                .map(|user| (user.username, user.id)).collect()
-            )
+            .map(|res| {
+                res.data
+                    .into_iter()
+                    .map(|user| (user.username, user.id))
+                    .collect()
+            })
     }
 
     pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
