@@ -8,11 +8,11 @@ use serde::{Deserialize, Serialize};
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::utilities::client::{BorrowClient, HttpRequest};
 
-pub struct UserBuilder {
+pub struct UserClient {
     pub(crate) client: Rc<RefCell<Client>>,
 }
 
-impl UserBuilder {
+impl UserClient {
     pub(crate) fn from(client: Rc<RefCell<Client>>) -> Self {
         Self { client }
     }

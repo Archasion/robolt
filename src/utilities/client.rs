@@ -10,7 +10,7 @@ use reqwest::header::{self, HeaderMap};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::models::users::UserBuilder;
+use crate::models::users::UserClient;
 use crate::utilities::errors::RobloxAPIResponseErrors;
 
 pub(crate) struct HttpRequest<'a, T: Serialize> {
@@ -77,8 +77,8 @@ impl Robolt {
         self.authenticated = false;
     }
 
-    pub fn users(&self) -> UserBuilder {
-        UserBuilder::from(Rc::clone(&self.client))
+    pub fn users(&self) -> UserClient {
+        UserClient::from(Rc::clone(&self.client))
     }
 
     pub fn is_authenticated(&self) -> bool {
