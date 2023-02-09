@@ -1,6 +1,7 @@
 use serde::Deserialize;
 
-pub mod users;
+mod users;
+mod auth;
 
 struct RobloxAPIEndpoints<T> {
     users: T,
