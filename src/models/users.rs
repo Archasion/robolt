@@ -68,7 +68,7 @@ impl Robolt {
         ids: Vec<u64>,
         exclude_banned: bool,
     ) -> Result<Vec<PartialUser>, String> {
-        let post = FetchMany {
+        let post = SearchById {
             user_ids: ids,
             exclude_banned_users: exclude_banned,
         };
@@ -79,7 +79,7 @@ impl Robolt {
             body: Some(&post),
         };
 
-        self.request::<FetchMany, DataResponse<PartialUser>>(req)
+        self.request::<SearchById, DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
@@ -88,7 +88,7 @@ impl Robolt {
         usernames: Vec<&str>,
         exclude_banned: bool,
     ) -> Result<Vec<PartialUser>, String> {
-        let post = FindMany {
+        let post = SearchByUsername {
             exclude_banned_users: exclude_banned,
             usernames,
         };
@@ -99,7 +99,7 @@ impl Robolt {
             body: Some(&post),
         };
 
-        self.request::<FindMany, DataResponse<PartialUser>>(req)
+        self.request::<SearchByUsername, DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
@@ -140,14 +140,14 @@ pub struct PartialUser {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct FetchMany {
+struct SearchById {
     exclude_banned_users: bool,
     user_ids: Vec<u64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct FindMany<'a> {
+struct SearchByUsername<'a> {
     exclude_banned_users: bool,
     usernames: Vec<&'a str>,
 }
