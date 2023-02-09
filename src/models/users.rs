@@ -16,7 +16,7 @@ impl Robolt {
         self.request::<(), User>(req)
     }
 
-    pub fn authenticated_user(&self) -> Result<PartialUser, String> {
+    pub fn user(&self) -> Result<PartialUser, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!("{}/v1/users/authenticated", ENDPOINTS.users),
