@@ -77,7 +77,7 @@ impl Robolt {
         self.authenticated
     }
 
-    pub(crate) fn request<U, T>(&self, data: HttpRequest<'_, U>) -> Result<T, String>
+    pub(crate) fn request<U, T>(&self, data: HttpRequest<U>) -> Result<T, String>
         where
             T: DeserializeOwned,
             U: Serialize,
