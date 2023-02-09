@@ -1,8 +1,6 @@
 #![allow(dead_code)]
 
-use std::cell::RefCell;
 use std::error::Error;
-use std::rc::Rc;
 
 use reqwest::{Method, StatusCode};
 use reqwest::blocking::Client;
@@ -10,7 +8,6 @@ use reqwest::header::{self, HeaderMap};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::models::users::UserClient;
 use crate::utilities::errors::RobloxAPIResponseErrors;
 
 pub(crate) struct HttpRequest<'a, T: Serialize> {
@@ -20,7 +17,7 @@ pub(crate) struct HttpRequest<'a, T: Serialize> {
 }
 
 pub struct Robolt {
-    client: Rc<RefCell<Client>>,
+    pub(crate) client: Client,
     authenticated: bool,
 }
 
@@ -33,7 +30,7 @@ impl Default for Robolt {
 impl Robolt {
     pub fn new() -> Self {
         Self {
-            client: Rc::new(RefCell::new(Client::new())),
+            client: Client::new(),
             authenticated: false,
         }
     }
@@ -61,46 +58,32 @@ impl Robolt {
 
         headers.insert("X_CSRF_TOKEN", csrf_token.clone());
 
-        let authenticated_client = Client::builder()
+        self.client = Client::builder()
             .default_headers(headers)
             .cookie_store(true)
             .build()?;
 
-        self.client.replace(authenticated_client);
         self.authenticated = true;
 
         Ok(())
     }
 
     pub fn logout(&mut self) {
-        self.client.replace(Client::new());
+        self.client = Client::new();
         self.authenticated = false;
-    }
-
-    pub fn users(&self) -> UserClient {
-        UserClient::from(Rc::clone(&self.client))
     }
 
     pub fn is_authenticated(&self) -> bool {
         self.authenticated
     }
-}
 
-pub(crate) trait BorrowClient {
-    fn request<U, T>(&self, data: HttpRequest<'_, U>) -> Result<T, String>
-        where
-            T: DeserializeOwned,
-            U: Serialize;
-}
-
-impl BorrowClient for RefCell<Client> {
-    fn request<U, T>(&self, data: HttpRequest<'_, U>) -> Result<T, String>
+    pub(crate) fn request<U, T>(&self, data: HttpRequest<'_, U>) -> Result<T, String>
         where
             T: DeserializeOwned,
             U: Serialize,
     {
         let url = format!("https://{}", data.endpoint);
-        let mut builder = self.borrow().request(data.method, url);
+        let mut builder = self.client.request(data.method, url);
 
         if let Some(body) = data.body {
             builder = builder.json(body);

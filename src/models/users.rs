@@ -1,53 +1,42 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-
-use reqwest::blocking::Client;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
 use crate::models::{DataResponse, ENDPOINTS};
-use crate::utilities::client::{BorrowClient, HttpRequest};
+use crate::Robolt;
+use crate::utilities::client::HttpRequest;
 
-pub struct UserClient {
-    pub(crate) client: Rc<RefCell<Client>>,
-}
-
-impl UserClient {
-    pub(crate) fn from(client: Rc<RefCell<Client>>) -> Self {
-        Self { client }
-    }
-
-    pub fn fetch(&self, id: u64) -> Result<User, String> {
+impl Robolt {
+    pub fn fetch_user(&self, id: u64) -> Result<User, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!("{}/v1/users/{}", ENDPOINTS.users, id),
             body: None,
         };
 
-        self.client.request::<(), User>(req)
+        self.request::<(), User>(req)
     }
 
-    pub fn authenticated(&self) -> Result<PartialUser, String> {
+    pub fn authenticated_user(&self) -> Result<PartialUser, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!("{}/v1/users/authenticated", ENDPOINTS.users),
             body: None,
         };
 
-        self.client.request::<(), PartialUser>(req)
+        self.request::<(), PartialUser>(req)
     }
 
-    pub fn partial(&self, id: u64) -> Result<PartialUser, String> {
+    pub fn partial_user(&self, id: u64) -> Result<PartialUser, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!("{}/v1/users/{}", ENDPOINTS.users, id),
             body: None,
         };
 
-        self.client.request::<(), PartialUser>(req)
+        self.request::<(), PartialUser>(req)
     }
 
-    pub fn id(&self, username: &str) -> Result<u64, String> {
+    pub fn user_id(&self, username: &str) -> Result<u64, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!(
@@ -57,10 +46,10 @@ impl UserClient {
             body: None,
         };
 
-        self.client.request::<(), UserId>(req).map(|res| res.id)
+        self.request::<(), UserId>(req).map(|res| res.id)
     }
 
-    pub fn search(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, String> {
+    pub fn search_users(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!(
@@ -70,12 +59,11 @@ impl UserClient {
             body: None,
         };
 
-        self.client
-            .request::<(), DataResponse<PartialUser>>(req)
+        self.request::<(), DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
-    pub fn fetch_many(
+    pub fn fetch_users(
         &self,
         ids: Vec<u64>,
         exclude_banned: bool,
@@ -91,12 +79,11 @@ impl UserClient {
             body: Some(&post),
         };
 
-        self.client
-            .request::<FetchMany, DataResponse<PartialUser>>(req)
+        self.request::<FetchMany, DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
-    pub fn find_many(
+    pub fn find_users(
         &self,
         usernames: Vec<&str>,
         exclude_banned: bool,
@@ -112,8 +99,7 @@ impl UserClient {
             body: Some(&post),
         };
 
-        self.client
-            .request::<FindMany, DataResponse<PartialUser>>(req)
+        self.request::<FindMany, DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
@@ -124,8 +110,7 @@ impl UserClient {
             body: None,
         };
 
-        self.client
-            .request::<(), DataResponse<String>>(req)
+        self.request::<(), DataResponse<String>>(req)
             .map(|res| res.data)
     }
 }
