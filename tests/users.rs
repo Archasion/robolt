@@ -11,7 +11,7 @@ fn fetch_user_by_id() {
 #[test]
 fn fetch_partial_user_by_id() {
     let client = Robolt::new();
-    assert_ok!(client.partial_user(1));
+    assert_ok!(client.fetch_partial_user(1));
 }
 
 #[test]

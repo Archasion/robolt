@@ -26,7 +26,7 @@ impl Robolt {
         self.request::<(), PartialUser>(req)
     }
 
-    pub fn partial_user(&self, id: u64) -> Result<PartialUser, String> {
+    pub fn fetch_partial_user(&self, id: u64) -> Result<PartialUser, String> {
         let req = HttpRequest {
             method: Method::GET,
             endpoint: format!("{}/v1/users/{}", ENDPOINTS.users, id),
