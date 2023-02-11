@@ -50,10 +50,9 @@ impl Robolt {
         if !status.is_success() {
             let err_res = res
                 .json::<RobloxAPIResponseErrors>()
-                .map_err(|e| e.to_string())?;
+                .map_err(|_| status.to_string())?;
 
             let err = err_res.errors.first().ok_or(status.to_string())?;
-
             return Err(err.message.clone());
         }
 
