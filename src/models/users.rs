@@ -79,7 +79,7 @@ impl Robolt {
             body: Some(&post),
         };
 
-        self.request::<SearchById, DataResponse<PartialUser>>(req)
+        self.request::<_, DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
@@ -99,7 +99,7 @@ impl Robolt {
             body: Some(&post),
         };
 
-        self.request::<SearchByUsername, DataResponse<PartialUser>>(req)
+        self.request::<_, DataResponse<PartialUser>>(req)
             .map(|res| res.data)
     }
 
