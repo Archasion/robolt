@@ -16,6 +16,12 @@ impl Robolt {
             .map(|res| res.data)
     }
 
+    pub fn fetch_user_badges(&self, id: u64) -> Result<Vec<Badge>, String> {
+        self.request_builder(format!("{}/v1/users/{}/badges?limit=100", ENDPOINTS.badges, id))
+            .send::<DataResponse<Badge>>()
+            .map(|res| res.data)
+    }
+
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
         BadgeUpdateBuilder::new(id, self)
     }
@@ -89,8 +95,7 @@ pub struct Badge {
     pub created: String,
     pub updated: String,
     pub statistics: BadgeAwardStatistics,
-    #[serde(rename = "awardingUniverse")]
-    pub awarding_game: AwardingGame,
+    pub awarding_universe: Option<AwardingUniverse>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -103,7 +108,7 @@ pub struct BadgeAwardStatistics {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AwardingGame {
+pub struct AwardingUniverse {
     pub id: u64,
     pub name: String,
     pub root_place_id: u64,

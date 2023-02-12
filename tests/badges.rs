@@ -13,3 +13,9 @@ fn fetch_game_badges() {
     let client = Robolt::new();
     assert_ok!(client.fetch_game_badges(2680623874));
 }
+
+#[test]
+fn fetch_user_badges() {
+    let client = Robolt::new();
+    assert_ok!(client.fetch_user_badges(2));
+}
