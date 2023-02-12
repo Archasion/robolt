@@ -45,8 +45,8 @@ impl Robolt {
         }
 
         let res = builder.send().map_err(|e| e.to_string())?;
-
         let status = res.status();
+
         if !status.is_success() {
             let err_res = res
                 .json::<RobloxAPIResponseErrors>()
