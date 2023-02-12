@@ -3,63 +3,35 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::Robolt;
-use crate::utilities::client::HttpRequest;
 
 impl Robolt {
     pub fn fetch_user(&self, id: u64) -> Result<User, String> {
-        let req = HttpRequest {
-            method: Method::GET,
-            endpoint: format!("{}/v1/users/{}", ENDPOINTS.users, id),
-            body: None,
-        };
-
-        self.request::<(), User>(req)
+        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id)).send()
     }
 
     pub fn user(&self) -> Result<PartialUser, String> {
-        let req = HttpRequest {
-            method: Method::GET,
-            endpoint: format!("{}/v1/users/authenticated", ENDPOINTS.users),
-            body: None,
-        };
-
-        self.request::<(), PartialUser>(req)
+        self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users)).send()
     }
 
     pub fn fetch_partial_user(&self, id: u64) -> Result<PartialUser, String> {
-        let req = HttpRequest {
-            method: Method::GET,
-            endpoint: format!("{}/v1/users/{}", ENDPOINTS.users, id),
-            body: None,
-        };
-
-        self.request::<(), PartialUser>(req)
+        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id)).send()
     }
 
     pub fn user_id(&self, username: &str) -> Result<u64, String> {
-        let req = HttpRequest {
-            method: Method::GET,
-            endpoint: format!(
-                "{}/users/get-by-username?username={}",
-                ENDPOINTS.base, username
-            ),
-            body: None,
-        };
-
-        self.request::<(), UserId>(req).map(|res| res.id)
+        self.request_builder(format!(
+            "{}/users/get-by-username?username={}",
+            ENDPOINTS.base, username
+        ))
+            .send::<UserId>()
+            .map(|res| res.id)
     }
 
     pub fn search_users(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, String> {
-        let req = HttpRequest {
-            method: Method::GET,
-            endpoint: format!(
-                "{}/v1/users/search?keyword={}&limit={}",
-                ENDPOINTS.users, keyword, limit
-            ),
-            body: None,
-        };
-
-        self.request::<(), DataResponse<PartialUser>>(req)
+        self.request_builder(format!(
+            "{}/v1/users/search?keyword={}&limit={}",
+            ENDPOINTS.users, keyword, limit
+        ))
+            .send::<DataResponse<PartialUser>>()
             .map(|res| res.data)
     }
 
@@ -73,13 +45,9 @@ impl Robolt {
             exclude_banned_users: exclude_banned,
         };
 
-        let req = HttpRequest {
-            method: Method::POST,
-            endpoint: format!("{}/v1/users", ENDPOINTS.users),
-            body: Some(&post),
-        };
-
-        self.request::<_, DataResponse<PartialUser>>(req)
+        self.request_builder(format!("{}/v1/users", ENDPOINTS.users))
+            .method(Method::POST)
+            .send_body::<_, DataResponse<PartialUser>>(Some(&post))
             .map(|res| res.data)
     }
 
@@ -93,24 +61,15 @@ impl Robolt {
             usernames,
         };
 
-        let req = HttpRequest {
-            method: Method::POST,
-            endpoint: format!("{}/v1/usernames/users", ENDPOINTS.users),
-            body: Some(&post),
-        };
-
-        self.request::<_, DataResponse<PartialUser>>(req)
+        self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
+            .method(Method::POST)
+            .send_body::<_, DataResponse<PartialUser>>(Some(&post))
             .map(|res| res.data)
     }
 
     pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
-        let req = HttpRequest {
-            method: Method::GET,
-            endpoint: format!("{}/v1/users/{}/username-history", ENDPOINTS.users, id),
-            body: None,
-        };
-
-        self.request::<(), DataResponse<String>>(req)
+        self.request_builder(format!("{}/v1/users/{}/username-history", ENDPOINTS.users, id))
+            .send::<DataResponse<String>>()
             .map(|res| res.data)
     }
 }

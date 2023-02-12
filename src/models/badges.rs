@@ -3,17 +3,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::ENDPOINTS;
 use crate::Robolt;
-use crate::utilities::client::HttpRequest;
 
 impl Robolt {
     pub fn fetch_badge(&self, id: u64) -> Result<Badge, String> {
-        let req = HttpRequest {
-            method: Method::GET,
-            endpoint: format!("{}/v1/badges/{}", ENDPOINTS.badges, id),
-            body: None,
-        };
-
-        self.request::<(), Badge>(req)
+        self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, id)).send()
     }
 
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
@@ -21,13 +14,9 @@ impl Robolt {
     }
 
     pub fn remove_badge(&self, id: u64) -> Result<(), String> {
-        let req = HttpRequest {
-            method: Method::DELETE,
-            endpoint: format!("{}/v1/user/badges/{}", ENDPOINTS.badges, id),
-            body: None,
-        };
-
-        self.request::<(), serde_json::Value>(req).map(|_| ())
+        self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, id))
+            .method(Method::DELETE)
+            .send()
     }
 }
 
@@ -58,13 +47,9 @@ impl<'a> BadgeUpdateBuilder<'a> {
     }
 
     pub fn update(self) -> Result<(), String> {
-        let req = HttpRequest {
-            method: Method::PATCH,
-            endpoint: format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id),
-            body: Some(&self),
-        };
-
-        self.client.request::<_, serde_json::Value>(req).map(|_| ())
+        self.client.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
+            .method(Method::PATCH)
+            .send_body(Some(self))
     }
 }
 
