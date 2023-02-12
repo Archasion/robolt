@@ -11,25 +11,38 @@ impl Robolt {
     }
 
     pub fn fetch_game_badges(&self, id: u64) -> Result<Vec<Badge>, String> {
-        self.request_builder(format!("{}/v1/universes/{}/badges?limit=100", ENDPOINTS.badges, id))
+        self.request_builder(format!(
+            "{}/v1/universes/{}/badges?limit=100",
+            ENDPOINTS.badges, id
+        ))
             .send::<DataResponse<Badge>>()
             .map(|res| res.data)
     }
 
     pub fn fetch_user_badges(&self, id: u64) -> Result<Vec<Badge>, String> {
-        self.request_builder(format!("{}/v1/users/{}/badges?limit=100", ENDPOINTS.badges, id))
+        self.request_builder(format!(
+            "{}/v1/users/{}/badges?limit=100",
+            ENDPOINTS.badges, id
+        ))
             .send::<DataResponse<Badge>>()
             .map(|res| res.data)
     }
 
-    pub fn fetch_user_awarded_badge_dates(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<Vec<BadgeAwardDate>, String> {
+    pub fn fetch_user_awarded_badge_dates(
+        &self,
+        user_id: u64,
+        badge_ids: Vec<u64>,
+    ) -> Result<Vec<BadgeAwardDate>, String> {
         let badge_ids = badge_ids
             .iter()
             .map(|id| id.to_string())
             .collect::<Vec<String>>()
             .join(",");
 
-        self.request_builder(format!("{}/v1/users/{}/badges/awarded-dates?badgeIds={}", ENDPOINTS.badges, user_id, badge_ids))
+        self.request_builder(format!(
+            "{}/v1/users/{}/badges/awarded-dates?badgeIds={}",
+            ENDPOINTS.badges, user_id, badge_ids
+        ))
             .send::<DataResponse<BadgeAwardDate>>()
             .map(|res| res.data)
     }
