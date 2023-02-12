@@ -19,6 +19,16 @@ impl Robolt {
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
         BadgeUpdateBuilder::new(id, self)
     }
+
+    pub fn remove_badge(&self, id: u64) -> Result<(), String> {
+        let req = HttpRequest {
+            method: Method::DELETE,
+            endpoint: format!("{}/v1/user/badges/{}", ENDPOINTS.badges, id),
+            body: None,
+        };
+
+        self.request::<(), serde_json::Value>(req).map(|_| ())
+    }
 }
 
 impl<'a> BadgeUpdateBuilder<'a> {
