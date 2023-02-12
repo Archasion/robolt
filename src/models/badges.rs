@@ -6,7 +6,8 @@ use crate::Robolt;
 
 impl Robolt {
     pub fn fetch_badge(&self, id: u64) -> Result<Badge, String> {
-        self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, id)).send()
+        self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, id))
+            .send()
     }
 
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
@@ -47,7 +48,8 @@ impl<'a> BadgeUpdateBuilder<'a> {
     }
 
     pub fn update(self) -> Result<(), String> {
-        self.client.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
+        self.client
+            .request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
             .method(Method::PATCH)
             .send_body(Some(self))
     }

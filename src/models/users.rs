@@ -6,15 +6,18 @@ use crate::Robolt;
 
 impl Robolt {
     pub fn fetch_user(&self, id: u64) -> Result<User, String> {
-        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id)).send()
+        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id))
+            .send()
     }
 
     pub fn user(&self) -> Result<PartialUser, String> {
-        self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users)).send()
+        self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
+            .send()
     }
 
     pub fn fetch_partial_user(&self, id: u64) -> Result<PartialUser, String> {
-        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id)).send()
+        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id))
+            .send()
     }
 
     pub fn user_id(&self, username: &str) -> Result<u64, String> {
@@ -68,7 +71,10 @@ impl Robolt {
     }
 
     pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
-        self.request_builder(format!("{}/v1/users/{}/username-history", ENDPOINTS.users, id))
+        self.request_builder(format!(
+            "{}/v1/users/{}/username-history",
+            ENDPOINTS.users, id
+        ))
             .send::<DataResponse<String>>()
             .map(|res| res.data)
     }
