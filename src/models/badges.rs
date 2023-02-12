@@ -1,13 +1,19 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
-use crate::models::ENDPOINTS;
+use crate::models::{DataResponse, ENDPOINTS};
 use crate::Robolt;
 
 impl Robolt {
     pub fn fetch_badge(&self, id: u64) -> Result<Badge, String> {
         self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, id))
             .send()
+    }
+
+    pub fn fetch_game_badges(&self, id: u64) -> Result<Vec<Badge>, String> {
+        self.request_builder(format!("{}/v1/universes/{}/badges?limit=100", ENDPOINTS.badges, id))
+            .send::<DataResponse<Badge>>()
+            .map(|res| res.data)
     }
 
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
@@ -83,7 +89,8 @@ pub struct Badge {
     pub created: String,
     pub updated: String,
     pub statistics: BadgeAwardStatistics,
-    pub awarding_universe: AwardingUniverse,
+    #[serde(rename = "awardingUniverse")]
+    pub awarding_game: AwardingGame,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -96,7 +103,7 @@ pub struct BadgeAwardStatistics {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AwardingUniverse {
+pub struct AwardingGame {
     pub id: u64,
     pub name: String,
     pub root_place_id: u64,
