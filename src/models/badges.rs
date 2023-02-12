@@ -22,6 +22,18 @@ impl Robolt {
             .map(|res| res.data)
     }
 
+    pub fn fetch_user_awarded_badge_dates(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<Vec<BadgeAwardDate>, String> {
+        let badge_ids = badge_ids
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<String>>()
+            .join(",");
+
+        self.request_builder(format!("{}/v1/users/{}/badges/awarded-dates?badgeIds={}", ENDPOINTS.badges, user_id, badge_ids))
+            .send::<DataResponse<BadgeAwardDate>>()
+            .map(|res| res.data)
+    }
+
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
         BadgeUpdateBuilder::new(id, self)
     }
@@ -79,6 +91,12 @@ pub struct BadgeUpdateBuilder<'a> {
     description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     enabled: Option<bool>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+pub struct BadgeAwardDate {
+    pub badge_id: u64,
+    pub awarded_date: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]

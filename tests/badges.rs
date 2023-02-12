@@ -19,3 +19,9 @@ fn fetch_user_badges() {
     let client = Robolt::new();
     assert_ok!(client.fetch_user_badges(2));
 }
+
+#[test]
+fn fetch_user_awarded_badge_dates() {
+    let client = Robolt::new();
+    assert_ok!(client.fetch_user_awarded_badge_dates(2, vec![1]));
+}
