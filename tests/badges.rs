@@ -4,6 +4,6 @@ use robolt::Robolt;
 
 #[test]
 fn fetch_badge_by_id() {
-    let roblox = Robolt::new();
-    assert_ok!(roblox.fetch_badge(2124789031));
+    let client = Robolt::new();
+    assert_ok!(client.fetch_badge(2124789031));
 }
