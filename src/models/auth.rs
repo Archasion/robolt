@@ -28,7 +28,7 @@ impl Robolt {
             .get("x-csrf-token")
             .ok_or("No CSRF token found")?;
 
-        headers.insert("X_CSRF_TOKEN", csrf_token.clone());
+        headers.insert("X-CSRF-TOKEN", csrf_token.clone());
 
         self.client = Client::builder()
             .default_headers(headers)
