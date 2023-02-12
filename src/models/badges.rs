@@ -1,5 +1,5 @@
 use reqwest::Method;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::ENDPOINTS;
 use crate::Robolt;
@@ -15,6 +15,61 @@ impl Robolt {
 
         self.request::<(), Badge>(req)
     }
+
+    pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
+        BadgeUpdateBuilder::new(id, self)
+    }
+}
+
+impl<'a> BadgeUpdateBuilder<'a> {
+    fn new(id: u64, client: &'a Robolt) -> Self {
+        Self {
+            id,
+            client,
+            name: None,
+            description: None,
+            enabled: None,
+        }
+    }
+
+    pub fn name(mut self, name: &str) -> Self {
+        self.name = Some(name.to_string());
+        self
+    }
+
+    pub fn description(mut self, description: &str) -> Self {
+        self.description = Some(description.to_string());
+        self
+    }
+
+    pub fn enabled(mut self, enabled: bool) -> Self {
+        self.enabled = Some(enabled);
+        self
+    }
+
+    pub fn update(self) -> Result<(), String> {
+        let req = HttpRequest {
+            method: Method::PATCH,
+            endpoint: format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id),
+            body: Some(&self),
+        };
+
+        self.client.request::<_, serde_json::Value>(req).map(|_| ())
+    }
+}
+
+#[derive(Serialize)]
+pub struct BadgeUpdateBuilder<'a> {
+    #[serde(skip_serializing)]
+    id: u64,
+    #[serde(skip_serializing)]
+    client: &'a Robolt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    enabled: Option<bool>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
