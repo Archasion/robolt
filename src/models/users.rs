@@ -146,21 +146,21 @@ pub struct PartialUser {
     pub id: u64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct SearchById {
     exclude_banned_users: bool,
     user_ids: Vec<u64>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct SearchByUsername<'a> {
     exclude_banned_users: bool,
     usernames: Vec<&'a str>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct UserId {
     id: u64,
