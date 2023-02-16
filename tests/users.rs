@@ -37,3 +37,10 @@ fn search_users_by_ids() {
     let client = Robolt::new();
     assert_ok!(client.fetch_users(vec![1, 2, 3], false));
 }
+
+#[test]
+fn fetch_roblox_badges_by_user_id() {
+    let client = Robolt::new();
+    assert_ok!(client.fetch_roblox_badges(1));
+    dbg!(client.fetch_roblox_badges(1).unwrap());
+}

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
@@ -78,6 +80,42 @@ impl Robolt {
             .send::<DataResponse<String>>()
             .map(|res| res.data)
     }
+
+    pub fn fetch_roblox_badges(&self, id: u64) -> Result<Vec<RobloxBadge>, String> {
+        self.request_builder(format!(
+            "{}/badges/roblox?userId={}",
+            ENDPOINTS.web, id
+        ))
+            .send::<RobloxBadgesResult>()
+            .map(|res| {
+                res.roblox_badges
+                    .into_iter()
+                    .map(|badge| RobloxBadge::from_str(&badge.name).unwrap())
+                    .collect()
+            })
+    }
+}
+
+impl FromStr for RobloxBadge {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Welcome To The Club" => Ok(RobloxBadge::WelcomeToTheClub),
+            "Administrator" => Ok(RobloxBadge::Administrator),
+            "Veteran" => Ok(RobloxBadge::Veteran),
+            "Friendship" => Ok(RobloxBadge::Friendship),
+            "Ambassador" => Ok(RobloxBadge::Ambassador),
+            "Inviter" => Ok(RobloxBadge::Inviter),
+            "Homestead" => Ok(RobloxBadge::Homestead),
+            "Bricksmith" => Ok(RobloxBadge::Bricksmith),
+            "Official Model Maker" => Ok(RobloxBadge::OfficialModelMaker),
+            "Combat Initiation" => Ok(RobloxBadge::CombatInitiation),
+            "Warrior" => Ok(RobloxBadge::Warrior),
+            "Bloxxer" => Ok(RobloxBadge::Bloxxer),
+            _ => Err(format!("Unknown badge: {}", s)),
+        }
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -121,4 +159,32 @@ struct SearchByUsername<'a> {
 #[serde(rename_all = "PascalCase")]
 struct UserId {
     id: u64,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "PascalCase")]
+struct RobloxBadgesResult {
+    roblox_badges: Vec<RobloxBadgeResult>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "PascalCase")]
+struct RobloxBadgeResult {
+    name: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum RobloxBadge {
+    WelcomeToTheClub,
+    Administrator,
+    Veteran,
+    Friendship,
+    Ambassador,
+    Inviter,
+    Homestead,
+    Bricksmith,
+    OfficialModelMaker,
+    CombatInitiation,
+    Warrior,
+    Bloxxer,
 }
