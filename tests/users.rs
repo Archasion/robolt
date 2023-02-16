@@ -17,13 +17,13 @@ fn fetch_partial_user_by_id() {
 #[test]
 fn find_id_by_username() {
     let client = Robolt::new();
-    assert_ok!(client.user_id("roblox"));
+    assert_ok!(client.fetch_user_id("roblox"));
 }
 
 #[test]
 fn fetch_username_history() {
     let client = Robolt::new();
-    assert_ok!(client.username_history(1));
+    assert_ok!(client.fetch_username_history(1));
 }
 
 #[test]

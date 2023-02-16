@@ -12,7 +12,7 @@ impl Robolt {
             .send()
     }
 
-    pub fn user(&self) -> Result<PartialUser, String> {
+    pub fn authenticated_user(&self) -> Result<PartialUser, String> {
         self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
             .send()
     }
@@ -22,7 +22,7 @@ impl Robolt {
             .send()
     }
 
-    pub fn user_id(&self, username: &str) -> Result<u64, String> {
+    pub fn fetch_user_id(&self, username: &str) -> Result<u64, String> {
         self.request_builder(format!(
             "{}/users/get-by-username?username={}",
             ENDPOINTS.base, username
@@ -56,7 +56,7 @@ impl Robolt {
             .map(|res| res.data)
     }
 
-    pub fn find_users(
+    pub fn fetch_users_by_username(
         &self,
         usernames: Vec<&str>,
         exclude_banned: bool,
@@ -72,7 +72,7 @@ impl Robolt {
             .map(|res| res.data)
     }
 
-    pub fn username_history(&self, id: u64) -> Result<Vec<String>, String> {
+    pub fn fetch_username_history(&self, id: u64) -> Result<Vec<String>, String> {
         self.request_builder(format!(
             "{}/v1/users/{}/username-history",
             ENDPOINTS.users, id
