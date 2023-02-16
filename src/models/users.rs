@@ -94,6 +94,11 @@ impl Robolt {
                     .collect()
             })
     }
+
+    pub fn has_roblox_badge(&self, id: u64, badge: RobloxBadge) -> Result<bool, String> {
+        self.fetch_roblox_badges(id)
+            .map(|badges| badges.contains(&badge))
+    }
 }
 
 impl FromStr for RobloxBadge {

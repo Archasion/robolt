@@ -1,8 +1,8 @@
 use serde::Deserialize;
 
-mod auth;
+pub(crate) mod users;
 mod badges;
-mod users;
+mod auth;
 
 struct RobloxAPIEndpoints<T> {
     badges: T,
