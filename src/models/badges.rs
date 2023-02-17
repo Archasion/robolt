@@ -49,6 +49,23 @@ impl Robolt {
             .map(|res| res.data)
     }
 
+    pub fn has_badge(&self, user_id: u64, badge_id: u64) -> Result<bool, String> {
+        self.fetch_user_awarded_badge_dates(user_id, vec![badge_id])
+            .map(|badges| badges.len() > 0)
+    }
+
+    pub fn has_badges(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
+        let badge_ids_len = badge_ids.len();
+
+        self.fetch_user_awarded_badge_dates(user_id, badge_ids)
+            .map(|badges| badges.len() == badge_ids_len)
+    }
+
+    pub fn has_badges_some(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
+        self.fetch_user_awarded_badge_dates(user_id, badge_ids)
+            .map(|badges| badges.len() > 0)
+    }
+
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
         BadgeUpdateBuilder::new(id, self)
     }
@@ -147,6 +164,7 @@ pub struct BadgeUpdateBuilder<'a> {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BadgeAwardDate {
     pub badge_id: u64,
     pub awarded_date: String,
