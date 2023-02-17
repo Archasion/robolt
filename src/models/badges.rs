@@ -60,10 +60,7 @@ impl Robolt {
     }
 
     pub fn fetch_roblox_badges(&self, id: u64) -> Result<Vec<RobloxBadge>, String> {
-        self.request_builder(format!(
-            "{}/badges/roblox?userId={}",
-            ENDPOINTS.web, id
-        ))
+        self.request_builder(format!("{}/badges/roblox?userId={}", ENDPOINTS.web, id))
             .send::<RobloxBadgesResult>()
             .map(|res| {
                 res.roblox_badges
