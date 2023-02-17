@@ -51,7 +51,9 @@ fn has_badges_any() {
 #[test]
 fn has_roblox_badge() {
     let client = Robolt::new();
-    assert!(client.has_roblox_badge(1, RobloxBadge::Administrator).unwrap());
+    assert!(client
+        .has_roblox_badge(1, RobloxBadge::Administrator)
+        .unwrap());
 }
 
 #[test]
@@ -70,10 +72,7 @@ fn has_roblox_badges() {
 #[test]
 fn has_roblox_badges_any() {
     let client = Robolt::new();
-    let badges = vec![
-        RobloxBadge::Administrator,
-        RobloxBadge::Ambassador,
-    ];
+    let badges = vec![RobloxBadge::Administrator, RobloxBadge::Ambassador];
 
     assert!(client.has_roblox_badges_any(1, badges).unwrap());
 }

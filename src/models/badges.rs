@@ -77,7 +77,10 @@ impl Robolt {
     }
 
     pub fn fetch_roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, String> {
-        self.request_builder(format!("{}/badges/roblox?userId={}", ENDPOINTS.web, user_id))
+        self.request_builder(format!(
+            "{}/badges/roblox?userId={}",
+            ENDPOINTS.web, user_id
+        ))
             .send::<RobloxBadgesResult>()
             .map(|res| {
                 res.roblox_badges
@@ -92,20 +95,22 @@ impl Robolt {
             .map(|owned_badges| owned_badges.contains(&badge))
     }
 
-    pub fn has_roblox_badges(&self, user_id: u64, badges: Vec<RobloxBadge>) -> Result<bool, String> {
+    pub fn has_roblox_badges(
+        &self,
+        user_id: u64,
+        badges: Vec<RobloxBadge>,
+    ) -> Result<bool, String> {
         self.fetch_roblox_badges(user_id)
-            .map(|owned_badges| badges
-                .iter()
-                .all(|badge| owned_badges.contains(badge))
-            )
+            .map(|owned_badges| badges.iter().all(|badge| owned_badges.contains(badge)))
     }
 
-    pub fn has_roblox_badges_any(&self, user_id: u64, badges: Vec<RobloxBadge>) -> Result<bool, String> {
+    pub fn has_roblox_badges_any(
+        &self,
+        user_id: u64,
+        badges: Vec<RobloxBadge>,
+    ) -> Result<bool, String> {
         self.fetch_roblox_badges(user_id)
-            .map(|owned_badges| badges
-                .iter()
-                .any(|badge| owned_badges.contains(badge))
-            )
+            .map(|owned_badges| badges.iter().any(|badge| owned_badges.contains(badge)))
     }
 }
 
