@@ -10,7 +10,7 @@ impl Robolt {
             .send()
     }
 
-    pub fn authenticated_user(&self) -> Result<PartialUser, String> {
+    pub fn fetch_current_user(&self) -> Result<PartialUser, String> {
         self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
             .send()
     }

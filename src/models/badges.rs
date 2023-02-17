@@ -30,11 +30,11 @@ impl Robolt {
             .map(|res| res.data)
     }
 
-    pub fn fetch_user_awarded_badge_dates(
+    pub fn fetch_awarded_timestamps(
         &self,
         user_id: u64,
         badge_ids: Vec<u64>,
-    ) -> Result<Vec<BadgeAwardDate>, String> {
+    ) -> Result<Vec<AwardedBadgeTimestamp>, String> {
         let badge_ids = badge_ids
             .iter()
             .map(|id| id.to_string())
@@ -45,24 +45,24 @@ impl Robolt {
             "{}/v1/users/{}/badges/awarded-dates?badgeIds={}",
             ENDPOINTS.badges, user_id, badge_ids
         ))
-            .send::<DataResponse<BadgeAwardDate>>()
+            .send::<DataResponse<AwardedBadgeTimestamp>>()
             .map(|res| res.data)
     }
 
     pub fn has_badge(&self, user_id: u64, badge_id: u64) -> Result<bool, String> {
-        self.fetch_user_awarded_badge_dates(user_id, vec![badge_id])
+        self.fetch_awarded_timestamps(user_id, vec![badge_id])
             .map(|badges| !badges.is_empty())
     }
 
     pub fn has_badges(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
         let badge_ids_len = badge_ids.len();
 
-        self.fetch_user_awarded_badge_dates(user_id, badge_ids)
+        self.fetch_awarded_timestamps(user_id, badge_ids)
             .map(|badges| badges.len() == badge_ids_len)
     }
 
     pub fn has_badges_any(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
-        self.fetch_user_awarded_badge_dates(user_id, badge_ids)
+        self.fetch_awarded_timestamps(user_id, badge_ids)
             .map(|badges| !badges.is_empty())
     }
 
@@ -186,7 +186,7 @@ pub struct BadgeUpdateBuilder<'a> {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct BadgeAwardDate {
+pub struct AwardedBadgeTimestamp {
     pub badge_id: u64,
     pub awarded_date: String,
 }
@@ -204,13 +204,13 @@ pub struct Badge {
     pub display_icon_image_id: u64,
     pub created: String,
     pub updated: String,
-    pub statistics: BadgeAwardStatistics,
+    pub statistics: BadgeStats,
     pub awarding_universe: Option<AwardingUniverse>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct BadgeAwardStatistics {
+pub struct BadgeStats {
     pub past_day_awarded_count: u64,
     pub awarded_count: u64,
     pub win_rate_percentage: f32,

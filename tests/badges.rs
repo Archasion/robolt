@@ -25,7 +25,7 @@ fn fetch_user_awarded_badge_dates() {
     let client = Robolt::new();
     let badges = vec![276292005, 275629737, 276292089];
 
-    assert_ok!(client.fetch_user_awarded_badge_dates(2, badges));
+    assert_ok!(client.fetch_awarded_timestamps(2, badges));
 }
 
 #[test]
