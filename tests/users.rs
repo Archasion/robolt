@@ -15,7 +15,7 @@ fn fetch_partial_user_by_id() {
 }
 
 #[test]
-fn find_id_by_username() {
+fn fetch_user_id_by_username() {
     let client = Robolt::new();
     assert_ok!(client.fetch_user_id("roblox"));
 }
