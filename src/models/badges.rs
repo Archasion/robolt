@@ -51,7 +51,7 @@ impl Robolt {
 
     pub fn has_badge(&self, user_id: u64, badge_id: u64) -> Result<bool, String> {
         self.fetch_user_awarded_badge_dates(user_id, vec![badge_id])
-            .map(|badges| badges.len() > 0)
+            .map(|badges| !badges.is_empty())
     }
 
     pub fn has_badges(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
@@ -63,7 +63,7 @@ impl Robolt {
 
     pub fn has_badges_any(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
         self.fetch_user_awarded_badge_dates(user_id, badge_ids)
-            .map(|badges| badges.len() > 0)
+            .map(|badges| !badges.is_empty())
     }
 
     pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
@@ -160,7 +160,7 @@ impl FromStr for RobloxBadge {
             "Combat Initiation" => Ok(RobloxBadge::CombatInitiation),
             "Warrior" => Ok(RobloxBadge::Warrior),
             "Bloxxer" => Ok(RobloxBadge::Bloxxer),
-            _ => Err(format!("Unknown badge: {}", s)),
+            _ => Err(format!("Unknown badge: {s}")),
         }
     }
 }
