@@ -7,15 +7,15 @@ use crate::models::{DataResponse, ENDPOINTS};
 use crate::Robolt;
 
 impl Robolt {
-    pub fn fetch_badge(&self, id: u64) -> Result<Badge, String> {
-        self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, id))
+    pub fn fetch_badge(&self, badge_id: u64) -> Result<Badge, String> {
+        self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, badge_id))
             .send()
     }
 
-    pub fn fetch_game_badges(&self, id: u64) -> Result<Vec<Badge>, String> {
+    pub fn fetch_game_badges(&self, universe_id: u64) -> Result<Vec<Badge>, String> {
         self.request_builder(format!(
             "{}/v1/universes/{}/badges?limit=100",
-            ENDPOINTS.badges, id
+            ENDPOINTS.badges, universe_id
         ))
             .send::<DataResponse<Badge>>()
             .map(|res| res.data)
@@ -66,12 +66,12 @@ impl Robolt {
             .map(|badges| !badges.is_empty())
     }
 
-    pub fn update_badge(&self, id: u64) -> BadgeUpdateBuilder {
-        BadgeUpdateBuilder::new(id, self)
+    pub fn update_badge(&self, badge_id: u64) -> BadgeUpdateBuilder {
+        BadgeUpdateBuilder::new(badge_id, self)
     }
 
-    pub fn remove_badge(&self, id: u64) -> Result<(), String> {
-        self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, id))
+    pub fn remove_badge(&self, badge_id: u64) -> Result<(), String> {
+        self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, badge_id))
             .method(Method::DELETE)
             .send()
     }

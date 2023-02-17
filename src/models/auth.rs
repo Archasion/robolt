@@ -7,9 +7,9 @@ use reqwest::StatusCode;
 use crate::Robolt;
 
 impl Robolt {
-    pub fn login(&mut self, cookie: String) -> Result<(), Box<dyn Error>> {
+    pub fn login(&mut self, roblox_cookie: String) -> Result<(), Box<dyn Error>> {
         let mut headers = HeaderMap::new();
-        let cookie = format!(".ROBLOSECURITY={cookie}");
+        let cookie = format!(".ROBLOSECURITY={roblox_cookie}");
 
         headers.insert(header::COOKIE, cookie.parse()?);
 

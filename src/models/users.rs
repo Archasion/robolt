@@ -5,8 +5,8 @@ use crate::models::{DataResponse, ENDPOINTS};
 use crate::Robolt;
 
 impl Robolt {
-    pub fn fetch_user(&self, id: u64) -> Result<User, String> {
-        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id))
+    pub fn fetch_user(&self, user_id: u64) -> Result<User, String> {
+        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
             .send()
     }
 
@@ -15,8 +15,8 @@ impl Robolt {
             .send()
     }
 
-    pub fn fetch_partial_user(&self, id: u64) -> Result<PartialUser, String> {
-        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, id))
+    pub fn fetch_partial_user(&self, user_id: u64) -> Result<PartialUser, String> {
+        self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
             .send()
     }
 
@@ -40,12 +40,12 @@ impl Robolt {
 
     pub fn fetch_users(
         &self,
-        ids: Vec<u64>,
+        user_ids: Vec<u64>,
         exclude_banned: bool,
     ) -> Result<Vec<PartialUser>, String> {
         let post = SearchById {
-            user_ids: ids,
             exclude_banned_users: exclude_banned,
+            user_ids,
         };
 
         self.request_builder(format!("{}/v1/users", ENDPOINTS.users))
