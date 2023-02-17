@@ -42,11 +42,15 @@ impl Robolt {
             U: Serialize,
     {
         let url = format!("https://{endpoint}");
-        let mut builder = self.client.request(method, url);
+        let builder = {
+            let mut builder = self.client.request(method, url);
 
-        if let Some(body) = &body {
-            builder = builder.json(body);
-        }
+            if let Some(body) = &body {
+                builder = builder.json(body);
+            }
+
+            builder
+        };
 
         let res = builder.send().map_err(|e| e.to_string())?;
         let status = res.status();
