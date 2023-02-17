@@ -50,3 +50,9 @@ fn check_for_roblox_badge() {
     let client = Robolt::new();
     assert_ok!(client.has_roblox_badge(1, RobloxBadge::Administrator));
 }
+
+#[test]
+fn validate_display_name() {
+    let client = Robolt::new();
+    assert_ok!(client.validate_display_name("test", "01-01-1999"));
+}

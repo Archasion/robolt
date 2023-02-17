@@ -78,6 +78,16 @@ impl Robolt {
             .send::<DataResponse<String>>()
             .map(|res| res.data)
     }
+
+    pub fn validate_display_name(&self, display_name: &str, date_of_birth: &str) -> Result<(), String> {
+        self.request_builder(format!(
+            "{}/v1/display-names/validate?displayName={}&birthdate={}",
+            ENDPOINTS.users, display_name, date_of_birth
+        ))
+            .send::<serde_json::Value>()?;
+
+        Ok(())
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
