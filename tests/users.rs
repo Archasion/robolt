@@ -1,6 +1,6 @@
 use tokio_test::assert_ok;
 
-use robolt::{RobloxBadge, Robolt};
+use robolt::Robolt;
 
 #[test]
 fn fetch_user_by_id() {
@@ -43,12 +43,6 @@ fn fetch_roblox_badges_by_user_id() {
     let client = Robolt::new();
     assert_ok!(client.fetch_roblox_badges(1));
     dbg!(client.fetch_roblox_badges(1).unwrap());
-}
-
-#[test]
-fn check_for_roblox_badge() {
-    let client = Robolt::new();
-    assert_ok!(client.has_roblox_badge(1, RobloxBadge::Administrator));
 }
 
 #[test]

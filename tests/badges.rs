@@ -1,6 +1,6 @@
 use tokio_test::assert_ok;
 
-use robolt::Robolt;
+use robolt::{RobloxBadge, Robolt};
 
 #[test]
 fn fetch_badge_by_id() {
@@ -41,9 +41,39 @@ fn has_badges() {
 }
 
 #[test]
-fn has_badges_some() {
+fn has_badges_any() {
     let client = Robolt::new();
     let badges = vec![276292005, 275629737, 2, 1];
 
-    assert!(client.has_badges_some(2, badges).unwrap());
+    assert!(client.has_badges_any(2, badges).unwrap());
+}
+
+#[test]
+fn has_roblox_badge() {
+    let client = Robolt::new();
+    assert!(client.has_roblox_badge(1, RobloxBadge::Administrator).unwrap());
+}
+
+#[test]
+fn has_roblox_badges() {
+    let client = Robolt::new();
+    let badges = vec![
+        RobloxBadge::Administrator,
+        RobloxBadge::Bloxxer,
+        RobloxBadge::Warrior,
+        RobloxBadge::Veteran,
+    ];
+
+    assert!(client.has_roblox_badges(1, badges).unwrap());
+}
+
+#[test]
+fn has_roblox_badges_any() {
+    let client = Robolt::new();
+    let badges = vec![
+        RobloxBadge::Administrator,
+        RobloxBadge::Ambassador,
+    ];
+
+    assert!(client.has_roblox_badges_any(1, badges).unwrap());
 }
