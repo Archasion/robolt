@@ -58,9 +58,46 @@ impl Robolt {
             .send::<DataResponse<User>>()
             .map(|res| res.data)
     }
+
+    pub fn my_friend_requests(&self, limit: u8) -> Result<Vec<FriendRequest>, String> {
+        self.request_builder(format!(
+            "{}/v1/my/friends/requests?limit={}",
+            ENDPOINTS.friends, limit
+        ))
+            .send::<DataResponse<FriendRequest>>()
+            .map(|res| res.data)
+    }
+
+    pub fn my_friend_count(&self) -> Result<u64, String> {
+        self.request_builder(format!(
+            "{}/v1/my/friends/count",
+            ENDPOINTS.friends
+        ))
+            .send::<CountResponse>()
+            .map(|res| res.count)
+    }
 }
 
 #[derive(Deserialize)]
 struct CountResponse {
     count: u64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FriendRequest {
+    pub friend_request: FriendRequestInfo,
+    pub mutual_friends_list: Vec<String>,
+    #[serde(flatten)]
+    pub user: User,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FriendRequestInfo {
+    pub sent_at: String,
+    pub sender_id: u64,
+    pub source_universe_id: Option<u64>,
+    pub origin_source_type: String,
+    pub contact_name: Option<String>,
 }

@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use tokio_test::assert_ok;
 
 use robolt::Robolt;
