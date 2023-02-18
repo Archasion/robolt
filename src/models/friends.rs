@@ -69,10 +69,7 @@ impl Robolt {
     }
 
     pub fn my_friend_count(&self) -> Result<u64, String> {
-        self.request_builder(format!(
-            "{}/v1/my/friends/count",
-            ENDPOINTS.friends
-        ))
+        self.request_builder(format!("{}/v1/my/friends/count", ENDPOINTS.friends))
             .send::<CountResponse>()
             .map(|res| res.count)
     }
