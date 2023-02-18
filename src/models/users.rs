@@ -99,7 +99,7 @@ impl Robolt {
 pub struct User {
     #[serde(rename = "name")]
     pub username: String,
-    pub description: String,
+    pub description: Option<String>,
     pub created: String,
     pub is_banned: bool,
     pub external_app_display_name: Option<String>,
