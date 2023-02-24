@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::Robolt;
+use crate::utilities::client::Authenticated;
 
-impl Robolt {
+impl<State> Robolt<State> {
     pub fn fetch_badge(&self, badge_id: u64) -> Result<Badge, String> {
         self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, badge_id))
             .send()
@@ -66,16 +67,6 @@ impl Robolt {
             .map(|badges| !badges.is_empty())
     }
 
-    pub fn update_badge(&self, badge_id: u64) -> BadgeUpdateBuilder {
-        BadgeUpdateBuilder::new(badge_id, self)
-    }
-
-    pub fn remove_badge(&self, badge_id: u64) -> Result<(), String> {
-        self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, badge_id))
-            .method(Method::DELETE)
-            .send()
-    }
-
     pub fn fetch_roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, String> {
         self.request_builder(format!(
             "{}/badges/roblox?userId={}",
@@ -114,8 +105,20 @@ impl Robolt {
     }
 }
 
+impl Robolt<Authenticated> {
+    pub fn update_badge(&self, badge_id: u64) -> BadgeUpdateBuilder {
+        BadgeUpdateBuilder::new(badge_id, self)
+    }
+
+    pub fn remove_badge(&self, badge_id: u64) -> Result<(), String> {
+        self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, badge_id))
+            .method(Method::DELETE)
+            .send()
+    }
+}
+
 impl<'a> BadgeUpdateBuilder<'a> {
-    fn new(id: u64, client: &'a Robolt) -> Self {
+    fn new(id: u64, client: &'a Robolt<Authenticated>) -> Self {
         Self {
             id,
             client,
@@ -175,7 +178,7 @@ pub struct BadgeUpdateBuilder<'a> {
     #[serde(skip_serializing)]
     id: u64,
     #[serde(skip_serializing)]
-    client: &'a Robolt,
+    client: &'a Robolt<Authenticated>,
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

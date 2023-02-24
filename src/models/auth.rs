@@ -1,13 +1,15 @@
 use std::error::Error;
+use std::marker::PhantomData;
 
 use reqwest::blocking::Client;
 use reqwest::header::{self, HeaderMap};
 use reqwest::StatusCode;
 
 use crate::Robolt;
+use crate::utilities::client::{Authenticated, Unauthenticated};
 
-impl Robolt {
-    pub fn login(&mut self, roblox_cookie: String) -> Result<(), Box<dyn Error>> {
+impl Robolt<Unauthenticated> {
+    pub fn login(self, roblox_cookie: String) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
         let mut headers = HeaderMap::new();
         let cookie = format!(".ROBLOSECURITY={roblox_cookie}");
 
@@ -30,22 +32,23 @@ impl Robolt {
 
         headers.insert("X-CSRF-TOKEN", csrf_token.clone());
 
-        self.client = Client::builder()
+        let client = Client::builder()
             .default_headers(headers)
             .cookie_store(true)
             .build()?;
 
-        self.authenticated = true;
-
-        Ok(())
+        Ok(Robolt {
+            state: PhantomData::<Authenticated>,
+            client,
+        })
     }
+}
 
-    pub fn logout(&mut self) {
-        self.client = Client::new();
-        self.authenticated = false;
-    }
-
-    pub fn is_authenticated(&self) -> bool {
-        self.authenticated
+impl Robolt<Authenticated> {
+    pub fn logout(self) -> Robolt<Unauthenticated> {
+        Robolt {
+            state: PhantomData::<Unauthenticated>,
+            client: Client::new(),
+        }
     }
 }

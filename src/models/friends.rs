@@ -3,8 +3,9 @@ use serde::Deserialize;
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::models::users::User;
 use crate::Robolt;
+use crate::utilities::client::Authenticated;
 
-impl Robolt {
+impl<State> Robolt<State> {
     pub fn count_followers(&self, user_id: u64) -> Result<u64, String> {
         self.request_builder(format!(
             "{}/v1/users/{}/followers/count",
@@ -58,7 +59,9 @@ impl Robolt {
             .send::<DataResponse<User>>()
             .map(|res| res.data)
     }
+}
 
+impl Robolt<Authenticated> {
     pub fn my_friend_requests(&self, limit: u8) -> Result<Vec<FriendRequest>, String> {
         self.request_builder(format!(
             "{}/v1/my/friends/requests?limit={}",
@@ -66,6 +69,12 @@ impl Robolt {
         ))
             .send::<DataResponse<FriendRequest>>()
             .map(|res| res.data)
+    }
+
+    pub fn my_friend_request_count(&self) -> Result<u64, String> {
+        self.request_builder(format!("{}/v1/user/friend-requests/count", ENDPOINTS.friends))
+            .send::<CountResponse>()
+            .map(|res| res.count)
     }
 
     pub fn my_friend_count(&self) -> Result<u64, String> {

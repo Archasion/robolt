@@ -3,15 +3,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::Robolt;
+use crate::utilities::client::Authenticated;
 
-impl Robolt {
+impl<State> Robolt<State> {
     pub fn fetch_user(&self, user_id: u64) -> Result<User, String> {
         self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
-            .send()
-    }
-
-    pub fn fetch_current_user(&self) -> Result<PartialUser, String> {
-        self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
             .send()
     }
 
@@ -54,22 +50,6 @@ impl Robolt {
             .map(|res| res.data)
     }
 
-    pub fn fetch_users_by_username(
-        &self,
-        usernames: Vec<&str>,
-        exclude_banned: bool,
-    ) -> Result<Vec<PartialUser>, String> {
-        let post = SearchByUsername {
-            exclude_banned_users: exclude_banned,
-            usernames,
-        };
-
-        self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
-            .method(Method::POST)
-            .send_body::<_, DataResponse<PartialUser>>(Some(&post))
-            .map(|res| res.data)
-    }
-
     pub fn fetch_username_history(&self, id: u64) -> Result<Vec<String>, String> {
         self.request_builder(format!(
             "{}/v1/users/{}/username-history",
@@ -91,6 +71,29 @@ impl Robolt {
             .send::<serde_json::Value>()?;
 
         Ok(())
+    }
+}
+
+impl Robolt<Authenticated> {
+    pub fn fetch_current_user(&self) -> Result<PartialUser, String> {
+        self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
+            .send()
+    }
+
+    pub fn fetch_users_by_username(
+        &self,
+        usernames: Vec<&str>,
+        exclude_banned: bool,
+    ) -> Result<Vec<PartialUser>, String> {
+        let post = SearchByUsername {
+            exclude_banned_users: exclude_banned,
+            usernames,
+        };
+
+        self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
+            .method(Method::POST)
+            .send_body::<_, DataResponse<PartialUser>>(Some(&post))
+            .map(|res| res.data)
     }
 }
 

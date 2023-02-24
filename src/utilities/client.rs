@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use std::marker::PhantomData;
+
 use reqwest::blocking::Client;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
@@ -7,15 +9,19 @@ use serde::Serialize;
 
 use crate::utilities::errors::RobloxAPIResponseErrors;
 
-pub(crate) struct RequestBuilder<'a> {
-    pub(crate) robolt: &'a Robolt,
+pub(crate) struct RequestBuilder<'a, State> {
+    pub(crate) robolt: &'a Robolt<State>,
     pub(crate) method: Method,
     pub(crate) endpoint: String,
 }
 
-pub struct Robolt {
+pub struct Unauthenticated;
+
+pub struct Authenticated;
+
+pub struct Robolt<State = Unauthenticated> {
     pub(crate) client: Client,
-    pub(crate) authenticated: bool,
+    pub(crate) state: PhantomData<State>,
 }
 
 impl Default for Robolt {
@@ -28,11 +34,13 @@ impl Robolt {
     pub fn new() -> Self {
         Self {
             client: Client::new(),
-            authenticated: false,
+            state: PhantomData::<Unauthenticated>,
         }
     }
+}
 
-    pub(crate) fn request_builder(&self, endpoint: String) -> RequestBuilder<'_> {
+impl<State> Robolt<State> {
+    pub(crate) fn request_builder(&self, endpoint: String) -> RequestBuilder<'_, State> {
         RequestBuilder::new(endpoint, self)
     }
 
@@ -70,8 +78,8 @@ impl Robolt {
     }
 }
 
-impl<'a> RequestBuilder<'a> {
-    fn new(endpoint: String, robolt: &'a Robolt) -> Self {
+impl<'a, State> RequestBuilder<'a, State> {
+    fn new(endpoint: String, robolt: &'a Robolt<State>) -> Self {
         Self {
             method: Method::GET,
             endpoint,
