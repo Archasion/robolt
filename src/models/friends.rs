@@ -2,7 +2,7 @@ use reqwest::Method;
 use serde::Deserialize;
 
 use crate::models::{DataResponse, ENDPOINTS};
-use crate::models::users::User;
+use crate::models::users::{PartialUser, User};
 use crate::Robolt;
 use crate::utilities::client::{Authenticated, EmptyResponse};
 
@@ -141,6 +141,41 @@ impl Robolt<Authenticated> {
 
         Ok(())
     }
+
+    pub fn my_online_friends(&self) -> Result<Vec<OnlineFriend>, String> {
+        let user_id = self.fetch_current_user()?.id;
+
+        self.request_builder(format!(
+            "{}/v1/users/{}/friends/online",
+            ENDPOINTS.friends, user_id
+        ))
+            .method(Method::GET)
+            .send::<DataResponse<OnlineFriend>>()
+            .map(|res| res.data)
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserPresence {
+    #[serde(rename = "UserPresenceType")]
+    user_presence_type: String,
+    #[serde(rename = "UserLocationType")]
+    user_location_type: String,
+    last_location: String,
+    last_online: String,
+    place_id: Option<u64>,
+    root_place_id: Option<u64>,
+    game_instance_id: Option<String>,
+    universe_id: Option<u64>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+pub struct OnlineFriend {
+    #[serde(flatten)]
+    user: PartialUser,
+    #[serde(rename = "userPresence")]
+    presence: UserPresence,
 }
 
 #[derive(Deserialize)]
