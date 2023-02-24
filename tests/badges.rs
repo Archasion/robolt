@@ -9,9 +9,9 @@ fn fetch_badge_by_id() {
 }
 
 #[test]
-fn fetch_game_badges() {
+fn fetch_universe_badges() {
     let client = Robolt::new();
-    assert_ok!(client.fetch_game_badges(2680623874));
+    assert_ok!(client.fetch_universe_badges(2680623874));
 }
 
 #[test]

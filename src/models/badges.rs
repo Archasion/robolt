@@ -13,7 +13,7 @@ impl<State> Robolt<State> {
             .send()
     }
 
-    pub fn fetch_game_badges(&self, universe_id: u64) -> Result<Vec<Badge>, String> {
+    pub fn fetch_universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, String> {
         self.request_builder(format!(
             "{}/v1/universes/{}/badges?limit=100",
             ENDPOINTS.badges, universe_id
