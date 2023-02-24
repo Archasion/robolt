@@ -50,10 +50,10 @@ impl<State> Robolt<State> {
             .map(|res| res.data)
     }
 
-    pub fn fetch_username_history(&self, id: u64) -> Result<Vec<String>, String> {
+    pub fn fetch_username_history(&self, user_id: u64) -> Result<Vec<String>, String> {
         self.request_builder(format!(
             "{}/v1/users/{}/username-history",
-            ENDPOINTS.users, id
+            ENDPOINTS.users, user_id
         ))
             .send::<DataResponse<String>>()
             .map(|res| res.data)
