@@ -153,6 +153,41 @@ impl Robolt<Authenticated> {
             .send::<DataResponse<OnlineFriend>>()
             .map(|res| res.data)
     }
+
+    pub fn my_friendship_statuses(&self, user_ids: Vec<u64>) -> Result<Vec<Friendship>, String> {
+        let user_id = self.fetch_current_user()?.id;
+        let user_ids = user_ids
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<String>>()
+            .join(",");
+
+        self.request_builder(format!(
+            "{}/v1/users/{}/friends/statuses?userIds={}",
+            ENDPOINTS.friends, user_id, user_ids
+        ))
+            .method(Method::GET)
+            .send::<DataResponse<Friendship>>()
+            .map(|res| res.data)
+    }
+}
+
+impl Friendship {
+    pub fn is_friend(&self) -> bool {
+        self.status == FriendshipStatus::Friends
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub enum FriendshipStatus {
+    NotFriends,
+    Friends,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct Friendship {
+    pub id: u64,
+    pub status: FriendshipStatus,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
