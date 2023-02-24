@@ -2,10 +2,11 @@
 
 use std::marker::PhantomData;
 
+use reqwest::{header, Method};
 use reqwest::blocking::Client;
-use reqwest::Method;
+use reqwest::header::HeaderMap;
+use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
-use serde::Serialize;
 
 use crate::utilities::errors::RobloxAPIResponseErrors;
 
@@ -18,6 +19,9 @@ pub(crate) struct RequestBuilder<'a, State> {
 pub struct Unauthenticated;
 
 pub struct Authenticated;
+
+#[derive(Deserialize)]
+pub(crate) struct EmptyResponse {}
 
 pub struct Robolt<State = Unauthenticated> {
     pub(crate) client: Client,
@@ -32,9 +36,20 @@ impl Default for Robolt {
 
 impl Robolt {
     pub fn new() -> Self {
+        let user_agent = format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+        let mut headers = HeaderMap::new();
+
+        headers.insert(header::CONTENT_LENGTH, "0".parse().unwrap());
+
+        let client = Client::builder()
+            .user_agent(user_agent)
+            .default_headers(headers)
+            .build()
+            .expect("Failed to build client");
+
         Self {
-            client: Client::new(),
             state: PhantomData::<Unauthenticated>,
+            client,
         }
     }
 }
@@ -92,12 +107,12 @@ impl<'a, State> RequestBuilder<'a, State> {
         self
     }
 
-    pub(crate) fn send_body<T, U>(self, body: Option<T>) -> Result<U, String>
+    pub(crate) fn send_body<T, U>(self, body: T) -> Result<U, String>
         where
             T: Serialize,
             U: DeserializeOwned,
     {
-        self.robolt.request(self.method, self.endpoint, body)
+        self.robolt.request(self.method, self.endpoint, Some(body))
     }
 
     pub(crate) fn send<T>(self) -> Result<T, String>

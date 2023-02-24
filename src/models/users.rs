@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::Robolt;
-use crate::utilities::client::Authenticated;
+use crate::utilities::client::{Authenticated, EmptyResponse};
 
 impl<State> Robolt<State> {
     pub fn fetch_user(&self, user_id: u64) -> Result<User, String> {
@@ -46,7 +46,7 @@ impl<State> Robolt<State> {
 
         self.request_builder(format!("{}/v1/users", ENDPOINTS.users))
             .method(Method::POST)
-            .send_body::<_, DataResponse<PartialUser>>(Some(&post))
+            .send_body::<_, DataResponse<PartialUser>>(&post)
             .map(|res| res.data)
     }
 
@@ -68,7 +68,7 @@ impl<State> Robolt<State> {
             "{}/v1/display-names/validate?displayName={}&birthdate={}",
             ENDPOINTS.users, display_name, date_of_birth
         ))
-            .send::<serde_json::Value>()?;
+            .send::<EmptyResponse>()?;
 
         Ok(())
     }
@@ -92,7 +92,7 @@ impl Robolt<Authenticated> {
 
         self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
             .method(Method::POST)
-            .send_body::<_, DataResponse<PartialUser>>(Some(&post))
+            .send_body::<_, DataResponse<PartialUser>>(&post)
             .map(|res| res.data)
     }
 }

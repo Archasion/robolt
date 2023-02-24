@@ -147,7 +147,7 @@ impl<'a> BadgeUpdateBuilder<'a> {
         self.client
             .request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
             .method(Method::PATCH)
-            .send_body(Some(self))
+            .send_body(self)
     }
 }
 

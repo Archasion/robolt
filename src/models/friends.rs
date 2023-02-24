@@ -1,9 +1,10 @@
+use reqwest::Method;
 use serde::Deserialize;
 
 use crate::models::{DataResponse, ENDPOINTS};
 use crate::models::users::User;
 use crate::Robolt;
-use crate::utilities::client::Authenticated;
+use crate::utilities::client::{Authenticated, EmptyResponse};
 
 impl<State> Robolt<State> {
     pub fn count_followers(&self, user_id: u64) -> Result<u64, String> {
@@ -84,6 +85,28 @@ impl Robolt<Authenticated> {
         self.request_builder(format!("{}/v1/my/friends/count", ENDPOINTS.friends))
             .send::<CountResponse>()
             .map(|res| res.count)
+    }
+
+    pub fn unfriend(&self, user_id: u64) -> Result<(), String> {
+        self.request_builder(format!(
+            "{}/v1/users/{}/unfriend",
+            ENDPOINTS.friends, user_id
+        ))
+            .method(Method::POST)
+            .send::<EmptyResponse>()?;
+
+        Ok(())
+    }
+
+    pub fn unfollow(&self, user_id: u64) -> Result<(), String> {
+        self.request_builder(format!(
+            "{}/v1/users/{}/unfollow",
+            ENDPOINTS.friends, user_id
+        ))
+            .method(Method::POST)
+            .send::<EmptyResponse>()?;
+
+        Ok(())
     }
 }
 
