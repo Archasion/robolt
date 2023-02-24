@@ -194,23 +194,23 @@ pub struct Friendship {
 #[serde(rename_all = "camelCase")]
 pub struct UserPresence {
     #[serde(rename = "UserPresenceType")]
-    user_presence_type: String,
+    pub user_presence_type: String,
     #[serde(rename = "UserLocationType")]
-    user_location_type: String,
-    last_location: String,
-    last_online: String,
-    place_id: Option<u64>,
-    root_place_id: Option<u64>,
-    game_instance_id: Option<String>,
-    universe_id: Option<u64>,
+    pub user_location_type: String,
+    pub last_location: String,
+    pub last_online: String,
+    pub place_id: Option<u64>,
+    pub root_place_id: Option<u64>,
+    pub game_instance_id: Option<String>,
+    pub universe_id: Option<u64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct OnlineFriend {
     #[serde(flatten)]
-    user: PartialUser,
+    pub user: PartialUser,
     #[serde(rename = "userPresence")]
-    presence: UserPresence,
+    pub presence: UserPresence,
 }
 
 #[derive(Deserialize)]
