@@ -108,6 +108,39 @@ impl Robolt<Authenticated> {
 
         Ok(())
     }
+
+    pub fn decline_friend_request(&self, user_id: u64) -> Result<(), String> {
+        self.request_builder(format!(
+            "{}/v1/users/{}/decline-friend-request",
+            ENDPOINTS.friends, user_id
+        ))
+            .method(Method::POST)
+            .send::<EmptyResponse>()?;
+
+        Ok(())
+    }
+
+    pub fn accept_friend_request(&self, user_id: u64) -> Result<(), String> {
+        self.request_builder(format!(
+            "{}/v1/users/{}/accept-friend-request",
+            ENDPOINTS.friends, user_id
+        ))
+            .method(Method::POST)
+            .send::<EmptyResponse>()?;
+
+        Ok(())
+    }
+
+    pub fn decline_all_friend_requests(&self) -> Result<(), String> {
+        self.request_builder(format!(
+            "{}/v1/user/friend-requests/decline-all",
+            ENDPOINTS.friends
+        ))
+            .method(Method::POST)
+            .send::<EmptyResponse>()?;
+
+        Ok(())
+    }
 }
 
 #[derive(Deserialize)]
