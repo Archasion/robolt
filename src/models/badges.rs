@@ -22,10 +22,10 @@ impl<State> Robolt<State> {
             .map(|res| res.data)
     }
 
-    pub fn fetch_user_badges(&self, id: u64) -> Result<Vec<Badge>, String> {
+    pub fn fetch_user_badges(&self, user_id: u64) -> Result<Vec<Badge>, String> {
         self.request_builder(format!(
             "{}/v1/users/{}/badges?limit=100",
-            ENDPOINTS.badges, id
+            ENDPOINTS.badges, user_id
         ))
             .send::<DataResponse<Badge>>()
             .map(|res| res.data)
