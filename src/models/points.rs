@@ -18,13 +18,7 @@ impl<State> Robolt<State> {
 impl Robolt<Authenticated> {
     pub fn my_points(&self, universe_id: u64) -> Result<u64, String> {
         let user_id = self.fetch_current_user()?.id;
-
-        self.request_builder(format!(
-            "{}/v1/universes/{}/users/{}/all-time",
-            ENDPOINTS.points, user_id, universe_id
-        ))
-            .send::<AllTimeScore>()
-            .map(|res| res.all_time_score)
+        self.fetch_points(user_id, universe_id)
     }
 }
 
