@@ -15,13 +15,6 @@ impl<State> Robolt<State> {
     }
 }
 
-impl Robolt<Authenticated> {
-    pub fn my_points(&self, universe_id: u64) -> Result<u64, String> {
-        let user_id = self.fetch_current_user()?.id;
-        self.fetch_points(user_id, universe_id)
-    }
-}
-
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AllTimeScore {

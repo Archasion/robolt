@@ -115,16 +115,6 @@ impl Robolt<Authenticated> {
             .method(Method::DELETE)
             .send()
     }
-
-    pub fn my_badges(&self) -> Result<Vec<Badge>, String> {
-        let user_id = self.fetch_current_user()?.id;
-        self.fetch_user_badges(user_id)
-    }
-
-    pub fn my_roblox_badges(&self) -> Result<Vec<RobloxBadge>, String> {
-        let user_id = self.fetch_current_user()?.id;
-        self.fetch_roblox_badges(user_id)
-    }
 }
 
 impl<'a> BadgeUpdateBuilder<'a> {

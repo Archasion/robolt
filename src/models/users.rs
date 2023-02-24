@@ -95,11 +95,6 @@ impl Robolt<Authenticated> {
             .send_body::<_, DataResponse<PartialUser>>(&post)
             .map(|res| res.data)
     }
-
-    pub fn my_username_history(&self) -> Result<Vec<String>, String> {
-        let user_id = self.fetch_current_user()?.id;
-        self.fetch_username_history(user_id)
-    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
