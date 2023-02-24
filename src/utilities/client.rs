@@ -83,7 +83,7 @@ impl<State> Robolt<State> {
                 .json::<RobloxAPIResponseErrors>()
                 .map_err(|_| status.to_string())?;
 
-            let err = err_res.errors.first().ok_or(status.to_string())?;
+            let err = err_res.errors.first().ok_or_else(|| status.to_string())?;
             return Err(err.message.clone());
         }
 
