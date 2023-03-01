@@ -3,10 +3,12 @@ use serde::Deserialize;
 mod auth;
 pub(crate) mod badges;
 pub(crate) mod friends;
+pub(crate) mod presence;
 mod users;
 mod points;
 
 struct RobloxAPIEndpoints<T> {
+    presence: T,
     friends: T,
     points: T,
     badges: T,
@@ -21,6 +23,7 @@ struct DataResponse<T> {
 }
 
 const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {
+    presence: "presence.roblox.com",
     friends: "friends.roblox.com",
     points: "points.roblox.com",
     badges: "badges.roblox.com",
