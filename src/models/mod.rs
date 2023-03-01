@@ -2,12 +2,12 @@ use serde::Deserialize;
 
 mod auth;
 pub(crate) mod badges;
+mod economy;
 pub(crate) mod friends;
 mod points;
+mod premium_features;
 pub(crate) mod presence;
 mod users;
-mod economy;
-mod premium_features;
 
 struct RobloxAPIEndpoints<T> {
     premium_features: T,
