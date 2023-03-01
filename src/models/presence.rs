@@ -8,28 +8,45 @@ use crate::models::ENDPOINTS;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-    pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<Presence>, String> {
+    pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<DetailedPresence>, String> {
         let mut body = HashMap::new();
         body.insert("userIds", user_ids);
 
         self.request_builder(format!("{}/v1/presence/users", ENDPOINTS.presence))
             .method(Method::POST)
-            .send_body::<_, Presences>(body)
+            .send_body::<_, DetailedPresences>(body)
             .map(|res| res.user_presences)
+    }
+
+    pub fn fetch_last_online(&self, user_ids: Vec<u64>) -> Result<Vec<Presence>, String> {
+        let mut body = HashMap::new();
+        body.insert("userIds", user_ids);
+
+        self.request_builder(format!("{}/v1/presence/last-online", ENDPOINTS.presence))
+            .method(Method::POST)
+            .send_body::<_, Presences>(body)
+            .map(|res| res.last_online_timestamps)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct DetailedPresence {
+    #[serde(flatten)]
+    pub presence: Presence,
+    pub user_presence_type: PresenceType,
+    pub last_location: String,
+    pub game_id: Option<u64>,
+    pub place_id: Option<u64>,
+    pub universe_id: Option<u64>,
+    pub root_place_id: Option<u64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Presence {
-    user_presence_type: PresenceType,
-    last_location: String,
-    last_online: String,
-    user_id: u64,
-    game_id: Option<u64>,
-    place_id: Option<u64>,
-    universe_id: Option<u64>,
-    root_place_id: Option<u64>,
+    pub user_id: u64,
+    pub last_online: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize_repr)]
@@ -43,6 +60,12 @@ pub enum PresenceType {
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
+struct DetailedPresences {
+    user_presences: Vec<DetailedPresence>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Presences {
-    user_presences: Vec<Presence>,
+    last_online_timestamps: Vec<Presence>,
 }
