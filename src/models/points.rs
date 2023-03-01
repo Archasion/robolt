@@ -2,7 +2,6 @@ use serde::Deserialize;
 
 use crate::models::ENDPOINTS;
 use crate::Robolt;
-use crate::utilities::client::Authenticated;
 
 impl<State> Robolt<State> {
     pub fn fetch_points(&self, user_id: u64, universe_id: u64) -> Result<u64, String> {
