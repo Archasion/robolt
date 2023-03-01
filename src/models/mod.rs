@@ -3,9 +3,9 @@ use serde::Deserialize;
 mod auth;
 pub(crate) mod badges;
 pub(crate) mod friends;
+mod points;
 pub(crate) mod presence;
 mod users;
-mod points;
 
 struct RobloxAPIEndpoints<T> {
     presence: T,
