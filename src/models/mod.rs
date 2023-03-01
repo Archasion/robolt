@@ -6,9 +6,11 @@ pub(crate) mod friends;
 mod points;
 pub(crate) mod presence;
 mod users;
+mod economy;
 
 struct RobloxAPIEndpoints<T> {
     presence: T,
+    economy: T,
     friends: T,
     points: T,
     badges: T,
@@ -24,6 +26,7 @@ struct DataResponse<T> {
 
 const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {
     presence: "presence.roblox.com",
+    economy: "economy.roblox.com",
     friends: "friends.roblox.com",
     points: "points.roblox.com",
     badges: "badges.roblox.com",
