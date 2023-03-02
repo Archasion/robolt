@@ -2,6 +2,7 @@ use serde::Deserialize;
 
 use crate::models::ENDPOINTS;
 use crate::Robolt;
+use crate::utilities::client::Authenticated;
 
 impl<State> Robolt<State> {
     pub fn fetch_roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, String> {
@@ -21,7 +22,17 @@ impl<State> Robolt<State> {
     }
 }
 
-#[derive(Deserialize)]
+impl Robolt<Authenticated> {
+    pub fn my_socials(&self) -> Result<AuthenticatedUserSocials, String> {
+        self.request_builder(format!(
+            "{}/v1/promotion-channels",
+            ENDPOINTS.account_information
+        ))
+            .send()
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RobloxBadge {
     pub id: u8,
@@ -30,7 +41,7 @@ pub struct RobloxBadge {
     pub image_url: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserSocials {
     pub facebook: Option<String>,
@@ -40,7 +51,7 @@ pub struct UserSocials {
     pub guilded: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthenticatedUserSocials {
     #[serde(rename = "promotionChannelsVisibilityPrivacy")]
