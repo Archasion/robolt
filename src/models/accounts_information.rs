@@ -11,6 +11,14 @@ impl<State> Robolt<State> {
         ))
             .send()
     }
+
+    pub fn fetch_user_socials(&self, user_id: u64) -> Result<UserSocials, String> {
+        self.request_builder(format!(
+            "{}/v1/users/{}/promotion-channels",
+            ENDPOINTS.account_information, user_id
+        ))
+            .send()
+    }
 }
 
 #[derive(Deserialize)]
@@ -20,4 +28,23 @@ pub struct RobloxBadge {
     pub name: String,
     pub description: String,
     pub image_url: String,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserSocials {
+    pub facebook: Option<String>,
+    pub twitter: Option<String>,
+    pub youtube: Option<String>,
+    pub twitch: Option<String>,
+    pub guilded: Option<String>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthenticatedUserSocials {
+    #[serde(rename = "promotionChannelsVisibilityPrivacy")]
+    pub visibility: String,
+    #[serde(flatten)]
+    pub connections: UserSocials,
 }
