@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-mod accounts_information;
+pub(crate) mod accounts_information;
 mod auth;
 pub(crate) mod badges;
 mod economy;
@@ -25,6 +25,11 @@ struct RobloxAPIEndpoints<T> {
 #[derive(Debug, Deserialize)]
 struct DataResponse<T> {
     data: Vec<T>,
+}
+
+#[derive(Deserialize)]
+struct CountResponse<T> {
+    count: T,
 }
 
 const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {
