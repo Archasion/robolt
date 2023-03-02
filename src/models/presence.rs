@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::io::Error;
 
 use reqwest::Method;
 use serde::Deserialize;
@@ -8,21 +9,23 @@ use crate::models::ENDPOINTS;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-    pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<DetailedPresence>, String> {
+    pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<DetailedPresence>, Error> {
         let mut body = HashMap::new();
         body.insert("userIds", user_ids);
 
         self.request_builder(format!("{}/v1/presence/users", ENDPOINTS.presence))
+            .function("fetch_presences")
             .method(Method::POST)
             .send_body::<_, DetailedPresences>(body)
             .map(|res| res.user_presences)
     }
 
-    pub fn fetch_last_online(&self, user_ids: Vec<u64>) -> Result<Vec<Presence>, String> {
+    pub fn fetch_last_online(&self, user_ids: Vec<u64>) -> Result<Vec<Presence>, Error> {
         let mut body = HashMap::new();
         body.insert("userIds", user_ids);
 
         self.request_builder(format!("{}/v1/presence/last-online", ENDPOINTS.presence))
+            .function("fetch_last_online")
             .method(Method::POST)
             .send_body::<_, Presences>(body)
             .map(|res| res.last_online_timestamps)
