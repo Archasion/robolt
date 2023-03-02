@@ -61,7 +61,13 @@ impl<State> Robolt<State> {
         RequestBuilder::new(endpoint, self)
     }
 
-    fn request<U, T>(&self, method: Method, endpoint: String, function: &str, body: Option<U>) -> Result<T, Error>
+    fn request<U, T>(
+        &self,
+        method: Method,
+        endpoint: String,
+        function: &str,
+        body: Option<U>,
+    ) -> Result<T, Error>
         where
             T: DeserializeOwned,
             U: Serialize,
@@ -77,10 +83,15 @@ impl<State> Robolt<State> {
             builder
         };
 
-        let unknown_error = |err: String| Error::new(
-            ErrorKind::Other,
-            format!("An unknown error has occurred while executing {}() | {}", function, err),
-        );
+        let unknown_error = |err: String| {
+            Error::new(
+                ErrorKind::Other,
+                format!(
+                    "An unknown error has occurred while executing {}() | {}",
+                    function, err
+                ),
+            )
+        };
 
         let res = builder
             .send()
@@ -91,25 +102,21 @@ impl<State> Robolt<State> {
         if !status.is_success() {
             let err_res = res
                 .json::<RobloxAPIErrors>()
-                .map_err(|_| Error::new(
-                    ErrorKind::Other,
-                    status.to_string(),
-                ))?;
+                .map_err(|_| Error::new(ErrorKind::Other, status.to_string()))?;
 
-            let err = err_res.errors
+            let err = err_res
+                .errors
                 .first()
-                .ok_or_else(|| Error::new(
-                    ErrorKind::Other,
-                    status.to_string(),
-                ))?;
+                .ok_or_else(|| Error::new(ErrorKind::Other, status.to_string()))?;
 
             return Err(Error::new(
                 ErrorKind::Other,
-                format!("RobloxAPIError: {}", err.message.clone()))
-            );
+                format!("RobloxAPIError: {}", err.message.clone()),
+            ));
         }
 
-        let json = res.json::<T>()
+        let json = res
+            .json::<T>()
             .map_err(|err| unknown_error(err.to_string()))?;
 
         Ok(json)
@@ -141,7 +148,8 @@ impl<'a, State> RequestBuilder<'a, State> {
             T: Serialize,
             U: DeserializeOwned,
     {
-        self.robolt.request(self.method, self.endpoint, self.function, Some(body))
+        self.robolt
+            .request(self.method, self.endpoint, self.function, Some(body))
     }
 
     pub(crate) fn send<T>(self) -> Result<T, Error>
