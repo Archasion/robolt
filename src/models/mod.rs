@@ -8,8 +8,10 @@ mod points;
 mod premium_features;
 pub(crate) mod presence;
 mod users;
+mod accounts_information;
 
 struct RobloxAPIEndpoints<T> {
+    account_information: T,
     premium_features: T,
     presence: T,
     economy: T,
@@ -18,7 +20,6 @@ struct RobloxAPIEndpoints<T> {
     badges: T,
     users: T,
     base: T,
-    web: T,
 }
 
 #[derive(Debug, Deserialize)]
@@ -27,6 +28,7 @@ struct DataResponse<T> {
 }
 
 const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {
+    account_information: "accountinformation.roblox.com",
     premium_features: "premiumfeatures.roblox.com",
     presence: "presence.roblox.com",
     economy: "economy.roblox.com",
@@ -35,5 +37,4 @@ const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {
     badges: "badges.roblox.com",
     users: "users.roblox.com",
     base: "api.roblox.com",
-    web: "www.roblox.com",
 };

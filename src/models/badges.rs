@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
@@ -49,60 +47,6 @@ impl<State> Robolt<State> {
             .send::<DataResponse<AwardedBadgeTimestamp>>()
             .map(|res| res.data)
     }
-
-    pub fn has_badge(&self, user_id: u64, badge_id: u64) -> Result<bool, String> {
-        self.fetch_awarded_timestamps(user_id, vec![badge_id])
-            .map(|badges| !badges.is_empty())
-    }
-
-    pub fn has_badges(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
-        let badge_ids_len = badge_ids.len();
-
-        self.fetch_awarded_timestamps(user_id, badge_ids)
-            .map(|badges| badges.len() == badge_ids_len)
-    }
-
-    pub fn has_badges_any(&self, user_id: u64, badge_ids: Vec<u64>) -> Result<bool, String> {
-        self.fetch_awarded_timestamps(user_id, badge_ids)
-            .map(|badges| !badges.is_empty())
-    }
-
-    pub fn fetch_roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, String> {
-        self.request_builder(format!(
-            "{}/badges/roblox?userId={}",
-            ENDPOINTS.web, user_id
-        ))
-            .send::<RobloxBadgesResult>()
-            .map(|res| {
-                res.roblox_badges
-                    .into_iter()
-                    .map(|badge| RobloxBadge::from_str(&badge.name).unwrap())
-                    .collect()
-            })
-    }
-
-    pub fn has_roblox_badge(&self, user_id: u64, badge: RobloxBadge) -> Result<bool, String> {
-        self.fetch_roblox_badges(user_id)
-            .map(|owned_badges| owned_badges.contains(&badge))
-    }
-
-    pub fn has_roblox_badges(
-        &self,
-        user_id: u64,
-        badges: Vec<RobloxBadge>,
-    ) -> Result<bool, String> {
-        self.fetch_roblox_badges(user_id)
-            .map(|owned_badges| badges.iter().all(|badge| owned_badges.contains(badge)))
-    }
-
-    pub fn has_roblox_badges_any(
-        &self,
-        user_id: u64,
-        badges: Vec<RobloxBadge>,
-    ) -> Result<bool, String> {
-        self.fetch_roblox_badges(user_id)
-            .map(|owned_badges| badges.iter().any(|badge| owned_badges.contains(badge)))
-    }
 }
 
 impl Robolt<Authenticated> {
@@ -148,28 +92,6 @@ impl<'a> BadgeUpdateBuilder<'a> {
             .request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
             .method(Method::PATCH)
             .send_body(self)
-    }
-}
-
-impl FromStr for RobloxBadge {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Welcome To The Club" => Ok(RobloxBadge::WelcomeToTheClub),
-            "Administrator" => Ok(RobloxBadge::Administrator),
-            "Veteran" => Ok(RobloxBadge::Veteran),
-            "Friendship" => Ok(RobloxBadge::Friendship),
-            "Ambassador" => Ok(RobloxBadge::Ambassador),
-            "Inviter" => Ok(RobloxBadge::Inviter),
-            "Homestead" => Ok(RobloxBadge::Homestead),
-            "Bricksmith" => Ok(RobloxBadge::Bricksmith),
-            "Official Model Maker" => Ok(RobloxBadge::OfficialModelMaker),
-            "Combat Initiation" => Ok(RobloxBadge::CombatInitiation),
-            "Warrior" => Ok(RobloxBadge::Warrior),
-            "Bloxxer" => Ok(RobloxBadge::Bloxxer),
-            _ => Err(format!("Unknown badge: {s}")),
-        }
     }
 }
 
@@ -225,32 +147,4 @@ pub struct AwardingUniverse {
     pub id: u64,
     pub name: String,
     pub root_place_id: u64,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "PascalCase")]
-struct RobloxBadgesResult {
-    roblox_badges: Vec<RobloxBadgeResult>,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "PascalCase")]
-struct RobloxBadgeResult {
-    name: String,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum RobloxBadge {
-    WelcomeToTheClub,
-    Administrator,
-    Veteran,
-    Friendship,
-    Ambassador,
-    Inviter,
-    Homestead,
-    Bricksmith,
-    OfficialModelMaker,
-    CombatInitiation,
-    Warrior,
-    Bloxxer,
 }
