@@ -38,29 +38,20 @@ impl Robolt<Authenticated> {
     }
 
     pub fn my_birthdate(&self) -> Result<Birthdate, Error> {
-        self.request_builder(format!(
-            "{}/v1/birthdate",
-            ENDPOINTS.account_information
-        ))
+        self.request_builder(format!("{}/v1/birthdate", ENDPOINTS.account_information))
             .function("my_birthdate")
             .send()
     }
 
     pub fn my_description(&self) -> Result<String, Error> {
-        self.request_builder(format!(
-            "{}/v1/description",
-            ENDPOINTS.account_information
-        ))
+        self.request_builder(format!("{}/v1/description", ENDPOINTS.account_information))
             .function("my_description")
             .send::<Description>()
             .map(|res| res.description)
     }
 
     pub fn my_gender(&self) -> Result<Gender, Error> {
-        self.request_builder(format!(
-            "{}/v1/gender",
-            ENDPOINTS.account_information
-        ))
+        self.request_builder(format!("{}/v1/gender", ENDPOINTS.account_information))
             .function("my_gender")
             .send::<GenderResponse>()
             .map(|res| res.gender)
@@ -77,10 +68,7 @@ impl Robolt<Authenticated> {
     }
 
     pub fn my_phone_number(&self) -> Result<PhoneNumber, Error> {
-        self.request_builder(format!(
-            "{}/v1/phone",
-            ENDPOINTS.account_information
-        ))
+        self.request_builder(format!("{}/v1/phone", ENDPOINTS.account_information))
             .function("my_phone_number")
             .send()
     }
