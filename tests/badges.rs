@@ -1,6 +1,6 @@
 use tokio_test::assert_ok;
 
-use robolt::{RobloxBadge, Robolt};
+use robolt::Robolt;
 
 #[test]
 fn fetch_badge_by_id() {

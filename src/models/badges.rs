@@ -1,3 +1,5 @@
+use std::io::Error;
+
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
@@ -6,25 +8,28 @@ use crate::Robolt;
 use crate::utilities::client::Authenticated;
 
 impl<State> Robolt<State> {
-    pub fn fetch_badge(&self, badge_id: u64) -> Result<Badge, String> {
+    pub fn fetch_badge(&self, badge_id: u64) -> Result<Badge, Error> {
         self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, badge_id))
+            .function("fetch_badge")
             .send()
     }
 
-    pub fn fetch_universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, String> {
+    pub fn fetch_universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, Error> {
         self.request_builder(format!(
             "{}/v1/universes/{}/badges?limit=100",
             ENDPOINTS.badges, universe_id
         ))
+            .function("fetch_universe_badges")
             .send::<DataResponse<Badge>>()
             .map(|res| res.data)
     }
 
-    pub fn fetch_user_badges(&self, user_id: u64) -> Result<Vec<Badge>, String> {
+    pub fn fetch_user_badges(&self, user_id: u64) -> Result<Vec<Badge>, Error> {
         self.request_builder(format!(
             "{}/v1/users/{}/badges?limit=100",
             ENDPOINTS.badges, user_id
         ))
+            .function("fetch_user_badges")
             .send::<DataResponse<Badge>>()
             .map(|res| res.data)
     }
@@ -33,7 +38,7 @@ impl<State> Robolt<State> {
         &self,
         user_id: u64,
         badge_ids: Vec<u64>,
-    ) -> Result<Vec<AwardedBadgeTimestamp>, String> {
+    ) -> Result<Vec<AwardedBadgeTimestamp>, Error> {
         let badge_ids = badge_ids
             .iter()
             .map(|id| id.to_string())
@@ -44,6 +49,7 @@ impl<State> Robolt<State> {
             "{}/v1/users/{}/badges/awarded-dates?badgeIds={}",
             ENDPOINTS.badges, user_id, badge_ids
         ))
+            .function("fetch_awarded_timestamps")
             .send::<DataResponse<AwardedBadgeTimestamp>>()
             .map(|res| res.data)
     }
@@ -54,8 +60,9 @@ impl Robolt<Authenticated> {
         BadgeUpdateBuilder::new(badge_id, self)
     }
 
-    pub fn remove_badge(&self, badge_id: u64) -> Result<(), String> {
+    pub fn remove_badge(&self, badge_id: u64) -> Result<(), Error> {
         self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, badge_id))
+            .function("remove_badge")
             .method(Method::DELETE)
             .send()
     }
@@ -87,7 +94,7 @@ impl<'a> BadgeUpdateBuilder<'a> {
         self
     }
 
-    pub fn update(self) -> Result<(), String> {
+    pub fn update(self) -> Result<(), Error> {
         self.client
             .request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
             .method(Method::PATCH)
