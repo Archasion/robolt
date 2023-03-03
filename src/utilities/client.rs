@@ -12,10 +12,10 @@ use serde::de::DeserializeOwned;
 use crate::utilities::errors::RobloxAPIErrors;
 
 pub(crate) struct RequestBuilder<'a, State> {
-    pub(crate) robolt: &'a Robolt<State>,
-    pub(crate) method: Method,
-    pub(crate) endpoint: String,
-    pub(crate) function: &'static str,
+    robolt: &'a Robolt<State>,
+    method: Method,
+    endpoint: String,
+    function: &'static str,
 }
 
 pub struct Unauthenticated;
