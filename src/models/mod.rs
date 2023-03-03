@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-pub(crate) mod accounts_information;
+pub(crate) mod account_information;
 mod auth;
 pub(crate) mod badges;
 mod economy;
@@ -9,9 +9,11 @@ mod points;
 mod premium_features;
 pub(crate) mod presence;
 mod users;
+pub(crate) mod account_settings;
 
 struct RobloxAPIEndpoints<T> {
     account_information: T,
+    account_settings: T,
     premium_features: T,
     presence: T,
     economy: T,
@@ -34,6 +36,7 @@ struct CountResponse<T> {
 
 const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {
     account_information: "accountinformation.roblox.com",
+    account_settings: "accountsettings.roblox.com",
     premium_features: "premiumfeatures.roblox.com",
     presence: "presence.roblox.com",
     economy: "economy.roblox.com",
