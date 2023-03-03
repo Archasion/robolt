@@ -8,14 +8,16 @@ use crate::utilities::client::Authenticated;
 
 impl Robolt<Authenticated> {
     pub fn my_privacy(&self, setting: PrivacySetting) -> Result<Privacy, Error> {
-        self.request_builder(format!("{}/v1/{}", ENDPOINTS.account_settings,
-                                     match setting {
-                                         PrivacySetting::AppChat => "app-chat-privacy",
-                                         PrivacySetting::GameChat => "game-chat-privacy",
-                                         PrivacySetting::Trade => "trade-privacy",
-                                         PrivacySetting::Inventory => "inventory-privacy",
-                                         PrivacySetting::PrivateMessage => "private-message-privacy",
-                                     }
+        self.request_builder(format!(
+            "{}/v1/{}",
+            ENDPOINTS.account_settings,
+            match setting {
+                PrivacySetting::AppChat => "app-chat-privacy",
+                PrivacySetting::GameChat => "game-chat-privacy",
+                PrivacySetting::Trade => "trade-privacy",
+                PrivacySetting::Inventory => "inventory-privacy",
+                PrivacySetting::PrivateMessage => "private-message-privacy",
+            }
         ))
             .send::<PrivacySettingResponse>()
             .map(|res| res.value)
