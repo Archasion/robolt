@@ -1,6 +1,7 @@
 use serde::Deserialize;
 
 pub(crate) mod account_information;
+pub(crate) mod account_settings;
 mod auth;
 pub(crate) mod badges;
 mod economy;
@@ -9,7 +10,6 @@ mod points;
 mod premium_features;
 pub(crate) mod presence;
 mod users;
-pub(crate) mod account_settings;
 
 struct RobloxAPIEndpoints<T> {
     account_information: T,

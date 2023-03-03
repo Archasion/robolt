@@ -35,19 +35,13 @@ impl Robolt<Authenticated> {
     }
 
     pub fn my_email(&self) -> Result<Email, Error> {
-        self.request_builder(format!(
-            "{}/v1/email",
-            ENDPOINTS.account_settings
-        ))
+        self.request_builder(format!("{}/v1/email", ENDPOINTS.account_settings))
             .function("my_email")
             .send::<Email>()
     }
 
     pub fn my_trade_value(&self) -> Result<TradeValue, Error> {
-        self.request_builder(format!(
-            "{}/v1/trade-value",
-            ENDPOINTS.account_settings
-        ))
+        self.request_builder(format!("{}/v1/trade-value", ENDPOINTS.account_settings))
             .function("my_trade_value")
             .send::<TradeValueResponse>()
             .map(|res| res.trade_value)
