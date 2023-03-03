@@ -3,6 +3,7 @@ use std::io::Error;
 use serde::Deserialize;
 
 use crate::models::ENDPOINTS;
+use crate::models::users::PartialUser;
 use crate::Robolt;
 use crate::utilities::client::Authenticated;
 
@@ -19,9 +20,27 @@ impl Robolt<Authenticated> {
                 PrivacySetting::PrivateMessage => "private-message-privacy",
             }
         ))
+            .function("my_privacy")
             .send::<PrivacySettingResponse>()
             .map(|res| res.value)
     }
+
+    pub fn my_blocked_users(&self) -> Result<BlockedUsers, Error> {
+        self.request_builder(format!(
+            "{}/v1/users/get-detailed-blocked-users",
+            ENDPOINTS.account_settings
+        ))
+            .function("my_blocked_users")
+            .send::<BlockedUsers>()
+    }
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BlockedUsers {
+    blocked_users: Vec<PartialUser>,
+    max_blocked_users: u8,
+    total: u8,
 }
 
 #[derive(Deserialize)]

@@ -128,6 +128,7 @@ pub struct PartialUser {
     #[serde(rename = "name")]
     pub username: String,
     pub display_name: String,
+    #[serde(alias = "userId")]
     pub id: u64,
 }
 
