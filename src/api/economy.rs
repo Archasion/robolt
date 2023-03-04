@@ -2,7 +2,7 @@ use std::io::Error;
 
 use serde::Deserialize;
 
-use crate::models::ENDPOINTS;
+use crate::api::ENDPOINTS;
 use crate::Robolt;
 use crate::utilities::client::Authenticated;
 

@@ -5,7 +5,7 @@ use reqwest::Method;
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
-use crate::models::ENDPOINTS;
+use crate::api::ENDPOINTS;
 use crate::Robolt;
 
 impl<State> Robolt<State> {

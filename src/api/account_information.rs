@@ -3,7 +3,7 @@ use std::io::Error;
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
-use crate::models::{CountResponse, ENDPOINTS};
+use crate::api::{CountResponse, ENDPOINTS};
 use crate::Robolt;
 use crate::utilities::client::Authenticated;
 

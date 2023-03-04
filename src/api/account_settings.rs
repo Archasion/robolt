@@ -2,8 +2,8 @@ use std::io::Error;
 
 use serde::Deserialize;
 
-use crate::models::ENDPOINTS;
-use crate::models::users::PartialUser;
+use crate::api::ENDPOINTS;
+use crate::api::users::PartialUser;
 use crate::Robolt;
 use crate::utilities::client::Authenticated;
 

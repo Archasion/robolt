@@ -1,8 +1,8 @@
-pub use models::account_information::{Gender, SocialsVisibility};
-pub use models::account_settings::{Privacy, PrivacySetting, TradeValue};
-pub use models::friends::FriendshipStatus;
-pub use models::presence::PresenceType;
+pub use api::account_information::{Gender, SocialsVisibility};
+pub use api::account_settings::{Privacy, PrivacySetting, TradeValue};
+pub use api::friends::FriendshipStatus;
+pub use api::presence::PresenceType;
 pub use utilities::client::Robolt;
 
-mod models;
+mod api;
 mod utilities;

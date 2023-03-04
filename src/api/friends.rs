@@ -3,8 +3,8 @@ use std::io::Error;
 use reqwest::Method;
 use serde::Deserialize;
 
-use crate::models::{DataResponse, ENDPOINTS};
-use crate::models::users::{PartialUser, User};
+use crate::api::{DataResponse, ENDPOINTS};
+use crate::api::users::{PartialUser, User};
 use crate::Robolt;
 use crate::utilities::client::{Authenticated, EmptyResponse};
 

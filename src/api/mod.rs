@@ -11,7 +11,7 @@ mod premium_features;
 pub(crate) mod presence;
 mod users;
 
-struct RobloxAPIEndpoints<T> {
+struct RobloxAPIEndpoints<T = &'static str> {
     account_information: T,
     account_settings: T,
     premium_features: T,
@@ -34,7 +34,7 @@ struct CountResponse<T> {
     count: T,
 }
 
-const ENDPOINTS: RobloxAPIEndpoints<&'static str> = RobloxAPIEndpoints {
+const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
     account_information: "accountinformation.roblox.com",
     account_settings: "accountsettings.roblox.com",
     premium_features: "premiumfeatures.roblox.com",
