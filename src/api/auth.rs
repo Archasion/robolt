@@ -9,7 +9,10 @@ use crate::Robolt;
 use crate::utilities::client::{Authenticated, Unauthenticated};
 
 impl Robolt<Unauthenticated> {
-    pub fn authenticate(self, roblox_cookie: String) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
+    pub fn authenticate(
+        self,
+        roblox_cookie: String,
+    ) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
         let user_agent = format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         let mut headers = HeaderMap::new();
         let cookie = format!(".ROBLOSECURITY={roblox_cookie}");

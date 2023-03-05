@@ -11,14 +11,16 @@ impl<State> Robolt<State> {
         self.request_builder(format!(
             "{}/v1/users/{}/roblox-badges",
             ENDPOINTS.account_information, user_id
-        )).send()
+        ))
+            .send()
     }
 
     pub fn fetch_user_socials(&self, user_id: u64) -> Result<UserSocials, RoboltError> {
         self.request_builder(format!(
             "{}/v1/users/{}/promotion-channels",
             ENDPOINTS.account_information, user_id
-        )).send()
+        ))
+            .send()
     }
 }
 
@@ -27,7 +29,8 @@ impl Robolt<Authenticated> {
         self.request_builder(format!(
             "{}/v1/promotion-channels",
             ENDPOINTS.account_information
-        )).send()
+        ))
+            .send()
     }
 
     pub fn my_birthdate(&self) -> Result<Birthdate, RoboltError> {

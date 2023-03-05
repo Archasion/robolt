@@ -155,7 +155,10 @@ impl Robolt<Authenticated> {
             .map(|res| res.data)
     }
 
-    pub fn my_friendship_statuses(&self, user_ids: Vec<u64>) -> Result<Vec<Friendship>, RoboltError> {
+    pub fn my_friendship_statuses(
+        &self,
+        user_ids: Vec<u64>,
+    ) -> Result<Vec<Friendship>, RoboltError> {
         let user_id = self.fetch_current_user()?.id;
         let user_ids = user_ids
             .iter()

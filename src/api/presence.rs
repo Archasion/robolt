@@ -9,7 +9,10 @@ use crate::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-    pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<DetailedPresence>, RoboltError> {
+    pub fn fetch_presences(
+        &self,
+        user_ids: Vec<u64>,
+    ) -> Result<Vec<DetailedPresence>, RoboltError> {
         let mut body = HashMap::new();
         body.insert("userIds", user_ids);
 

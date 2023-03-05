@@ -134,6 +134,7 @@ impl<'a, State> RequestBuilder<'a, State> {
         where
             T: DeserializeOwned,
     {
-        self.robolt.request::<(), T>(self.method, self.endpoint, None)
+        self.robolt
+            .request::<(), T>(self.method, self.endpoint, None)
     }
 }
