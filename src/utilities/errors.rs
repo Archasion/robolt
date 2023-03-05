@@ -5,9 +5,14 @@ use serde::Deserialize;
 #[derive(Deserialize, Debug)]
 pub struct RoboltError {
     pub message: String,
-    pub code: u8,
+    #[serde(default = "code_default")]
+    pub code: i8,
     #[serde(skip)]
     kind: ErrorKind,
+}
+
+fn code_default() -> i8 {
+    -1
 }
 
 #[derive(Deserialize)]
@@ -45,7 +50,7 @@ impl From<String> for RoboltError {
     fn from(message: String) -> Self {
         Self {
             kind: ErrorKind::Unknown,
-            code: 0,
+            code: code_default(),
             message,
         }
     }
