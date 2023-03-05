@@ -1,41 +1,36 @@
-use std::io::Error;
-
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
 use crate::api::{DataResponse, ENDPOINTS};
 use crate::Robolt;
 use crate::utilities::client::{Authenticated, EmptyResponse};
+use crate::utilities::errors::RoboltError;
 
 impl<State> Robolt<State> {
-    pub fn fetch_user(&self, user_id: u64) -> Result<User, Error> {
+    pub fn fetch_user(&self, user_id: u64) -> Result<User, RoboltError> {
         self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
-            .function("fetch_user")
             .send()
     }
 
-    pub fn fetch_partial_user(&self, user_id: u64) -> Result<PartialUser, Error> {
+    pub fn fetch_partial_user(&self, user_id: u64) -> Result<PartialUser, RoboltError> {
         self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
-            .function("fetch_partial_user")
             .send()
     }
 
-    pub fn fetch_user_id(&self, username: &str) -> Result<u64, Error> {
+    pub fn fetch_user_id(&self, username: &str) -> Result<u64, RoboltError> {
         self.request_builder(format!(
             "{}/users/get-by-username?username={}",
             ENDPOINTS.base, username
         ))
-            .function("fetch_user_id")
             .send::<UserId>()
             .map(|res| res.id)
     }
 
-    pub fn search_users(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, Error> {
+    pub fn search_users(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, RoboltError> {
         self.request_builder(format!(
             "{}/v1/users/search?keyword={}&limit={}",
             ENDPOINTS.users, keyword, limit
         ))
-            .function("search_users")
             .send::<DataResponse<PartialUser>>()
             .map(|res| res.data)
     }
@@ -44,25 +39,23 @@ impl<State> Robolt<State> {
         &self,
         user_ids: Vec<u64>,
         exclude_banned: bool,
-    ) -> Result<Vec<PartialUser>, Error> {
+    ) -> Result<Vec<PartialUser>, RoboltError> {
         let post = SearchById {
             exclude_banned_users: exclude_banned,
             user_ids,
         };
 
         self.request_builder(format!("{}/v1/users", ENDPOINTS.users))
-            .function("fetch_users")
             .method(Method::POST)
             .send_body::<_, DataResponse<PartialUser>>(&post)
             .map(|res| res.data)
     }
 
-    pub fn fetch_username_history(&self, user_id: u64) -> Result<Vec<String>, Error> {
+    pub fn fetch_username_history(&self, user_id: u64) -> Result<Vec<String>, RoboltError> {
         self.request_builder(format!(
             "{}/v1/users/{}/username-history",
             ENDPOINTS.users, user_id
         ))
-            .function("fetch_username_history")
             .send::<DataResponse<String>>()
             .map(|res| res.data)
     }
@@ -71,12 +64,11 @@ impl<State> Robolt<State> {
         &self,
         display_name: &str,
         date_of_birth: &str,
-    ) -> Result<(), Error> {
+    ) -> Result<(), RoboltError> {
         self.request_builder(format!(
             "{}/v1/display-names/validate?displayName={}&birthdate={}",
             ENDPOINTS.users, display_name, date_of_birth
         ))
-            .function("validate_display_name")
             .send::<EmptyResponse>()?;
 
         Ok(())
@@ -84,9 +76,8 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Authenticated> {
-    pub fn fetch_current_user(&self) -> Result<PartialUser, Error> {
+    pub fn fetch_current_user(&self) -> Result<PartialUser, RoboltError> {
         self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
-            .function("fetch_current_user")
             .send()
     }
 
@@ -94,14 +85,13 @@ impl Robolt<Authenticated> {
         &self,
         usernames: Vec<&str>,
         exclude_banned: bool,
-    ) -> Result<Vec<PartialUser>, Error> {
+    ) -> Result<Vec<PartialUser>, RoboltError> {
         let post = SearchByUsername {
             exclude_banned_users: exclude_banned,
             usernames,
         };
 
         self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
-            .function("fetch_users_by_username")
             .method(Method::POST)
             .send_body::<_, DataResponse<PartialUser>>(&post)
             .map(|res| res.data)

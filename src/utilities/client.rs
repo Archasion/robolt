@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 
-use std::io::{Error, ErrorKind};
 use std::marker::PhantomData;
 
 use reqwest::{header, Method};
@@ -9,13 +8,12 @@ use reqwest::header::HeaderMap;
 use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
 
-use crate::utilities::errors::RobloxAPIErrors;
+use crate::utilities::errors::{RobloxAPIErrors, RoboltError};
 
 pub(crate) struct RequestBuilder<'a, State> {
     robolt: &'a Robolt<State>,
     method: Method,
     endpoint: String,
-    function: &'static str,
 }
 
 pub struct Unauthenticated;
@@ -65,9 +63,8 @@ impl<State> Robolt<State> {
         &self,
         method: Method,
         endpoint: String,
-        function: &str,
         body: Option<U>,
-    ) -> Result<T, Error>
+    ) -> Result<T, RoboltError>
         where
             T: DeserializeOwned,
             U: Serialize,
@@ -83,41 +80,29 @@ impl<State> Robolt<State> {
             builder
         };
 
-        let unknown_error = |err: String| {
-            Error::new(
-                ErrorKind::Other,
-                format!(
-                    "An unknown error has occurred while executing {}() | {}",
-                    function, err
-                ),
-            )
-        };
-
         let res = builder
             .send()
-            .map_err(|err| unknown_error(err.to_string()))?;
+            .map_err(|err| RoboltError::from(err.to_string()))?;
 
         let status = res.status();
 
         if !status.is_success() {
             let err_res = res
                 .json::<RobloxAPIErrors>()
-                .map_err(|_| Error::new(ErrorKind::Other, status.to_string()))?;
+                .map_err(|_| RoboltError::from(status.to_string()))?;
 
             let err = err_res
                 .errors
-                .first()
-                .ok_or_else(|| Error::new(ErrorKind::Other, status.to_string()))?;
+                .into_iter()
+                .next()
+                .ok_or_else(|| RoboltError::from(status.to_string()))?;
 
-            return Err(Error::new(
-                ErrorKind::Other,
-                format!("RobloxAPIError: {}", err.message.clone()),
-            ));
+            return Err(err);
         }
 
         let json = res
             .json::<T>()
-            .map_err(|err| unknown_error(err.to_string()))?;
+            .map_err(|err| RoboltError::from(err.to_string()))?;
 
         Ok(json)
     }
@@ -127,7 +112,6 @@ impl<'a, State> RequestBuilder<'a, State> {
     fn new(endpoint: String, robolt: &'a Robolt<State>) -> Self {
         Self {
             method: Method::GET,
-            function: "[Unknown Function]",
             endpoint,
             robolt,
         }
@@ -138,25 +122,18 @@ impl<'a, State> RequestBuilder<'a, State> {
         self
     }
 
-    pub(crate) fn function(mut self, function: &'static str) -> Self {
-        self.function = function;
-        self
-    }
-
-    pub(crate) fn send_body<T, U>(self, body: T) -> Result<U, Error>
+    pub(crate) fn send_body<T, U>(self, body: T) -> Result<U, RoboltError>
         where
             T: Serialize,
             U: DeserializeOwned,
     {
-        self.robolt
-            .request(self.method, self.endpoint, self.function, Some(body))
+        self.robolt.request(self.method, self.endpoint, Some(body))
     }
 
-    pub(crate) fn send<T>(self) -> Result<T, Error>
+    pub(crate) fn send<T>(self) -> Result<T, RoboltError>
         where
             T: DeserializeOwned,
     {
-        self.robolt
-            .request::<(), T>(self.method, self.endpoint, self.function, None)
+        self.robolt.request::<(), T>(self.method, self.endpoint, None)
     }
 }

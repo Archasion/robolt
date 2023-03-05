@@ -1,75 +1,63 @@
-use std::io::Error;
-
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
 use crate::api::{CountResponse, ENDPOINTS};
+use crate::errors::RoboltError;
 use crate::Robolt;
 use crate::utilities::client::Authenticated;
 
 impl<State> Robolt<State> {
-    pub fn fetch_roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, Error> {
+    pub fn fetch_roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, RoboltError> {
         self.request_builder(format!(
             "{}/v1/users/{}/roblox-badges",
             ENDPOINTS.account_information, user_id
-        ))
-            .function("fetch_roblox_badges")
-            .send()
+        )).send()
     }
 
-    pub fn fetch_user_socials(&self, user_id: u64) -> Result<UserSocials, Error> {
+    pub fn fetch_user_socials(&self, user_id: u64) -> Result<UserSocials, RoboltError> {
         self.request_builder(format!(
             "{}/v1/users/{}/promotion-channels",
             ENDPOINTS.account_information, user_id
-        ))
-            .function("fetch_user_socials")
-            .send()
+        )).send()
     }
 }
 
 impl Robolt<Authenticated> {
-    pub fn my_socials(&self) -> Result<AuthenticatedUserSocials, Error> {
+    pub fn my_socials(&self) -> Result<AuthenticatedUserSocials, RoboltError> {
         self.request_builder(format!(
             "{}/v1/promotion-channels",
             ENDPOINTS.account_information
-        ))
-            .function("my_socials")
-            .send()
+        )).send()
     }
 
-    pub fn my_birthdate(&self) -> Result<Birthdate, Error> {
+    pub fn my_birthdate(&self) -> Result<Birthdate, RoboltError> {
         self.request_builder(format!("{}/v1/birthdate", ENDPOINTS.account_information))
-            .function("my_birthdate")
             .send()
     }
 
-    pub fn my_description(&self) -> Result<String, Error> {
+    pub fn my_description(&self) -> Result<String, RoboltError> {
         self.request_builder(format!("{}/v1/description", ENDPOINTS.account_information))
-            .function("my_description")
             .send::<Description>()
             .map(|res| res.description)
     }
 
-    pub fn my_gender(&self) -> Result<Gender, Error> {
+    pub fn my_gender(&self) -> Result<Gender, RoboltError> {
         self.request_builder(format!("{}/v1/gender", ENDPOINTS.account_information))
-            .function("my_gender")
             .send::<GenderResponse>()
             .map(|res| res.gender)
     }
 
-    pub fn my_consecutive_xbox_logins(&self) -> Result<u16, Error> {
+    pub fn my_consecutive_xbox_logins(&self) -> Result<u16, RoboltError> {
         self.request_builder(format!(
             "{}/v1/xbox-live/consecutive-login-days",
             ENDPOINTS.account_information
         ))
-            .function("consecutive_xbox_logins")
             .send::<CountResponse<u16>>()
             .map(|res| res.count)
     }
 
-    pub fn my_phone_number(&self) -> Result<PhoneNumber, Error> {
+    pub fn my_phone_number(&self) -> Result<PhoneNumber, RoboltError> {
         self.request_builder(format!("{}/v1/phone", ENDPOINTS.account_information))
-            .function("my_phone_number")
             .send()
     }
 }

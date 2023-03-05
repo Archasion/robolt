@@ -1,14 +1,13 @@
-use std::io::Error;
-
 use serde::Deserialize;
 
 use crate::api::ENDPOINTS;
 use crate::api::users::PartialUser;
+use crate::errors::RoboltError;
 use crate::Robolt;
 use crate::utilities::client::Authenticated;
 
 impl Robolt<Authenticated> {
-    pub fn my_privacy(&self, setting: PrivacySetting) -> Result<Privacy, Error> {
+    pub fn my_privacy(&self, setting: PrivacySetting) -> Result<Privacy, RoboltError> {
         self.request_builder(format!(
             "{}/v1/{}",
             ENDPOINTS.account_settings,
@@ -20,29 +19,25 @@ impl Robolt<Authenticated> {
                 PrivacySetting::PrivateMessage => "private-message-privacy",
             }
         ))
-            .function("my_privacy")
             .send::<PrivacySettingResponse>()
             .map(|res| res.value)
     }
 
-    pub fn my_blocked_users(&self) -> Result<BlockedUsers, Error> {
+    pub fn my_blocked_users(&self) -> Result<BlockedUsers, RoboltError> {
         self.request_builder(format!(
             "{}/v1/users/get-detailed-blocked-users",
             ENDPOINTS.account_settings
         ))
-            .function("my_blocked_users")
             .send::<BlockedUsers>()
     }
 
-    pub fn my_email(&self) -> Result<Email, Error> {
+    pub fn my_email(&self) -> Result<Email, RoboltError> {
         self.request_builder(format!("{}/v1/email", ENDPOINTS.account_settings))
-            .function("my_email")
             .send::<Email>()
     }
 
-    pub fn my_trade_value(&self) -> Result<TradeValue, Error> {
+    pub fn my_trade_value(&self) -> Result<TradeValue, RoboltError> {
         self.request_builder(format!("{}/v1/trade-value", ENDPOINTS.account_settings))
-            .function("my_trade_value")
             .send::<TradeValueResponse>()
             .map(|res| res.trade_value)
     }
