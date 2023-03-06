@@ -8,12 +8,12 @@ use crate::Robolt;
 impl Robolt<Authenticated> {
 	pub fn fetch_balance(&self) -> Result<u64, RoboltError> {
 		self.request_builder(format!("{}/v1/user/currency", ENDPOINTS.economy))
-			.send::<Robux>()
+			.send::<UserBalance>()
 			.map(|res| res.robux)
 	}
 }
 
 #[derive(Deserialize)]
-struct Robux {
+struct UserBalance {
 	robux: u64,
 }

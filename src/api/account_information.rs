@@ -40,7 +40,7 @@ impl Robolt<Authenticated> {
 
 	pub fn my_description(&self) -> Result<String, RoboltError> {
 		self.request_builder(format!("{}/v1/description", ENDPOINTS.account_information))
-			.send::<Description>()
+			.send::<ProfileDescription>()
 			.map(|res| res.description)
 	}
 
@@ -79,7 +79,7 @@ struct GenderResponse {
 }
 
 #[derive(Deserialize)]
-struct Description {
+struct ProfileDescription {
 	description: String,
 }
 

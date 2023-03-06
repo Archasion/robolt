@@ -40,7 +40,7 @@ impl<State> Robolt<State> {
 		user_ids: Vec<u64>,
 		exclude_banned: bool,
 	) -> Result<Vec<PartialUser>, RoboltError> {
-		let post = SearchById {
+		let post = SearchPartialUsersById {
 			exclude_banned_users: exclude_banned,
 			user_ids,
 		};
@@ -86,7 +86,7 @@ impl Robolt<Authenticated> {
 		usernames: Vec<&str>,
 		exclude_banned: bool,
 	) -> Result<Vec<PartialUser>, RoboltError> {
-		let post = SearchByUsername {
+		let post = SearchPartialUsersByUsername {
 			exclude_banned_users: exclude_banned,
 			usernames,
 		};
@@ -124,14 +124,14 @@ pub struct PartialUser {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct SearchById {
+struct SearchPartialUsersById {
 	exclude_banned_users: bool,
 	user_ids:             Vec<u64>,
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct SearchByUsername<'a> {
+struct SearchPartialUsersByUsername<'a> {
 	exclude_banned_users: bool,
 	usernames:            Vec<&'a str>,
 }

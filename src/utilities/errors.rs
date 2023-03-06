@@ -8,7 +8,7 @@ pub struct RoboltError {
 	#[serde(default = "code_default")]
 	pub code:    i8,
 	#[serde(skip)]
-	kind:        ErrorKind,
+	kind:        RoboltErrorKind,
 }
 
 fn code_default() -> i8 {
@@ -21,15 +21,15 @@ pub(crate) struct RobloxAPIErrors {
 }
 
 #[derive(Debug)]
-pub(crate) enum ErrorKind {
+pub(crate) enum RoboltErrorKind {
 	Unknown,
 	Api,
 }
 
 #[doc(hidden)]
-impl Default for ErrorKind {
+impl Default for RoboltErrorKind {
 	fn default() -> Self {
-		ErrorKind::Api
+		RoboltErrorKind::Api
 	}
 }
 
@@ -37,8 +37,8 @@ impl Default for ErrorKind {
 impl fmt::Display for RoboltError {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let kind = match self.kind {
-			ErrorKind::Api => format!("API Error (code: {})", self.code),
-			ErrorKind::Unknown => "Unknown".to_string(),
+			RoboltErrorKind::Api => format!("API Error (code: {})", self.code),
+			RoboltErrorKind::Unknown => "Unknown".to_string(),
 		};
 
 		write!(f, "[Robolt] {}: {}", kind, self.message)
@@ -49,7 +49,7 @@ impl fmt::Display for RoboltError {
 impl From<String> for RoboltError {
 	fn from(message: String) -> Self {
 		Self {
-			kind: ErrorKind::Unknown,
+			kind: RoboltErrorKind::Unknown,
 			code: code_default(),
 			message,
 		}

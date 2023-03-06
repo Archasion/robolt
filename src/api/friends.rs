@@ -1,8 +1,9 @@
 use reqwest::Method;
 use serde::Deserialize;
 
+use crate::api::presence::Presence;
 use crate::api::users::{PartialUser, User};
-use crate::api::{DataResponse, ENDPOINTS};
+use crate::api::{CountResponse, DataResponse, ENDPOINTS};
 use crate::errors::RoboltError;
 use crate::utilities::client::{Authenticated, EmptyResponse};
 use crate::Robolt;
@@ -13,7 +14,7 @@ impl<State> Robolt<State> {
 			"{}/v1/users/{}/followers/count",
 			ENDPOINTS.friends, user_id
 		))
-		.send::<CountResponse>()
+		.send::<CountResponse<u64>>()
 		.map(|res| res.count)
 	}
 
@@ -22,7 +23,7 @@ impl<State> Robolt<State> {
 			"{}/v1/users/{}/followings/count",
 			ENDPOINTS.friends, user_id
 		))
-		.send::<CountResponse>()
+		.send::<CountResponse<u64>>()
 		.map(|res| res.count)
 	}
 
@@ -31,7 +32,7 @@ impl<State> Robolt<State> {
 			"{}/v1/users/{}/friends/count",
 			ENDPOINTS.friends, user_id
 		))
-		.send::<CountResponse>()
+		.send::<CountResponse<u64>>()
 		.map(|res| res.count)
 	}
 
@@ -78,13 +79,13 @@ impl Robolt<Authenticated> {
 			"{}/v1/user/friend-requests/count",
 			ENDPOINTS.friends
 		))
-		.send::<CountResponse>()
+		.send::<CountResponse<u64>>()
 		.map(|res| res.count)
 	}
 
 	pub fn my_friend_count(&self) -> Result<u64, RoboltError> {
 		self.request_builder(format!("{}/v1/my/friends/count", ENDPOINTS.friends))
-			.send::<CountResponse>()
+			.send::<CountResponse<u64>>()
 			.map(|res| res.count)
 	}
 
@@ -158,7 +159,7 @@ impl Robolt<Authenticated> {
 	pub fn my_friendship_statuses(
 		&self,
 		user_ids: Vec<u64>,
-	) -> Result<Vec<Friendship>, RoboltError> {
+	) -> Result<Vec<UserRelation>, RoboltError> {
 		let user_id = self.fetch_current_user()?.id;
 		let user_ids = user_ids
 			.iter()
@@ -171,12 +172,12 @@ impl Robolt<Authenticated> {
 			ENDPOINTS.friends, user_id, user_ids
 		))
 		.method(Method::GET)
-		.send::<DataResponse<Friendship>>()
+		.send::<DataResponse<UserRelation>>()
 		.map(|res| res.data)
 	}
 }
 
-impl Friendship {
+impl UserRelation {
 	pub fn is_friend(&self) -> bool {
 		self.status == FriendshipStatus::Friends
 	}
@@ -186,40 +187,22 @@ impl Friendship {
 pub enum FriendshipStatus {
 	NotFriends,
 	Friends,
+	RequestSent,
+	RequestReceived,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct Friendship {
+pub struct UserRelation {
 	pub id:     u64,
 	pub status: FriendshipStatus,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UserPresence {
-	#[serde(rename = "UserPresenceType")]
-	pub user_presence_type: String,
-	#[serde(rename = "UserLocationType")]
-	pub user_location_type: String,
-	pub last_location:      String,
-	pub last_online:        String,
-	pub place_id:           Option<u64>,
-	pub root_place_id:      Option<u64>,
-	pub game_instance_id:   Option<String>,
-	pub universe_id:        Option<u64>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 pub struct OnlineFriend {
+	#[serde(rename = "userPresence")]
+	pub presence: Presence,
 	#[serde(flatten)]
 	pub user:     PartialUser,
-	#[serde(rename = "userPresence")]
-	pub presence: UserPresence,
-}
-
-#[derive(Deserialize)]
-struct CountResponse {
-	count: u64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -227,13 +210,13 @@ struct CountResponse {
 pub struct FriendRequest {
 	#[serde(flatten)]
 	pub user:                User,
-	pub friend_request:      FriendRequestInfo,
+	pub friend_request:      FriendRequestDetails,
 	pub mutual_friends_list: Vec<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct FriendRequestInfo {
+pub struct FriendRequestDetails {
 	pub sent_at:            String,
 	pub sender_id:          u64,
 	pub source_universe_id: Option<u64>,

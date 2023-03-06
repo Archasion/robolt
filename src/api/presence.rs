@@ -9,10 +9,7 @@ use crate::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub fn fetch_presences(
-		&self,
-		user_ids: Vec<u64>,
-	) -> Result<Vec<DetailedPresence>, RoboltError> {
+	pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<Presence>, RoboltError> {
 		let mut body = HashMap::new();
 		body.insert("userIds", user_ids);
 
@@ -22,7 +19,10 @@ impl<State> Robolt<State> {
 			.map(|res| res.user_presences)
 	}
 
-	pub fn fetch_last_online(&self, user_ids: Vec<u64>) -> Result<Vec<Presence>, RoboltError> {
+	pub fn fetch_last_online(
+		&self,
+		user_ids: Vec<u64>,
+	) -> Result<Vec<PartialPresence>, RoboltError> {
 		let mut body = HashMap::new();
 		body.insert("userIds", user_ids);
 
@@ -35,10 +35,14 @@ impl<State> Robolt<State> {
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct DetailedPresence {
-	#[serde(flatten)]
-	pub presence:           Presence,
-	pub user_presence_type: PresenceType,
+pub struct Presence {
+	#[serde(alias = "UserPresenceType")]
+	pub user_presence_type: UserPresenceType,
+	#[serde(alias = "UserLocationType")]
+	pub user_location_type: Option<UserLocationType>,
+	#[serde(default)]
+	pub user_id:            u64,
+	pub last_online:        String,
 	pub last_location:      String,
 	pub game_id:            Option<u64>,
 	pub place_id:           Option<u64>,
@@ -48,28 +52,35 @@ pub struct DetailedPresence {
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Presence {
+pub struct PartialPresence {
 	pub user_id:     u64,
 	pub last_online: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize_repr)]
 #[repr(u8)]
-pub enum PresenceType {
+pub enum UserPresenceType {
 	Offline  = 0,
 	Online   = 1,
 	InGame   = 2,
 	InStudio = 3,
 }
 
+#[derive(Debug, Clone, PartialEq, Deserialize_repr)]
+#[repr(u8)]
+pub enum UserLocationType {
+	Page,
+	Game,
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct DetailedPresences {
-	user_presences: Vec<DetailedPresence>,
+	user_presences: Vec<Presence>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Presences {
-	last_online_timestamps: Vec<Presence>,
+	last_online_timestamps: Vec<PartialPresence>,
 }
