@@ -38,7 +38,7 @@ impl<State> Robolt<State> {
 pub struct Presence {
 	#[serde(alias = "UserPresenceType")]
 	pub user_presence_type: UserPresenceType,
-	#[serde(alias = "UserLocationType")]
+	#[serde(rename = "UserLocationType")]
 	pub user_location_type: Option<UserLocationType>,
 	#[serde(default)]
 	pub user_id:            u64,
