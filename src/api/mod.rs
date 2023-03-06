@@ -12,37 +12,37 @@ pub(crate) mod presence;
 mod users;
 
 struct RobloxAPIEndpoints<T = &'static str> {
-    account_information: T,
-    account_settings: T,
-    premium_features: T,
-    presence: T,
-    economy: T,
-    friends: T,
-    points: T,
-    badges: T,
-    users: T,
-    base: T,
+	account_information: T,
+	account_settings:    T,
+	premium_features:    T,
+	presence:            T,
+	economy:             T,
+	friends:             T,
+	points:              T,
+	badges:              T,
+	users:               T,
+	base:                T,
 }
 
 #[derive(Debug, Deserialize)]
 struct DataResponse<T> {
-    data: Vec<T>,
+	data: Vec<T>,
 }
 
 #[derive(Deserialize)]
 struct CountResponse<T> {
-    count: T,
+	count: T,
 }
 
 const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
-    account_information: "accountinformation.roblox.com",
-    account_settings: "accountsettings.roblox.com",
-    premium_features: "premiumfeatures.roblox.com",
-    presence: "presence.roblox.com",
-    economy: "economy.roblox.com",
-    friends: "friends.roblox.com",
-    points: "points.roblox.com",
-    badges: "badges.roblox.com",
-    users: "users.roblox.com",
-    base: "api.roblox.com",
+	account_information: "accountinformation.roblox.com",
+	account_settings:    "accountsettings.roblox.com",
+	premium_features:    "premiumfeatures.roblox.com",
+	presence:            "presence.roblox.com",
+	economy:             "economy.roblox.com",
+	friends:             "friends.roblox.com",
+	points:              "points.roblox.com",
+	badges:              "badges.roblox.com",
+	users:               "users.roblox.com",
+	base:                "api.roblox.com",
 };
