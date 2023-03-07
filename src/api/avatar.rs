@@ -2,10 +2,9 @@ use serde::Deserialize;
 
 use crate::api::ENDPOINTS;
 use crate::errors::RoboltError;
-use crate::utilities::client::Unauthenticated;
 use crate::Robolt;
 
-impl Robolt<Unauthenticated> {
+impl<State> Robolt<State> {
 	pub fn fetch_avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}/avatar", ENDPOINTS.avatar, user_id))
 			.send()
@@ -19,15 +18,79 @@ impl Robolt<Unauthenticated> {
 		.send::<AssetIdsResponse>()
 		.map(|res| res.asset_ids)
 	}
+
+	pub fn fetch_outfits(&self, user_id: u64) -> OutfitsFilterBuilder<State> {
+		OutfitsFilterBuilder::new(user_id, self)
+	}
 }
 
-#[derive(Deserialize)]
+impl<'a, State> OutfitsFilterBuilder<'a, State> {
+	pub fn new(user_id: u64, client: &'a Robolt<State>) -> Self {
+		Self {
+			user_id,
+			page: 1,
+			items_per_page: 25,
+			is_editable: true,
+			client,
+		}
+	}
+
+	pub fn page(mut self, page: u8) -> Self {
+		self.page = page;
+		self
+	}
+
+	pub fn items_per_page(mut self, items_per_page: u8) -> Self {
+		self.items_per_page = items_per_page;
+		self
+	}
+
+	pub fn editable(mut self, is_editable: bool) -> Self {
+		self.is_editable = is_editable;
+		self
+	}
+
+	pub fn send(self) -> Result<OutfitsResponse, RoboltError> {
+		self.client
+			.request_builder(format!(
+				"{}/v1/users/{}/outfits?page={}&itemsPerPage={}&isEditable={}",
+				ENDPOINTS.avatar, self.user_id, self.page, self.items_per_page, self.is_editable
+			))
+			.send()
+	}
+}
+
+pub struct OutfitsFilterBuilder<'a, State> {
+	user_id:        u64,
+	page:           u8,
+	items_per_page: u8,
+	is_editable:    bool,
+	client:         &'a Robolt<State>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OutfitsResponse {
+	pub filtered_count: u32,
+	pub data:           Vec<Outfit>,
+	pub total:          u64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Outfit {
+	pub id:          u64,
+	pub name:        String,
+	pub is_editable: bool,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AssetIdsResponse {
 	asset_ids: Vec<u64>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar {
 	pub player_avatar_type:    AvatarType,
@@ -39,7 +102,7 @@ pub struct Avatar {
 	pub emotes:                Vec<AvatarEmotes>,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarScales {
 	pub head:       f32,
@@ -50,7 +113,7 @@ pub struct AvatarScales {
 	pub body_type:  f32,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BodyColors {
 	pub head_color_id:      u32,
@@ -61,7 +124,7 @@ pub struct BodyColors {
 	pub left_leg_color_id:  u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarEmotes {
 	#[serde(rename = "assetName")]
@@ -71,7 +134,7 @@ pub struct AvatarEmotes {
 	pub position: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarAssets {
 	pub id:                 u64,
@@ -81,20 +144,20 @@ pub struct AvatarAssets {
 	pub current_version_id: u64,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct AvatarAssetType {
 	pub id:   u64,
 	pub name: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct AvatarAssetMeta {
 	pub order:     u32,
 	pub puffiness: f32,
 	pub version:   u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 pub enum AvatarType {
 	R6,
 	R15,

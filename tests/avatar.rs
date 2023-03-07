@@ -13,3 +13,16 @@ fn fetch_wearing_assets() {
 	let client = Robolt::new();
 	assert_ok!(client.fetch_currently_wearing(1));
 }
+
+#[test]
+fn fetch_outfits() {
+	let client = Robolt::new();
+	let res = client
+		.fetch_outfits(1)
+		.items_per_page(100)
+		.page(1)
+		.editable(true)
+		.send();
+
+	assert_ok!(res);
+}
