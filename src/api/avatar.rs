@@ -1,0 +1,86 @@
+use serde::Deserialize;
+
+use crate::api::ENDPOINTS;
+use crate::errors::RoboltError;
+use crate::utilities::client::Unauthenticated;
+use crate::Robolt;
+
+impl Robolt<Unauthenticated> {
+	pub fn fetch_avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
+		self.request_builder(format!("{}/v1/users/{}/avatar", ENDPOINTS.avatar, user_id))
+			.send()
+	}
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Avatar {
+	pub player_avatar_type:    AvatarType,
+	pub default_shirt_applied: bool,
+	pub default_pants_applied: bool,
+	pub scales:                AvatarScales,
+	pub body_colors:           BodyColors,
+	pub assets:                Vec<AvatarAssets>,
+	pub emotes:                Vec<AvatarEmotes>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AvatarScales {
+	pub head:       f32,
+	pub depth:      f32,
+	pub height:     f32,
+	pub width:      f32,
+	pub proportion: f32,
+	pub body_type:  f32,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BodyColors {
+	pub head_color_id:      u32,
+	pub torso_color_id:     u32,
+	pub right_arm_color_id: u32,
+	pub left_arm_color_id:  u32,
+	pub right_leg_color_id: u32,
+	pub left_leg_color_id:  u32,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AvatarEmotes {
+	#[serde(rename = "assetName")]
+	pub name:     String,
+	#[serde(rename = "assetId")]
+	pub id:       u64,
+	pub position: u32,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AvatarAssets {
+	pub id:                 u64,
+	pub name:               String,
+	pub asset_type:         AvatarAssetType,
+	pub meta:               AvatarAssetMeta,
+	pub current_version_id: u64,
+}
+
+#[derive(Deserialize)]
+pub struct AvatarAssetType {
+	pub id:   u64,
+	pub name: String,
+}
+
+#[derive(Deserialize)]
+pub struct AvatarAssetMeta {
+	pub order:     u32,
+	pub puffiness: f32,
+	pub version:   u32,
+}
+
+#[derive(Deserialize)]
+pub enum AvatarType {
+	R6,
+	R15,
+}

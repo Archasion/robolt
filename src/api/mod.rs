@@ -3,6 +3,7 @@ use serde::Deserialize;
 pub(crate) mod account_information;
 pub(crate) mod account_settings;
 mod auth;
+pub(crate) mod avatar;
 pub(crate) mod badges;
 mod economy;
 pub(crate) mod friends;
@@ -20,6 +21,7 @@ struct RobloxAPIEndpoints<T = &'static str> {
 	friends:             T,
 	points:              T,
 	badges:              T,
+	avatar:              T,
 	users:               T,
 	base:                T,
 }
@@ -43,6 +45,7 @@ const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
 	friends:             "friends.roblox.com",
 	points:              "points.roblox.com",
 	badges:              "badges.roblox.com",
+	avatar:              "avatar.roblox.com",
 	users:               "users.roblox.com",
 	base:                "api.roblox.com",
 };
