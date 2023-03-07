@@ -26,7 +26,7 @@ struct RobloxAPIEndpoints<T = &'static str> {
 	base:                T,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct DataResponse<T> {
 	data: Vec<T>,
 }
@@ -50,7 +50,7 @@ const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
 	base:                "api.roblox.com",
 };
 
-#[derive(Default)]
+#[derive(Default, Debug, Clone, PartialEq)]
 pub enum Limit {
 	#[default]
 	Min  = 10,
