@@ -10,6 +10,21 @@ impl Robolt<Unauthenticated> {
 		self.request_builder(format!("{}/v1/users/{}/avatar", ENDPOINTS.avatar, user_id))
 			.send()
 	}
+
+	pub fn fetch_currently_wearing(&self, user_id: u64) -> Result<Vec<u64>, RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/users/{}/currently-wearing",
+			ENDPOINTS.avatar, user_id
+		))
+		.send::<AssetIdsResponse>()
+		.map(|res| res.asset_ids)
+	}
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AssetIdsResponse {
+	asset_ids: Vec<u64>,
 }
 
 #[derive(Deserialize)]
