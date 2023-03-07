@@ -1,17 +1,17 @@
 use tokio_test::assert_ok;
 
-use robolt::Robolt;
+use robolt::{Limit, Robolt};
 
 #[test]
 fn fetch_followers() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_followers(1, 10));
+	assert_ok!(client.fetch_followers(1, Limit::default()));
 }
 
 #[test]
 fn fetch_followings() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_followings(1, 10));
+	assert_ok!(client.fetch_followings(1, Limit::default()));
 }
 
 #[test]

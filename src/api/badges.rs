@@ -1,7 +1,7 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
-use crate::api::{DataResponse, ENDPOINTS};
+use crate::api::{DataResponse, Limit, ENDPOINTS};
 use crate::errors::RoboltError;
 use crate::utilities::client::Authenticated;
 use crate::Robolt;
@@ -12,19 +12,23 @@ impl<State> Robolt<State> {
 			.send()
 	}
 
-	pub fn fetch_universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, RoboltError> {
+	pub fn fetch_universe_badges(
+		&self,
+		universe_id: u64,
+		limit: Limit,
+	) -> Result<Vec<Badge>, RoboltError> {
 		self.request_builder(format!(
-			"{}/v1/universes/{}/badges?limit=100",
-			ENDPOINTS.badges, universe_id
+			"{}/v1/universes/{}/badges?limit={}",
+			ENDPOINTS.badges, universe_id, limit as u8
 		))
 		.send::<DataResponse<Badge>>()
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_user_badges(&self, user_id: u64) -> Result<Vec<Badge>, RoboltError> {
+	pub fn fetch_user_badges(&self, user_id: u64, limit: Limit) -> Result<Vec<Badge>, RoboltError> {
 		self.request_builder(format!(
-			"{}/v1/users/{}/badges?limit=100",
-			ENDPOINTS.badges, user_id
+			"{}/v1/users/{}/badges?limit={}",
+			ENDPOINTS.badges, user_id, limit as u8
 		))
 		.send::<DataResponse<Badge>>()
 		.map(|res| res.data)

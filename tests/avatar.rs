@@ -1,6 +1,6 @@
 use tokio_test::assert_ok;
 
-use robolt::Robolt;
+use robolt::{Limit, Robolt};
 
 #[test]
 fn fetch_avatar() {
@@ -19,7 +19,7 @@ fn fetch_outfits() {
 	let client = Robolt::new();
 	let res = client
 		.fetch_outfits(1)
-		.items_per_page(100)
+		.items_per_page(Limit::default())
 		.page(1)
 		.editable(true)
 		.send();

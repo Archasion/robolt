@@ -1,6 +1,6 @@
 use tokio_test::assert_ok;
 
-use robolt::Robolt;
+use robolt::{Limit, Robolt};
 
 #[test]
 fn fetch_user_by_id() {
@@ -29,7 +29,7 @@ fn fetch_username_history() {
 #[test]
 fn search_users_by_keyword() {
 	let client = Robolt::new();
-	assert_ok!(client.search_users("test", 10));
+	assert_ok!(client.search_users("test", Limit::default()));
 }
 
 #[test]

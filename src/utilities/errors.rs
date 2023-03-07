@@ -20,17 +20,11 @@ pub(crate) struct RobloxAPIErrors {
 	pub(crate) errors: Vec<RoboltError>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub(crate) enum RoboltErrorKind {
-	Unknown,
+	#[default]
 	Api,
-}
-
-#[doc(hidden)]
-impl Default for RoboltErrorKind {
-	fn default() -> Self {
-		RoboltErrorKind::Api
-	}
+	Unknown,
 }
 
 #[doc(hidden)]

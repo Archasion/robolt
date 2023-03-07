@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::api::presence::Presence;
 use crate::api::users::{PartialUser, User};
-use crate::api::{CountResponse, DataResponse, ENDPOINTS};
+use crate::api::{CountResponse, DataResponse, Limit, ENDPOINTS};
 use crate::errors::RoboltError;
 use crate::utilities::client::{Authenticated, EmptyResponse};
 use crate::Robolt;
@@ -45,19 +45,19 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_followers(&self, user_id: u64, limit: u8) -> Result<Vec<User>, RoboltError> {
+	pub fn fetch_followers(&self, user_id: u64, limit: Limit) -> Result<Vec<User>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followers?limit={}",
-			ENDPOINTS.friends, user_id, limit
+			ENDPOINTS.friends, user_id, limit as u8
 		))
 		.send::<DataResponse<User>>()
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_followings(&self, user_id: u64, limit: u8) -> Result<Vec<User>, RoboltError> {
+	pub fn fetch_followings(&self, user_id: u64, limit: Limit) -> Result<Vec<User>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followings?limit={}",
-			ENDPOINTS.friends, user_id, limit
+			ENDPOINTS.friends, user_id, limit as u8
 		))
 		.send::<DataResponse<User>>()
 		.map(|res| res.data)
@@ -65,10 +65,10 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Authenticated> {
-	pub fn my_friend_requests(&self, limit: u8) -> Result<Vec<FriendRequest>, RoboltError> {
+	pub fn my_friend_requests(&self, limit: Limit) -> Result<Vec<FriendRequest>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/my/friends/requests?limit={}",
-			ENDPOINTS.friends, limit
+			ENDPOINTS.friends, limit as u8
 		))
 		.send::<DataResponse<FriendRequest>>()
 		.map(|res| res.data)

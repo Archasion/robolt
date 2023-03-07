@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::api::ENDPOINTS;
+use crate::api::{Limit, ENDPOINTS};
 use crate::errors::RoboltError;
 use crate::Robolt;
 
@@ -29,7 +29,7 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 		Self {
 			user_id,
 			page: 1,
-			items_per_page: 25,
+			items_per_page: Limit::default(),
 			is_editable: true,
 			client,
 		}
@@ -40,7 +40,7 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 		self
 	}
 
-	pub fn items_per_page(mut self, items_per_page: u8) -> Self {
+	pub fn items_per_page(mut self, items_per_page: Limit) -> Self {
 		self.items_per_page = items_per_page;
 		self
 	}
@@ -54,7 +54,11 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 		self.client
 			.request_builder(format!(
 				"{}/v1/users/{}/outfits?page={}&itemsPerPage={}&isEditable={}",
-				ENDPOINTS.avatar, self.user_id, self.page, self.items_per_page, self.is_editable
+				ENDPOINTS.avatar,
+				self.user_id,
+				self.page,
+				self.items_per_page as u8,
+				self.is_editable
 			))
 			.send()
 	}
@@ -63,7 +67,7 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 pub struct OutfitsFilterBuilder<'a, State> {
 	user_id:        u64,
 	page:           u8,
-	items_per_page: u8,
+	items_per_page: Limit,
 	is_editable:    bool,
 	client:         &'a Robolt<State>,
 }

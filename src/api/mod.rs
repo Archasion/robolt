@@ -49,3 +49,12 @@ const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
 	users:               "users.roblox.com",
 	base:                "api.roblox.com",
 };
+
+#[derive(Default)]
+pub enum Limit {
+	#[default]
+	Min  = 10,
+	Low  = 25,
+	High = 50,
+	Max  = 100,
+}

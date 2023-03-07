@@ -1,7 +1,7 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
-use crate::api::{DataResponse, ENDPOINTS};
+use crate::api::{DataResponse, Limit, ENDPOINTS};
 use crate::utilities::client::{Authenticated, EmptyResponse};
 use crate::utilities::errors::RoboltError;
 use crate::Robolt;
@@ -26,10 +26,14 @@ impl<State> Robolt<State> {
 		.map(|res| res.id)
 	}
 
-	pub fn search_users(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, RoboltError> {
+	pub fn search_users(
+		&self,
+		keyword: &str,
+		limit: Limit,
+	) -> Result<Vec<PartialUser>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/search?keyword={}&limit={}",
-			ENDPOINTS.users, keyword, limit
+			ENDPOINTS.users, keyword, limit as u8
 		))
 		.send::<DataResponse<PartialUser>>()
 		.map(|res| res.data)
