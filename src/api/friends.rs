@@ -193,7 +193,7 @@ pub enum FriendshipStatus {
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 pub struct UserRelation {
-	pub id:     u64,
+	pub id: u64,
 	pub status: FriendshipStatus,
 }
 
@@ -202,24 +202,24 @@ pub struct OnlineFriend {
 	#[serde(rename = "userPresence")]
 	pub presence: Presence,
 	#[serde(flatten)]
-	pub user:     PartialUser,
+	pub user: PartialUser,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FriendRequest {
 	#[serde(flatten)]
-	pub user:                User,
-	pub friend_request:      FriendRequestDetails,
+	pub user: User,
+	pub friend_request: FriendRequestDetails,
 	pub mutual_friends_list: Vec<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FriendRequestDetails {
-	pub sent_at:            String,
-	pub sender_id:          u64,
+	pub sent_at: String,
+	pub sender_id: u64,
 	pub source_universe_id: Option<u64>,
 	pub origin_source_type: String,
-	pub contact_name:       Option<String>,
+	pub contact_name: Option<String>,
 }

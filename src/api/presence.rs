@@ -41,28 +41,28 @@ pub struct Presence {
 	#[serde(rename = "UserLocationType")]
 	pub user_location_type: Option<UserLocationType>,
 	#[serde(default)]
-	pub user_id:            u64,
-	pub last_online:        String,
-	pub last_location:      String,
-	pub game_id:            Option<u64>,
-	pub place_id:           Option<u64>,
-	pub universe_id:        Option<u64>,
-	pub root_place_id:      Option<u64>,
+	pub user_id: u64,
+	pub last_online: String,
+	pub last_location: String,
+	pub game_id: Option<u64>,
+	pub place_id: Option<u64>,
+	pub universe_id: Option<u64>,
+	pub root_place_id: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PartialPresence {
-	pub user_id:     u64,
+	pub user_id: u64,
 	pub last_online: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize_repr)]
 #[repr(u8)]
 pub enum UserPresenceType {
-	Offline  = 0,
-	Online   = 1,
-	InGame   = 2,
+	Offline = 0,
+	Online = 1,
+	InGame = 2,
 	InStudio = 3,
 }
 

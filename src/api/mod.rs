@@ -14,16 +14,16 @@ mod users;
 
 struct RobloxAPIEndpoints<T = &'static str> {
 	account_information: T,
-	account_settings:    T,
-	premium_features:    T,
-	presence:            T,
-	economy:             T,
-	friends:             T,
-	points:              T,
-	badges:              T,
-	avatar:              T,
-	users:               T,
-	base:                T,
+	account_settings: T,
+	premium_features: T,
+	presence: T,
+	economy: T,
+	friends: T,
+	points: T,
+	badges: T,
+	avatar: T,
+	users: T,
+	base: T,
 }
 
 #[derive(Deserialize)]
@@ -38,23 +38,23 @@ struct CountResponse<T> {
 
 const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
 	account_information: "accountinformation.roblox.com",
-	account_settings:    "accountsettings.roblox.com",
-	premium_features:    "premiumfeatures.roblox.com",
-	presence:            "presence.roblox.com",
-	economy:             "economy.roblox.com",
-	friends:             "friends.roblox.com",
-	points:              "points.roblox.com",
-	badges:              "badges.roblox.com",
-	avatar:              "avatar.roblox.com",
-	users:               "users.roblox.com",
-	base:                "api.roblox.com",
+	account_settings: "accountsettings.roblox.com",
+	premium_features: "premiumfeatures.roblox.com",
+	presence: "presence.roblox.com",
+	economy: "economy.roblox.com",
+	friends: "friends.roblox.com",
+	points: "points.roblox.com",
+	badges: "badges.roblox.com",
+	avatar: "avatar.roblox.com",
+	users: "users.roblox.com",
+	base: "api.roblox.com",
 };
 
 #[derive(Default, Debug, Clone, PartialEq)]
 pub enum Limit {
 	#[default]
-	Min  = 10,
-	Low  = 25,
+	Min = 10,
+	Low = 25,
 	High = 50,
-	Max  = 100,
+	Max = 100,
 }

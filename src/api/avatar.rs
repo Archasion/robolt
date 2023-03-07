@@ -65,26 +65,26 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 }
 
 pub struct OutfitsFilterBuilder<'a, State> {
-	user_id:        u64,
-	page:           u8,
+	user_id: u64,
+	page: u8,
 	items_per_page: Limit,
-	is_editable:    bool,
-	client:         &'a Robolt<State>,
+	is_editable: bool,
+	client: &'a Robolt<State>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OutfitsResponse {
 	pub filtered_count: u32,
-	pub data:           Vec<Outfit>,
-	pub total:          u64,
+	pub data: Vec<Outfit>,
+	pub total: u64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Outfit {
-	pub id:          u64,
-	pub name:        String,
+	pub id: u64,
+	pub name: String,
 	pub is_editable: bool,
 }
 
@@ -97,68 +97,68 @@ struct AssetIdsResponse {
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar {
-	pub player_avatar_type:    AvatarType,
+	pub player_avatar_type: AvatarType,
 	pub default_shirt_applied: bool,
 	pub default_pants_applied: bool,
-	pub scales:                AvatarScales,
-	pub body_colors:           BodyColors,
-	pub assets:                Vec<AvatarAssets>,
-	pub emotes:                Vec<AvatarEmotes>,
+	pub scales: AvatarScales,
+	pub body_colors: BodyColors,
+	pub assets: Vec<AvatarAssets>,
+	pub emotes: Vec<AvatarEmotes>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarScales {
-	pub head:       f32,
-	pub depth:      f32,
-	pub height:     f32,
-	pub width:      f32,
+	pub head: f32,
+	pub depth: f32,
+	pub height: f32,
+	pub width: f32,
 	pub proportion: f32,
-	pub body_type:  f32,
+	pub body_type: f32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BodyColors {
-	pub head_color_id:      u32,
-	pub torso_color_id:     u32,
+	pub head_color_id: u32,
+	pub torso_color_id: u32,
 	pub right_arm_color_id: u32,
-	pub left_arm_color_id:  u32,
+	pub left_arm_color_id: u32,
 	pub right_leg_color_id: u32,
-	pub left_leg_color_id:  u32,
+	pub left_leg_color_id: u32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarEmotes {
 	#[serde(rename = "assetName")]
-	pub name:     String,
+	pub name: String,
 	#[serde(rename = "assetId")]
-	pub id:       u64,
+	pub id: u64,
 	pub position: u32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarAssets {
-	pub id:                 u64,
-	pub name:               String,
-	pub asset_type:         AvatarAssetType,
-	pub meta:               AvatarAssetMeta,
+	pub id: u64,
+	pub name: String,
+	pub asset_type: AvatarAssetType,
+	pub meta: AvatarAssetMeta,
 	pub current_version_id: u64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct AvatarAssetType {
-	pub id:   u64,
+	pub id: u64,
 	pub name: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct AvatarAssetMeta {
-	pub order:     u32,
+	pub order: u32,
 	pub puffiness: f32,
-	pub version:   u32,
+	pub version: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
