@@ -84,7 +84,7 @@ pub struct Outfit {
 	pub is_editable: bool,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AssetIdsResponse {
 	asset_ids: Vec<u64>,
