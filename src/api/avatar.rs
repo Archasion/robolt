@@ -1,8 +1,72 @@
+use std::collections::HashMap;
+
+use reqwest::Method;
 use serde::Deserialize;
 
 use crate::api::{Limit, ENDPOINTS};
 use crate::errors::RoboltError;
+use crate::utilities::client::{Authenticated, EmptyResponse};
 use crate::Robolt;
+
+impl Robolt<Authenticated> {
+	pub fn my_avatar(&self) -> Result<Avatar, RoboltError> {
+		self.request_builder(format!("{}/v1/avatar", ENDPOINTS.avatar))
+			.send()
+	}
+
+	pub fn add_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/avatar/assets/{}/wear",
+			ENDPOINTS.avatar, asset_id
+		))
+		.method(Method::POST)
+		.send::<EmptyResponse>()?;
+
+		Ok(())
+	}
+
+	pub fn set_wearing_assets(&self, asset_ids: Vec<u64>) -> Result<InvalidAssets, RoboltError> {
+		let mut body = HashMap::new();
+		body.insert("assetIds", asset_ids);
+
+		self.request_builder(format!("{}/v1/avatar/set-wearing-assets", ENDPOINTS.avatar))
+			.method(Method::POST)
+			.send_body(body)
+	}
+
+	pub fn remove_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/avatar/assets/{}/remove",
+			ENDPOINTS.avatar, asset_id
+		))
+		.method(Method::POST)
+		.send::<EmptyResponse>()?;
+
+		Ok(())
+	}
+
+	pub fn redraw_avatar_thumbnail(&self) -> Result<(), RoboltError> {
+		self.request_builder(format!("{}/v1/avatar/redraw-thumbnail", ENDPOINTS.avatar))
+			.method(Method::POST)
+			.send::<EmptyResponse>()?;
+
+		Ok(())
+	}
+
+	pub fn set_avatar_type(&self, avatar_type: AvatarType) -> Result<(), RoboltError> {
+		let mut body = HashMap::new();
+		body.insert("playerAvatarType", avatar_type as u8);
+
+		self.request_builder(format!(
+			"{}/v1/avatar/set-player-avatar-type",
+			ENDPOINTS.avatar
+		))
+		.method(Method::POST)
+		.send_body::<_, EmptyResponse>(body)?;
+
+		Ok(())
+	}
+}
 
 impl<State> Robolt<State> {
 	pub fn fetch_avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
@@ -64,6 +128,14 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 	}
 }
 
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InvalidAssets {
+	pub invalid_assets: Vec<AvatarAsset>,
+	pub invalid_asset_ids: Vec<u64>,
+	pub success: bool,
+}
+
 pub struct OutfitsFilterBuilder<'a, State> {
 	user_id: u64,
 	page: u8,
@@ -102,7 +174,7 @@ pub struct Avatar {
 	pub default_pants_applied: bool,
 	pub scales: AvatarScales,
 	pub body_colors: BodyColors,
-	pub assets: Vec<AvatarAssets>,
+	pub assets: Vec<AvatarAsset>,
 	pub emotes: Vec<AvatarEmotes>,
 }
 
@@ -140,11 +212,11 @@ pub struct AvatarEmotes {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AvatarAssets {
+pub struct AvatarAsset {
 	pub id: u64,
 	pub name: String,
 	pub asset_type: AvatarAssetType,
-	pub meta: AvatarAssetMeta,
+	pub meta: Option<AvatarAssetMeta>,
 	pub current_version_id: u64,
 }
 
@@ -157,12 +229,12 @@ pub struct AvatarAssetType {
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct AvatarAssetMeta {
 	pub order: u32,
-	pub puffiness: f32,
+	pub puffiness: Option<f32>,
 	pub version: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 pub enum AvatarType {
-	R6,
-	R15,
+	R6 = 1,
+	R15 = 3,
 }

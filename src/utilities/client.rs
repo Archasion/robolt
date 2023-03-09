@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use std::error::Error;
 use std::marker::PhantomData;
 
 use reqwest::blocking::Client;
@@ -51,6 +52,10 @@ impl Robolt {
 			state: PhantomData::<Unauthenticated>,
 			client,
 		}
+	}
+
+	pub fn from(roblox_cookie: String) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
+		Self::new().authenticate(roblox_cookie)
 	}
 }
 
