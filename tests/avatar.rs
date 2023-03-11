@@ -34,7 +34,7 @@ fn fetch_avatar_metadata() {
 }
 
 #[test]
-fn fetch_game_start_avatar_info() {
+fn fetch_game_start_info() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_game_start_avatar_info(2124789031));
+	assert_ok!(client.fetch_game_start_info(2124789031));
 }

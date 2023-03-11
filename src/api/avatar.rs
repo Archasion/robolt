@@ -92,7 +92,7 @@ impl<State> Robolt<State> {
 		OutfitsFilterBuilder::new(user_id, self)
 	}
 
-	pub fn fetch_game_start_avatar_info(
+	pub fn fetch_game_start_info(
 		&self,
 		universe_id: u64,
 	) -> Result<GameStartAvatarInfo, RoboltError> {
