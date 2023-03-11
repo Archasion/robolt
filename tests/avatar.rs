@@ -26,3 +26,15 @@ fn fetch_outfits() {
 
 	assert_ok!(res);
 }
+
+#[test]
+fn fetch_avatar_metadata() {
+	let client = Robolt::new();
+	assert_ok!(client.fetch_avatar_metadata());
+}
+
+#[test]
+fn fetch_game_start_avatar_info() {
+	let client = Robolt::new();
+	assert_ok!(client.fetch_game_start_avatar_info(2124789031));
+}

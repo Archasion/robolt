@@ -69,6 +69,11 @@ impl Robolt<Authenticated> {
 }
 
 impl<State> Robolt<State> {
+	pub fn fetch_avatar_metadata(&self) -> Result<AvatarMetadata, RoboltError> {
+		self.request_builder(format!("{}/v1/avatar/metadata", ENDPOINTS.avatar))
+			.send()
+	}
+
 	pub fn fetch_avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}/avatar", ENDPOINTS.avatar, user_id))
 			.send()
@@ -85,6 +90,17 @@ impl<State> Robolt<State> {
 
 	pub fn fetch_outfits(&self, user_id: u64) -> OutfitsFilterBuilder<State> {
 		OutfitsFilterBuilder::new(user_id, self)
+	}
+
+	pub fn fetch_game_start_avatar_info(
+		&self,
+		universe_id: u64,
+	) -> Result<GameStartAvatarInfo, RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/game-start-info?universeId={universe_id}",
+			ENDPOINTS.avatar
+		))
+		.send()
 	}
 }
 
@@ -237,4 +253,75 @@ pub struct AvatarAssetMeta {
 pub enum AvatarType {
 	R6 = 1,
 	R15 = 3,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AvatarMetadata {
+	pub enable_default_clothing_message: bool,
+	pub is_avatar_scale_embedded_in_tab: bool,
+	pub is_body_type_scale_out_of_tab: bool,
+	pub scale_height_increment: f32,
+	pub scale_width_increment: f32,
+	pub scale_head_increment: f32,
+	pub scale_proportion_increment: f32,
+	pub scale_body_type_increment: f32,
+	pub support_proportion_and_body_type: bool,
+	pub show_default_clothing_message_on_page_load: bool,
+	pub are_three_dee_thumbs_enabled: bool,
+	pub is_avatar_wearing_api_calls_locking_on_frontend_enabled: bool,
+	pub is_outfit_handling_on_frontend_enabled: bool,
+	pub is_justin_ui_changes_enabled: bool,
+	pub is_category_reorg_enabled: bool,
+	#[serde(rename = "LCEnabledInEditorAndCatalog")]
+	pub lcenabled_in_editor_and_catalog: bool,
+	#[serde(rename = "isLCCompletelyEnabled")]
+	pub is_lccompletely_enabled: bool,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GameStartAvatarInfo {
+	pub game_avatar_type: String,
+	pub allow_custom_animations: String,
+	pub universe_avatar_collision_type: String,
+	pub universe_avatar_body_type: String,
+	pub joint_positioning_type: String,
+	pub message: String,
+	pub universe_avatar_min_scales: UniverseAvatarMinScales,
+	pub universe_avatar_max_scales: UniverseAvatarMaxScales,
+	pub universe_avatar_asset_overrides: Vec<UniverseAvatarAssetOverride>,
+	pub moderation_status: Option<String>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UniverseAvatarMinScales {
+	pub height: f32,
+	pub width: f32,
+	pub head: f32,
+	pub depth: f32,
+	pub proportion: f32,
+	pub body_type: f32,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UniverseAvatarMaxScales {
+	pub height: f32,
+	pub width: f32,
+	pub head: f32,
+	pub depth: f32,
+	pub proportion: f32,
+	pub body_type: f32,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UniverseAvatarAssetOverride {
+	#[serde(rename = "assetID")]
+	pub asset_id: f32,
+	#[serde(rename = "assetTypeID")]
+	pub asset_type_id: f32,
+	pub is_player_choice: bool,
 }
