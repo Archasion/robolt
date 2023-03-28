@@ -136,6 +136,14 @@ impl<State> Robolt<State> {
 		))
 		.send()
 	}
+
+	pub fn fetch_outfit_details(&self, outfit_id: u64) -> Result<OutfitDetails, RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/outfits/{}/details",
+			ENDPOINTS.avatar, outfit_id
+		))
+		.send()
+	}
 }
 
 impl<'a, State> OutfitsFilterBuilder<'a, State> {
@@ -178,7 +186,27 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 	}
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OutfitDetails {
+	#[serde(rename = "playerAvatarType")]
+	avatar_type: AvatarType,
+	#[serde(flatten)]
+	outfit: Outfit,
+	body_colors: BodyColors,
+	assets: Vec<AvatarAsset>,
+	scale: AvatarScales,
+	outfit_type: OutfitType,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub enum OutfitType {
+	Invalid,
+	Avatar,
+	DynamicHead,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AssetIdsResponse {
 	asset_ids: Vec<u64>,

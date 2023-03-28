@@ -38,3 +38,9 @@ fn fetch_game_start_info() {
 	let client = Robolt::new();
 	assert_ok!(client.fetch_game_start_info(2124789031));
 }
+
+#[test]
+fn fetch_outfit_detail() {
+	let client = Robolt::new();
+	assert_ok!(client.fetch_outfit_details(11675594890));
+}
