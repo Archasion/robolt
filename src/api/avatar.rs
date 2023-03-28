@@ -80,6 +80,26 @@ impl Robolt<Authenticated> {
 
 		Ok(())
 	}
+
+	pub fn delete_outfit(&self, outfit_id: u64) -> Result<(), RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/outfits/{}/delete",
+			ENDPOINTS.avatar, outfit_id
+		))
+		.method(Method::POST)
+		.send::<EmptyResponse>()?;
+
+		Ok(())
+	}
+
+	pub fn wear_outfit(&self, outfit_id: u64) -> Result<InvalidAssets, RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/outfits/{}/wear",
+			ENDPOINTS.avatar, outfit_id
+		))
+		.method(Method::POST)
+		.send()
+	}
 }
 
 impl<State> Robolt<State> {
