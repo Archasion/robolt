@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use reqwest::Method;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::api::{Limit, ENDPOINTS};
 use crate::errors::RoboltError;
@@ -61,6 +61,22 @@ impl Robolt<Authenticated> {
 		))
 		.method(Method::POST)
 		.send_body::<_, EmptyResponse>(body)?;
+
+		Ok(())
+	}
+
+	pub fn set_body_colors(&self, body_colors: BodyColors) -> Result<(), RoboltError> {
+		self.request_builder(format!("{}/v1/avatar/set-body-colors", ENDPOINTS.avatar))
+			.method(Method::POST)
+			.send_body::<_, EmptyResponse>(body_colors)?;
+
+		Ok(())
+	}
+
+	pub fn set_scales(&self, scales: AvatarScales) -> Result<(), RoboltError> {
+		self.request_builder(format!("{}/v1/avatar/set-scales", ENDPOINTS.avatar))
+			.method(Method::POST)
+			.send_body::<_, EmptyResponse>(scales)?;
 
 		Ok(())
 	}
@@ -192,7 +208,7 @@ pub struct Avatar {
 	pub emotes: Vec<AvatarEmotes>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarScales {
 	pub head: f32,
@@ -203,15 +219,15 @@ pub struct AvatarScales {
 	pub body_type: f32,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BodyColors {
-	pub head_color_id: u32,
-	pub torso_color_id: u32,
-	pub right_arm_color_id: u32,
-	pub left_arm_color_id: u32,
-	pub right_leg_color_id: u32,
-	pub left_leg_color_id: u32,
+	pub head_color_id: u16,
+	pub torso_color_id: u16,
+	pub right_arm_color_id: u16,
+	pub left_arm_color_id: u16,
+	pub right_leg_color_id: u16,
+	pub left_leg_color_id: u16,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
