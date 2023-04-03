@@ -109,6 +109,18 @@ impl Robolt<Authenticated> {
 
 		Ok(())
 	}
+
+	/// # ⚠️ Warning
+	/// The API endpoint associated with this function may not be functional
+	pub fn update_outfit(
+		&self,
+		outfit_id: u64,
+		updated_outfit: Outfit,
+	) -> Result<PartialOutfit, RoboltError> {
+		self.request_builder(format!("{}/v1/outfits/{}", ENDPOINTS.avatar, outfit_id))
+			.method(Method::POST)
+			.send_body(updated_outfit)
+	}
 }
 
 impl<State> Robolt<State> {
