@@ -17,15 +17,6 @@ impl<State> Robolt<State> {
 			.send()
 	}
 
-	pub fn fetch_user_id(&self, username: &str) -> Result<u64, RoboltError> {
-		self.request_builder(format!(
-			"{}/users/get-by-username?username={}",
-			ENDPOINTS.base, username
-		))
-		.send::<UserId>()
-		.map(|res| res.id)
-	}
-
 	pub fn search_users(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/search?keyword={}&limit={}",

@@ -15,12 +15,6 @@ fn fetch_partial_user_by_id() {
 }
 
 #[test]
-fn fetch_user_id_by_username() {
-	let client = Robolt::new();
-	assert_eq!(client.fetch_user_id("roblox").unwrap(), 1);
-}
-
-#[test]
 fn fetch_username_history() {
 	let client = Robolt::new();
 	assert_ok!(client.fetch_username_history(1));
