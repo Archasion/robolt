@@ -126,9 +126,3 @@ struct SearchPartialUsersByUsername<'a> {
 	exclude_banned_users: bool,
 	usernames: Vec<&'a str>,
 }
-
-#[derive(Deserialize)]
-#[serde(rename_all = "PascalCase")]
-struct UserId {
-	id: u64,
-}
