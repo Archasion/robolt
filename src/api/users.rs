@@ -1,5 +1,8 @@
+use std::collections::HashMap;
+
 use reqwest::Method;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde_json::Value;
 
 use crate::api::{DataResponse, ENDPOINTS};
 use crate::utils::client::{Authenticated, EmptyResponse};
@@ -31,14 +34,14 @@ impl<State> Robolt<State> {
 		user_ids: Vec<u64>,
 		exclude_banned: bool,
 	) -> Result<Vec<PartialUser>, RoboltError> {
-		let post = SearchPartialUsersById {
-			exclude_banned_users: exclude_banned,
-			user_ids,
-		};
+		let body = HashMap::from([
+			("excludeBannedUsers", Value::from(exclude_banned)),
+			("userIds", Value::from(user_ids)),
+		]);
 
 		self.request_builder(format!("{}/v1/users", ENDPOINTS.users))
 			.method(Method::POST)
-			.send_body::<_, DataResponse<PartialUser>>(&post)
+			.send_body::<_, DataResponse<PartialUser>>(body)
 			.map(|res| res.data)
 	}
 
@@ -77,14 +80,14 @@ impl Robolt<Authenticated> {
 		usernames: Vec<&str>,
 		exclude_banned: bool,
 	) -> Result<Vec<PartialUser>, RoboltError> {
-		let post = SearchPartialUsersByUsername {
-			exclude_banned_users: exclude_banned,
-			usernames,
-		};
+		let body = HashMap::from([
+			("excludeBannedUsers", Value::from(exclude_banned)),
+			("usernames", Value::from(usernames)),
+		]);
 
 		self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
 			.method(Method::POST)
-			.send_body::<_, DataResponse<PartialUser>>(&post)
+			.send_body::<_, DataResponse<PartialUser>>(body)
 			.map(|res| res.data)
 	}
 }
@@ -111,18 +114,4 @@ pub struct PartialUser {
 	#[serde(rename = "name")]
 	pub username: String,
 	pub display_name: String,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct SearchPartialUsersById {
-	exclude_banned_users: bool,
-	user_ids: Vec<u64>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct SearchPartialUsersByUsername<'a> {
-	exclude_banned_users: bool,
-	usernames: Vec<&'a str>,
 }

@@ -9,33 +9,31 @@ use crate::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<Presence>, RoboltError> {
-		let mut body = HashMap::new();
-		body.insert("userIds", user_ids);
+	pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<UserPresence>, RoboltError> {
+		let body = HashMap::from([("userIds", user_ids)]);
 
 		self.request_builder(format!("{}/v1/presence/users", ENDPOINTS.presence))
 			.method(Method::POST)
-			.send_body::<_, DetailedPresences>(body)
+			.send_body::<_, UserPresences>(body)
 			.map(|res| res.user_presences)
 	}
 
 	pub fn fetch_last_online(
 		&self,
 		user_ids: Vec<u64>,
-	) -> Result<Vec<PartialPresence>, RoboltError> {
-		let mut body = HashMap::new();
-		body.insert("userIds", user_ids);
+	) -> Result<Vec<PartialUserPresence>, RoboltError> {
+		let body = HashMap::from([("userIds", user_ids)]);
 
 		self.request_builder(format!("{}/v1/presence/last-online", ENDPOINTS.presence))
 			.method(Method::POST)
-			.send_body::<_, Presences>(body)
+			.send_body::<_, LastOnlineTimestamps>(body)
 			.map(|res| res.last_online_timestamps)
 	}
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Presence {
+pub struct UserPresence {
 	#[serde(alias = "UserPresenceType")]
 	pub user_presence_type: UserPresenceType,
 	#[serde(rename = "UserLocationType")]
@@ -52,7 +50,7 @@ pub struct Presence {
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PartialPresence {
+pub struct PartialUserPresence {
 	pub user_id: u64,
 	pub last_online: String,
 }
@@ -75,12 +73,12 @@ pub enum UserLocationType {
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct DetailedPresences {
-	user_presences: Vec<Presence>,
+struct UserPresences {
+	user_presences: Vec<UserPresence>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct Presences {
-	last_online_timestamps: Vec<PartialPresence>,
+struct LastOnlineTimestamps {
+	last_online_timestamps: Vec<PartialUserPresence>,
 }

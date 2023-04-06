@@ -24,7 +24,6 @@ struct RobloxAPIEndpoints<T = &'static str> {
 	badges: T,
 	avatar: T,
 	users: T,
-	base: T,
 }
 
 #[derive(Default, Debug, Deserialize_repr)]
@@ -58,5 +57,4 @@ const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
 	badges: "badges.roblox.com",
 	avatar: "avatar.roblox.com",
 	users: "users.roblox.com",
-	base: "api.roblox.com",
 };

@@ -1,7 +1,7 @@
 use reqwest::Method;
 use serde::Deserialize;
 
-use crate::api::presence::Presence;
+use crate::api::presence::UserPresence;
 use crate::api::users::{PartialUser, User};
 use crate::api::{CountResponse, DataResponse, ENDPOINTS};
 use crate::errors::RoboltError;
@@ -200,7 +200,7 @@ pub struct UserRelation {
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 pub struct OnlineFriend {
 	#[serde(rename = "userPresence")]
-	pub presence: Presence,
+	pub presence: UserPresence,
 	#[serde(flatten)]
 	pub user: PartialUser,
 }
