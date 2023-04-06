@@ -2,8 +2,8 @@ use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
 use crate::api::{DataResponse, ENDPOINTS};
-use crate::utilities::client::{Authenticated, EmptyResponse};
-use crate::utilities::errors::RoboltError;
+use crate::utils::client::{Authenticated, EmptyResponse};
+use crate::utils::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {

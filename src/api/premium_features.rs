@@ -1,6 +1,6 @@
 use crate::api::ENDPOINTS;
 use crate::errors::RoboltError;
-use crate::utilities::client::Authenticated;
+use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl Robolt<Authenticated> {

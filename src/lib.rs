@@ -13,8 +13,8 @@ pub use api::avatar::{
 pub use api::friends::FriendshipStatus;
 pub use api::presence::UserPresenceType;
 pub use api::Limit;
-pub use utilities::client::Robolt;
-pub use utilities::errors;
+pub use utils::client::Robolt;
+pub use utils::errors;
 
 mod api;
-mod utilities;
+mod utils;

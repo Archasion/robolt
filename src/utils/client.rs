@@ -8,7 +8,7 @@ use reqwest::{header, Method};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::utilities::errors::{RobloxAPIErrors, RoboltError};
+use crate::utils::errors::{RobloxAPIErrors, RoboltError};
 
 pub(crate) struct RequestBuilder<'a, State> {
 	robolt: &'a Robolt<State>,

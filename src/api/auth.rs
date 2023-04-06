@@ -5,7 +5,7 @@ use reqwest::blocking::Client;
 use reqwest::header::{self, HeaderMap};
 use reqwest::StatusCode;
 
-use crate::utilities::client::{Authenticated, Unauthenticated};
+use crate::utils::client::{Authenticated, Unauthenticated};
 use crate::Robolt;
 
 impl Robolt<Unauthenticated> {

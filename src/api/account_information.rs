@@ -3,7 +3,7 @@ use serde_repr::Deserialize_repr;
 
 use crate::api::{CountResponse, ENDPOINTS};
 use crate::errors::RoboltError;
-use crate::utilities::client::Authenticated;
+use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl<State> Robolt<State> {

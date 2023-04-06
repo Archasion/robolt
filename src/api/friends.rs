@@ -5,7 +5,7 @@ use crate::api::presence::Presence;
 use crate::api::users::{PartialUser, User};
 use crate::api::{CountResponse, DataResponse, ENDPOINTS};
 use crate::errors::RoboltError;
-use crate::utilities::client::{Authenticated, EmptyResponse};
+use crate::utils::client::{Authenticated, EmptyResponse};
 use crate::Robolt;
 
 impl<State> Robolt<State> {

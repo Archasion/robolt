@@ -6,7 +6,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use crate::api::{DataResponse, Limit, ENDPOINTS};
 use crate::errors::RoboltError;
-use crate::utilities::client::{Authenticated, EmptyResponse};
+use crate::utils::client::{Authenticated, EmptyResponse};
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
