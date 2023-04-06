@@ -1,7 +1,13 @@
 pub use api::account_information::{Gender, SocialsVisibility};
 pub use api::account_settings::{Privacy, PrivacySetting, TradeValue};
 pub use api::avatar::{
-	AvatarItemFilter, AvatarItemType, AvatarScale, AvatarType, BodyColors, BrickColor, Outfit,
+	AvatarItemFilter,
+	AvatarItemType,
+	AvatarScale,
+	AvatarType,
+	BodyColors,
+	BrickColor,
+	Outfit,
 	OutfitType,
 };
 pub use api::friends::FriendshipStatus;

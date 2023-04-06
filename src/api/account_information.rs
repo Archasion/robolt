@@ -69,8 +69,8 @@ impl Robolt<Authenticated> {
 #[repr(u8)]
 pub enum Gender {
 	Unknown = 1,
-	Male    = 2,
-	Female  = 3,
+	Male = 2,
+	Female = 3,
 }
 
 #[derive(Deserialize)]
@@ -86,38 +86,38 @@ struct ProfileDescription {
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PhoneNumber {
-	pub country_code:                         String,
-	pub prefix:                               String,
-	pub phone:                                String,
-	pub is_verified:                          bool,
-	pub verification_code_length:             u8,
+	pub country_code: String,
+	pub prefix: String,
+	pub phone: String,
+	pub is_verified: bool,
+	pub verification_code_length: u8,
 	pub can_bypass_password_for_phone_update: bool,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RobloxBadge {
-	pub id:          u8,
-	pub name:        String,
+	pub id: u8,
+	pub name: String,
 	pub description: String,
-	pub image_url:   String,
+	pub image_url: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserSocials {
 	pub facebook: Option<String>,
-	pub twitter:  Option<String>,
-	pub youtube:  Option<String>,
-	pub twitch:   Option<String>,
-	pub guilded:  Option<String>,
+	pub twitter: Option<String>,
+	pub youtube: Option<String>,
+	pub twitch: Option<String>,
+	pub guilded: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthenticatedUserSocials {
 	#[serde(rename = "promotionChannelsVisibilityPrivacy")]
-	pub visibility:  SocialsVisibility,
+	pub visibility: SocialsVisibility,
 	#[serde(flatten)]
 	pub connections: UserSocials,
 }
@@ -134,9 +134,9 @@ pub enum SocialsVisibility {
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct Birthdate {
 	#[serde(rename = "birthYear")]
-	pub year:  u16,
+	pub year: u16,
 	#[serde(rename = "birthMonth")]
 	pub month: u8,
 	#[serde(rename = "birthDay")]
-	pub day:   u8,
+	pub day: u8,
 }

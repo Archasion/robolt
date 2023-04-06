@@ -102,23 +102,23 @@ impl Robolt<Authenticated> {
 #[serde(rename_all = "camelCase")]
 pub struct User {
 	#[serde(rename = "name")]
-	pub username:                  String,
+	pub username: String,
 	pub external_app_display_name: Option<String>,
-	pub description:               Option<String>,
-	pub created:                   String,
-	pub is_banned:                 bool,
-	pub has_verified_badge:        bool,
-	pub id:                        u64,
-	pub display_name:              String,
+	pub description: Option<String>,
+	pub created: String,
+	pub is_banned: bool,
+	pub has_verified_badge: bool,
+	pub id: u64,
+	pub display_name: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PartialUser {
 	#[serde(alias = "userId")]
-	pub id:           u64,
+	pub id: u64,
 	#[serde(rename = "name")]
-	pub username:     String,
+	pub username: String,
 	pub display_name: String,
 }
 
@@ -126,14 +126,14 @@ pub struct PartialUser {
 #[serde(rename_all = "camelCase")]
 struct SearchPartialUsersById {
 	exclude_banned_users: bool,
-	user_ids:             Vec<u64>,
+	user_ids: Vec<u64>,
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct SearchPartialUsersByUsername<'a> {
 	exclude_banned_users: bool,
-	usernames:            Vec<&'a str>,
+	usernames: Vec<&'a str>,
 }
 
 #[derive(Deserialize)]

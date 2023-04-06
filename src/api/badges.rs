@@ -99,53 +99,53 @@ impl<'a> BadgeUpdateBuilder<'a> {
 #[derive(Serialize)]
 pub struct BadgeUpdateBuilder<'a> {
 	#[serde(skip_serializing)]
-	id:          u64,
+	id: u64,
 	#[serde(skip_serializing)]
-	client:      &'a Robolt<Authenticated>,
+	client: &'a Robolt<Authenticated>,
 	#[serde(skip_serializing_if = "Option::is_none")]
-	name:        Option<String>,
+	name: Option<String>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	description: Option<String>,
 	#[serde(skip_serializing_if = "Option::is_none")]
-	enabled:     Option<bool>,
+	enabled: Option<bool>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AwardedBadgeTimestamp {
-	pub badge_id:     u64,
+	pub badge_id: u64,
 	pub awarded_date: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Badge {
-	pub id:                    u64,
-	pub name:                  String,
-	pub description:           Option<String>,
-	pub display_name:          String,
-	pub display_description:   Option<String>,
-	pub enabled:               bool,
-	pub icon_image_id:         u64,
+	pub id: u64,
+	pub name: String,
+	pub description: Option<String>,
+	pub display_name: String,
+	pub display_description: Option<String>,
+	pub enabled: bool,
+	pub icon_image_id: u64,
 	pub display_icon_image_id: u64,
-	pub created:               String,
-	pub updated:               String,
-	pub statistics:            BadgeStats,
-	pub awarding_universe:     Option<AwardingUniverse>,
+	pub created: String,
+	pub updated: String,
+	pub statistics: BadgeStats,
+	pub awarding_universe: Option<AwardingUniverse>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BadgeStats {
 	pub past_day_awarded_count: u64,
-	pub awarded_count:          u64,
-	pub win_rate_percentage:    f32,
+	pub awarded_count: u64,
+	pub win_rate_percentage: f32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AwardingUniverse {
-	pub id:            u64,
-	pub name:          String,
+	pub id: u64,
+	pub name: String,
 	pub root_place_id: u64,
 }

@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 use crate::utilities::errors::{RobloxAPIErrors, RoboltError};
 
 pub(crate) struct RequestBuilder<'a, State> {
-	robolt:   &'a Robolt<State>,
-	method:   Method,
+	robolt: &'a Robolt<State>,
+	method: Method,
 	endpoint: String,
 }
 
@@ -25,7 +25,7 @@ pub(crate) struct EmptyResponse {}
 
 pub struct Robolt<State = Unauthenticated> {
 	pub(crate) client: Client,
-	pub(crate) state:  PhantomData<State>,
+	pub(crate) state: PhantomData<State>,
 }
 
 impl Default for Robolt {

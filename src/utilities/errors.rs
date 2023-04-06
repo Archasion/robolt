@@ -6,9 +6,9 @@ use serde::Deserialize;
 pub struct RoboltError {
 	pub message: String,
 	#[serde(default = "code_default")]
-	pub code:    i8,
+	pub code: i8,
 	#[serde(skip)]
-	kind:        RoboltErrorKind,
+	kind: RoboltErrorKind,
 }
 
 fn code_default() -> i8 {

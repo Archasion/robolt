@@ -111,7 +111,8 @@ impl Robolt<Authenticated> {
 	}
 
 	/// # ⚠️ Warning
-	/// The API endpoint associated with this function may not function as expected.
+	/// The API endpoint associated with this function may not function as
+	/// expected.
 	pub fn update_outfit(
 		&self,
 		outfit_id: u64,

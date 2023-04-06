@@ -61,17 +61,17 @@ pub enum TradeValue {
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Email {
-	pub email_address:                        String,
-	pub verified:                             bool,
+	pub email_address: String,
+	pub verified: bool,
 	pub can_bypass_password_for_email_update: bool,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockedUsers {
-	pub blocked_users:     Vec<PartialUser>,
+	pub blocked_users: Vec<PartialUser>,
 	pub max_blocked_users: u8,
-	pub total:             u8,
+	pub total: u8,
 }
 
 #[derive(Deserialize)]
