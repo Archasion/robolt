@@ -4,7 +4,7 @@ use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::api::{Limit, ENDPOINTS};
+use crate::api::{DataResponse, Limit, ENDPOINTS};
 use crate::errors::RoboltError;
 use crate::utilities::client::{Authenticated, EmptyResponse};
 use crate::Robolt;
@@ -111,7 +111,7 @@ impl Robolt<Authenticated> {
 	}
 
 	/// # ⚠️ Warning
-	/// The API endpoint associated with this function may not be functional
+	/// The API endpoint associated with this function may not function as expected.
 	pub fn update_outfit(
 		&self,
 		outfit_id: u64,
@@ -120,6 +120,18 @@ impl Robolt<Authenticated> {
 		self.request_builder(format!("{}/v1/outfits/{}", ENDPOINTS.avatar, outfit_id))
 			.method(Method::POST)
 			.send_body(updated_outfit)
+	}
+
+	pub fn recent_avatar_items(
+		&self,
+		item_type: AvatarItemFilter,
+	) -> Result<Vec<RecentAvatarItem>, RoboltError> {
+		self.request_builder(format!(
+			"{}/v1/recent-items/{}/list",
+			ENDPOINTS.avatar, item_type as u8
+		))
+		.send::<DataResponse<RecentAvatarItem>>()
+		.map(|res| res.data)
 	}
 }
 
@@ -270,6 +282,24 @@ pub struct OutfitsResponse {
 	pub total: u64,
 }
 
+#[derive(Default, Debug, Clone, PartialEq)]
+pub enum AvatarItemFilter {
+	#[default]
+	All = 0,
+	Clothing = 1,
+	Body = 2,
+	Animations = 3,
+	Accessories = 4,
+	Outfits = 5,
+	Gears = 6,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub enum AvatarItemType {
+	Asset,
+	Outfit,
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PartialOutfit {
@@ -327,13 +357,23 @@ pub struct AvatarEmotes {
 pub struct AvatarAsset {
 	pub id: u64,
 	pub name: String,
-	pub asset_type: AvatarAssetType,
+	pub asset_type: AvatarAssetDetails,
 	pub meta: Option<AvatarAssetMeta>,
 	pub current_version_id: u64,
 }
 
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecentAvatarItem {
+	pub id: u64,
+	pub name: String,
+	#[serde(rename = "type")]
+	pub item_type: AvatarItemType,
+	pub asset_type: AvatarAssetDetails,
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct AvatarAssetType {
+pub struct AvatarAssetDetails {
 	pub id: u64,
 	pub name: String,
 }
