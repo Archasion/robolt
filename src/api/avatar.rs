@@ -227,7 +227,7 @@ pub struct OutfitDetails {
 	#[serde(rename = "playerAvatarType")]
 	avatar_type: AvatarType,
 	name: String,
-	id_editable: bool,
+	is_editable: bool,
 	body_colors: BodyColors,
 	assets: Vec<AvatarAsset>,
 	scale: AvatarScale,
