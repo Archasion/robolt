@@ -238,12 +238,12 @@ pub struct OutfitDetails {
 #[serde(rename_all = "camelCase")]
 pub struct Outfit {
 	#[serde(rename = "playerAvatarType")]
-	avatar_type: AvatarType,
-	name: &'static str,
-	body_colors: BodyColors,
-	asset_ids: Vec<u64>,
-	scale: AvatarScale,
-	outfit_type: OutfitType,
+	pub avatar_type: AvatarType,
+	pub name: &'static str,
+	pub body_colors: BodyColors,
+	pub asset_ids: Vec<u64>,
+	pub scale: AvatarScale,
+	pub outfit_type: OutfitType,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
