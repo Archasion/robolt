@@ -47,7 +47,7 @@ impl Robolt<Unauthenticated> {
 }
 
 impl Robolt<Authenticated> {
-	pub fn clear_session(self) -> Robolt<Unauthenticated> {
+	pub fn logout(self) -> Robolt<Unauthenticated> {
 		Robolt {
 			state: PhantomData::<Unauthenticated>,
 			client: Client::new(),
