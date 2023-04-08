@@ -223,15 +223,15 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OutfitDetails {
-	id: u64,
+	pub id: u64,
 	#[serde(rename = "playerAvatarType")]
-	avatar_type: AvatarType,
-	name: String,
-	is_editable: bool,
-	body_colors: BodyColors,
-	assets: Vec<AvatarAsset>,
-	scale: AvatarScale,
-	outfit_type: OutfitType,
+	pub avatar_type: AvatarType,
+	pub name: String,
+	pub is_editable: bool,
+	pub body_colors: BodyColors,
+	pub assets: Vec<AvatarAsset>,
+	pub scale: AvatarScale,
+	pub outfit_type: OutfitType,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
