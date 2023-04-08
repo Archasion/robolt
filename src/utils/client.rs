@@ -55,7 +55,7 @@ impl Robolt {
 	}
 
 	pub fn from(roblox_cookie: String) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
-		Self::new().authenticate(roblox_cookie)
+		Self::new().login(roblox_cookie)
 	}
 }
 
