@@ -9,7 +9,7 @@ fn fetch_avatar() {
 }
 
 #[test]
-fn fetch_wearing_assets() {
+fn fetch_currently_wearing() {
 	let client = Robolt::new();
 	assert_ok!(client.fetch_currently_wearing(1));
 }
@@ -40,7 +40,7 @@ fn fetch_game_start_info() {
 }
 
 #[test]
-fn fetch_outfit_detail() {
+fn fetch_outfit() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_outfit_details(11675594890));
+	assert_ok!(client.fetch_outfit(11675594890));
 }

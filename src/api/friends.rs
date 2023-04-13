@@ -3,13 +3,13 @@ use serde::Deserialize;
 
 use crate::api::presence::UserPresence;
 use crate::api::users::{PartialUser, User};
-use crate::api::{CountResponse, DataResponse, ENDPOINTS};
+use crate::api::{CountResponse, DataResponse, EmptyResponse, ENDPOINTS};
 use crate::errors::RoboltError;
-use crate::utils::client::{Authenticated, EmptyResponse};
+use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub fn count_followers(&self, user_id: u64) -> Result<u64, RoboltError> {
+	pub fn fetch_follower_count(&self, user_id: u64) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followers/count",
 			ENDPOINTS.friends, user_id
@@ -18,7 +18,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.count)
 	}
 
-	pub fn count_followings(&self, user_id: u64) -> Result<u64, RoboltError> {
+	pub fn fetch_following_count(&self, user_id: u64) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followings/count",
 			ENDPOINTS.friends, user_id
@@ -27,7 +27,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.count)
 	}
 
-	pub fn count_friends(&self, user_id: u64) -> Result<u64, RoboltError> {
+	pub fn fetch_friend_count(&self, user_id: u64) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/friends/count",
 			ENDPOINTS.friends, user_id
@@ -145,7 +145,7 @@ impl Robolt<Authenticated> {
 	}
 
 	pub fn my_online_friends(&self) -> Result<Vec<OnlineFriend>, RoboltError> {
-		let user_id = self.fetch_current_user()?.id;
+		let user_id = self.fetch_my_user()?.id;
 
 		self.request_builder(format!(
 			"{}/v1/users/{}/friends/online",
@@ -159,8 +159,8 @@ impl Robolt<Authenticated> {
 	pub fn my_friendship_statuses(
 		&self,
 		user_ids: Vec<u64>,
-	) -> Result<Vec<UserRelation>, RoboltError> {
-		let user_id = self.fetch_current_user()?.id;
+	) -> Result<Vec<UserRelationship>, RoboltError> {
+		let user_id = self.fetch_my_user()?.id;
 		let user_ids = user_ids
 			.iter()
 			.map(|id| id.to_string())
@@ -172,12 +172,12 @@ impl Robolt<Authenticated> {
 			ENDPOINTS.friends, user_id, user_ids
 		))
 		.method(Method::GET)
-		.send::<DataResponse<UserRelation>>()
+		.send::<DataResponse<UserRelationship>>()
 		.map(|res| res.data)
 	}
 }
 
-impl UserRelation {
+impl UserRelationship {
 	pub fn is_friend(&self) -> bool {
 		self.status == FriendshipStatus::Friends
 	}
@@ -192,7 +192,7 @@ pub enum FriendshipStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct UserRelation {
+pub struct UserRelationship {
 	pub id: u64,
 	pub status: FriendshipStatus,
 }

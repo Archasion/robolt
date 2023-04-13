@@ -4,9 +4,9 @@ use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::api::{DataResponse, Limit, ENDPOINTS};
+use crate::api::{DataResponse, EmptyResponse, Limit, ENDPOINTS};
 use crate::errors::RoboltError;
-use crate::utils::client::{Authenticated, EmptyResponse};
+use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
@@ -53,7 +53,7 @@ impl Robolt<Authenticated> {
 		Ok(())
 	}
 
-	pub fn set_avatar_type(&self, avatar_type: AvatarType) -> Result<(), RoboltError> {
+	pub fn set_avatar_type(&self, avatar_type: BodyType) -> Result<(), RoboltError> {
 		let body = HashMap::from([("avatarType", avatar_type as u8)]);
 
 		self.request_builder(format!(
@@ -74,7 +74,7 @@ impl Robolt<Authenticated> {
 		Ok(())
 	}
 
-	pub fn set_scales(&self, scales: AvatarScale) -> Result<(), RoboltError> {
+	pub fn set_scales(&self, scales: BodyScale) -> Result<(), RoboltError> {
 		self.request_builder(format!("{}/v1/avatar/set-scales", ENDPOINTS.avatar))
 			.method(Method::POST)
 			.send_body::<_, EmptyResponse>(scales)?;
@@ -102,7 +102,7 @@ impl Robolt<Authenticated> {
 		.send()
 	}
 
-	pub fn create_outfit(&self, new_outfit: Outfit) -> Result<(), RoboltError> {
+	pub fn create_outfit(&self, new_outfit: OutfitV1) -> Result<(), RoboltError> {
 		self.request_builder(format!("{}/v1/outfits/create", ENDPOINTS.avatar))
 			.method(Method::POST)
 			.send_body::<_, EmptyResponse>(new_outfit)?;
@@ -110,17 +110,19 @@ impl Robolt<Authenticated> {
 		Ok(())
 	}
 
-	/// # ⚠️ Warning
-	/// The API endpoint associated with this function may not function as
-	/// expected.
 	pub fn update_outfit(
 		&self,
 		outfit_id: u64,
-		updated_outfit: Outfit,
-	) -> Result<PartialOutfit, RoboltError> {
-		self.request_builder(format!("{}/v1/outfits/{}", ENDPOINTS.avatar, outfit_id))
-			.method(Method::POST)
-			.send_body(updated_outfit)
+		updated_outfit: OutfitV2,
+	) -> Result<(), RoboltError> {
+		self.request_builder(format!(
+			"{}/v2/outfits/{}/update",
+			ENDPOINTS.avatar, outfit_id
+		))
+		.method(Method::POST)
+		.send_body::<_, EmptyResponse>(updated_outfit)?;
+
+		Ok(())
 	}
 
 	pub fn recent_avatar_items(
@@ -156,8 +158,8 @@ impl<State> Robolt<State> {
 		.map(|res| res.asset_ids)
 	}
 
-	pub fn fetch_outfits(&self, user_id: u64) -> OutfitsFilterBuilder<State> {
-		OutfitsFilterBuilder::new(user_id, self)
+	pub fn fetch_outfits(&self, user_id: u64) -> OutfitFilterBuilder<State> {
+		OutfitFilterBuilder::new(user_id, self)
 	}
 
 	pub fn fetch_game_start_info(
@@ -171,7 +173,7 @@ impl<State> Robolt<State> {
 		.send()
 	}
 
-	pub fn fetch_outfit_details(&self, outfit_id: u64) -> Result<OutfitDetails, RoboltError> {
+	pub fn fetch_outfit(&self, outfit_id: u64) -> Result<DetailedOutfit, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/outfits/{}/details",
 			ENDPOINTS.avatar, outfit_id
@@ -180,7 +182,7 @@ impl<State> Robolt<State> {
 	}
 }
 
-impl<'a, State> OutfitsFilterBuilder<'a, State> {
+impl<'a, State> OutfitFilterBuilder<'a, State> {
 	pub fn new(user_id: u64, client: &'a Robolt<State>) -> Self {
 		Self {
 			user_id,
@@ -206,7 +208,7 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 		self
 	}
 
-	pub fn send(self) -> Result<OutfitsResponse, RoboltError> {
+	pub fn send(self) -> Result<FilteredOutfitResponse, RoboltError> {
 		self.client
 			.request_builder(format!(
 				"{}/v1/users/{}/outfits?page={}&itemsPerPage={}&isEditable={}",
@@ -222,27 +224,39 @@ impl<'a, State> OutfitsFilterBuilder<'a, State> {
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OutfitDetails {
+pub struct DetailedOutfit {
 	pub id: u64,
 	#[serde(rename = "playerAvatarType")]
-	pub avatar_type: AvatarType,
+	pub avatar_type: BodyType,
 	pub name: String,
 	pub is_editable: bool,
 	pub body_colors: BodyColors,
 	pub assets: Vec<AvatarAsset>,
-	pub scale: AvatarScale,
+	pub scale: BodyScale,
 	pub outfit_type: OutfitType,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Outfit {
+pub struct OutfitV1 {
 	#[serde(rename = "playerAvatarType")]
-	pub avatar_type: AvatarType,
+	pub avatar_type: BodyType,
 	pub name: &'static str,
 	pub body_colors: BodyColors,
 	pub asset_ids: Vec<u64>,
-	pub scale: AvatarScale,
+	pub scale: BodyScale,
+	pub outfit_type: OutfitType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OutfitV2 {
+	#[serde(rename = "playerAvatarType")]
+	pub avatar_type: BodyType,
+	pub name: &'static str,
+	pub body_colors: BodyColors,
+	pub assets: Vec<AvatarAsset>,
+	pub scale: BodyScale,
 	pub outfit_type: OutfitType,
 }
 
@@ -253,7 +267,7 @@ pub enum OutfitType {
 	DynamicHead,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AssetIdsResponse {
 	asset_ids: Vec<u64>,
@@ -267,7 +281,7 @@ pub struct InvalidAssets {
 	pub success: bool,
 }
 
-pub struct OutfitsFilterBuilder<'a, State> {
+pub struct OutfitFilterBuilder<'a, State> {
 	user_id: u64,
 	page: u8,
 	items_per_page: Limit,
@@ -277,9 +291,9 @@ pub struct OutfitsFilterBuilder<'a, State> {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OutfitsResponse {
+pub struct FilteredOutfitResponse {
 	pub filtered_count: u32,
-	pub data: Vec<PartialOutfit>,
+	pub data: Vec<OutfitDetails>,
 	pub total: u64,
 }
 
@@ -303,7 +317,7 @@ pub enum AvatarItemType {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PartialOutfit {
+pub struct OutfitDetails {
 	pub id: u64,
 	pub name: String,
 	pub is_editable: bool,
@@ -312,10 +326,10 @@ pub struct PartialOutfit {
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar {
-	pub player_avatar_type: AvatarType,
+	pub player_avatar_type: BodyType,
 	pub default_shirt_applied: bool,
 	pub default_pants_applied: bool,
-	pub scales: AvatarScale,
+	pub scales: BodyScale,
 	pub body_colors: BodyColors,
 	pub assets: Vec<AvatarAsset>,
 	pub emotes: Vec<AvatarEmotes>,
@@ -323,7 +337,7 @@ pub struct Avatar {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AvatarScale {
+pub struct BodyScale {
 	pub head: f32,
 	pub depth: f32,
 	pub height: f32,
@@ -353,7 +367,7 @@ pub struct AvatarEmotes {
 	pub position: u32,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarAsset {
 	pub id: u64,
@@ -373,13 +387,13 @@ pub struct RecentAvatarItem {
 	pub asset_type: AvatarAssetDetails,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct AvatarAssetDetails {
 	pub id: u64,
 	pub name: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct AvatarAssetMeta {
 	pub order: u32,
 	pub puffiness: Option<f32>,
@@ -387,7 +401,7 @@ pub struct AvatarAssetMeta {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub enum AvatarType {
+pub enum BodyType {
 	#[default]
 	R6 = 1,
 	R15 = 3,
@@ -426,32 +440,10 @@ pub struct GameStartAvatarInfo {
 	pub universe_avatar_body_type: String,
 	pub joint_positioning_type: String,
 	pub message: String,
-	pub universe_avatar_min_scales: UniverseAvatarMinScales,
-	pub universe_avatar_max_scales: UniverseAvatarMaxScales,
+	pub universe_avatar_min_scales: BodyScale,
+	pub universe_avatar_max_scales: BodyScale,
 	pub universe_avatar_asset_overrides: Vec<UniverseAvatarAssetOverride>,
 	pub moderation_status: Option<String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UniverseAvatarMinScales {
-	pub height: f32,
-	pub width: f32,
-	pub head: f32,
-	pub depth: f32,
-	pub proportion: f32,
-	pub body_type: f32,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UniverseAvatarMaxScales {
-	pub height: f32,
-	pub width: f32,
-	pub head: f32,
-	pub depth: f32,
-	pub proportion: f32,
-	pub body_type: f32,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]

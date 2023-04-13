@@ -7,7 +7,7 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
-	pub fn my_privacy(&self, setting: PrivacySetting) -> Result<Privacy, RoboltError> {
+	pub fn my_privacy(&self, setting: PrivacySetting) -> Result<PrivacyState, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/{}",
 			ENDPOINTS.account_settings,
@@ -83,7 +83,7 @@ struct PrivacySettingResponse {
 		alias = "inventoryPrivacy",
 		alias = "privateMessagePrivacy"
 	)]
-	value: Privacy,
+	value: PrivacyState,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -96,7 +96,7 @@ pub enum PrivacySetting {
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
-pub enum Privacy {
+pub enum PrivacyState {
 	#[serde(alias = "All", alias = "AllUsers")]
 	Everyone,
 	AllAuthenticatedUsers,

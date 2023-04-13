@@ -18,7 +18,7 @@ impl<State> Robolt<State> {
 			.map(|res| res.user_presences)
 	}
 
-	pub fn fetch_last_online(
+	pub fn fetch_partial_presences(
 		&self,
 		user_ids: Vec<u64>,
 	) -> Result<Vec<PartialUserPresence>, RoboltError> {

@@ -21,19 +21,19 @@ fn fetch_friends() {
 }
 
 #[test]
-fn count_friends() {
+fn fetch_friend_count() {
 	let client = Robolt::new();
-	assert_ok!(client.count_friends(1));
+	assert_ok!(client.fetch_friend_count(1));
 }
 
 #[test]
-fn count_followers() {
+fn fetch_follower_count() {
 	let client = Robolt::new();
-	assert_ok!(client.count_followers(1));
+	assert_ok!(client.fetch_follower_count(1));
 }
 
 #[test]
-fn count_followings() {
+fn fetch_following_count() {
 	let client = Robolt::new();
-	assert_ok!(client.count_followings(1));
+	assert_ok!(client.fetch_following_count(1));
 }

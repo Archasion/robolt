@@ -30,7 +30,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_awarded_timestamps(
+	pub fn fetch_awarded_badge_timestamps(
 		&self,
 		user_id: u64,
 		badge_ids: Vec<u64>,

@@ -10,8 +10,8 @@ fn fetch_presences() {
 }
 
 #[test]
-fn fetch_last_online() {
+fn fetch_partial_presences() {
 	let client = Robolt::new();
 	let user_ids = vec![1, 2, 3];
-	assert_ok!(client.fetch_last_online(user_ids));
+	assert_ok!(client.fetch_partial_presences(user_ids));
 }

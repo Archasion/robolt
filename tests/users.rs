@@ -3,13 +3,13 @@ use tokio_test::assert_ok;
 use robolt::Robolt;
 
 #[test]
-fn fetch_user_by_id() {
+fn fetch_user() {
 	let client = Robolt::new();
 	assert_ok!(client.fetch_user(1));
 }
 
 #[test]
-fn fetch_partial_user_by_id() {
+fn fetch_partial_user() {
 	let client = Robolt::new();
 	assert_ok!(client.fetch_partial_user(1));
 }
@@ -21,21 +21,15 @@ fn fetch_username_history() {
 }
 
 #[test]
-fn search_users_by_keyword() {
+fn search_users() {
 	let client = Robolt::new();
 	assert_ok!(client.search_users("test", 10));
 }
 
 #[test]
-fn search_users_by_ids() {
+fn fetch_users_by_ids() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_users(vec![1, 2, 3], false));
-}
-
-#[test]
-fn fetch_roblox_badges_by_user_id() {
-	let client = Robolt::new();
-	assert_ok!(client.fetch_roblox_badges(1));
+	assert_ok!(client.fetch_users_by_ids(vec![1, 2, 3], false));
 }
 
 #[test]

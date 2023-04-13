@@ -4,8 +4,8 @@ use reqwest::Method;
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::api::{DataResponse, ENDPOINTS};
-use crate::utils::client::{Authenticated, EmptyResponse};
+use crate::api::{DataResponse, EmptyResponse, ENDPOINTS};
+use crate::utils::client::Authenticated;
 use crate::utils::errors::RoboltError;
 use crate::Robolt;
 
@@ -29,7 +29,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_users(
+	pub fn fetch_users_by_ids(
 		&self,
 		user_ids: Vec<u64>,
 		exclude_banned: bool,
@@ -70,12 +70,12 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Authenticated> {
-	pub fn fetch_current_user(&self) -> Result<PartialUser, RoboltError> {
+	pub fn fetch_my_user(&self) -> Result<PartialUser, RoboltError> {
 		self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
 			.send()
 	}
 
-	pub fn fetch_users_by_username(
+	pub fn fetch_users_by_usernames(
 		&self,
 		usernames: Vec<&str>,
 		exclude_banned: bool,

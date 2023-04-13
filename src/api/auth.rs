@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::intrinsics::type_name;
 use std::marker::PhantomData;
 
 use reqwest::blocking::Client;
@@ -8,11 +9,17 @@ use reqwest::StatusCode;
 use crate::utils::client::{Authenticated, Unauthenticated};
 use crate::Robolt;
 
+impl<State> Robolt<State> {
+	pub fn is_authenticated(&self) -> bool {
+		type_name::<State>() == type_name::<Authenticated>()
+	}
+}
+
 impl Robolt<Unauthenticated> {
 	pub fn login(self, roblox_cookie: String) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
 		let user_agent = format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-		let mut headers = HeaderMap::new();
 		let cookie = format!(".ROBLOSECURITY={roblox_cookie}");
+		let mut headers = HeaderMap::new();
 
 		headers.insert(header::CONTENT_LENGTH, "0".parse()?);
 		headers.insert(header::COOKIE, cookie.parse()?);

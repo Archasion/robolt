@@ -5,13 +5,13 @@ use serde::Deserialize;
 #[derive(Deserialize, Debug)]
 pub struct RoboltError {
 	pub message: String,
-	#[serde(default = "code_default")]
+	#[serde(default = "default_error_code")]
 	pub code: i8,
 	#[serde(skip)]
 	kind: RoboltErrorKind,
 }
 
-fn code_default() -> i8 {
+fn default_error_code() -> i8 {
 	-1
 }
 
@@ -20,17 +20,11 @@ pub(crate) struct RobloxAPIErrors {
 	pub(crate) errors: Vec<RoboltError>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub(crate) enum RoboltErrorKind {
-	Unknown,
+	#[default]
 	Api,
-}
-
-#[doc(hidden)]
-impl Default for RoboltErrorKind {
-	fn default() -> Self {
-		RoboltErrorKind::Api
-	}
+	Unknown,
 }
 
 #[doc(hidden)]
@@ -50,7 +44,7 @@ impl From<String> for RoboltError {
 	fn from(message: String) -> Self {
 		Self {
 			kind: RoboltErrorKind::Unknown,
-			code: code_default(),
+			code: default_error_code(),
 			message,
 		}
 	}

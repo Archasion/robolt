@@ -1,33 +1,13 @@
-#![allow(dead_code)]
-
 use std::error::Error;
 use std::marker::PhantomData;
 
 use reqwest::blocking::Client;
-use reqwest::header::HeaderMap;
-use reqwest::{header, Method};
+use reqwest::header::{HeaderMap, CONTENT_LENGTH};
+use reqwest::Method;
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::utils::errors::{RobloxAPIErrors, RoboltError};
-
-pub(crate) struct RequestBuilder<'a, State> {
-	robolt: &'a Robolt<State>,
-	method: Method,
-	endpoint: String,
-}
-
-pub struct Unauthenticated;
-
-pub struct Authenticated;
-
-#[derive(Deserialize)]
-pub(crate) struct EmptyResponse {}
-
-pub struct Robolt<State = Unauthenticated> {
-	pub(crate) client: Client,
-	pub(crate) state: PhantomData<State>,
-}
 
 impl Default for Robolt {
 	fn default() -> Self {
@@ -40,7 +20,7 @@ impl Robolt {
 		let user_agent = format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 		let mut headers = HeaderMap::new();
 
-		headers.insert(header::CONTENT_LENGTH, "0".parse().unwrap());
+		headers.insert(CONTENT_LENGTH, "0".parse().unwrap());
 
 		let client = Client::builder()
 			.user_agent(user_agent)
@@ -60,7 +40,8 @@ impl Robolt {
 }
 
 impl<State> Robolt<State> {
-	pub(crate) fn request_builder(&self, endpoint: String) -> RequestBuilder<'_, State> {
+	#[doc(cfg(feature = "http"))]
+	pub fn request_builder(&self, endpoint: String) -> RequestBuilder<'_, State> {
 		RequestBuilder::new(endpoint, self)
 	}
 
@@ -142,4 +123,24 @@ impl<'a, State> RequestBuilder<'a, State> {
 		self.robolt
 			.request::<(), T>(self.method, self.endpoint, None)
 	}
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Unauthenticated;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Authenticated;
+
+#[derive(Debug, Clone)]
+pub struct Robolt<State = Unauthenticated> {
+	pub(crate) client: Client,
+	pub(crate) state: PhantomData<State>,
+}
+
+#[derive(Debug, Clone)]
+#[doc(cfg(feature = "http"))]
+pub struct RequestBuilder<'a, State> {
+	robolt: &'a Robolt<State>,
+	method: Method,
+	endpoint: String,
 }

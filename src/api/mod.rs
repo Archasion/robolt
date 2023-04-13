@@ -1,17 +1,17 @@
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
-pub(crate) mod account_information;
-pub(crate) mod account_settings;
+pub mod account_information;
+pub mod account_settings;
 mod auth;
-pub(crate) mod avatar;
-pub(crate) mod badges;
-mod economy;
-pub(crate) mod friends;
-mod points;
-mod premium_features;
-pub(crate) mod presence;
-mod users;
+pub mod avatar;
+pub mod badges;
+pub mod economy;
+pub mod friends;
+pub mod points;
+pub mod premium_features;
+pub mod presence;
+pub mod users;
 
 struct RobloxAPIEndpoints<T = &'static str> {
 	account_information: T,
@@ -36,7 +36,7 @@ pub enum Limit {
 	Max = 100,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct DataResponse<T> {
 	data: Vec<T>,
 }
@@ -45,6 +45,9 @@ struct DataResponse<T> {
 struct CountResponse<T> {
 	count: T,
 }
+
+#[derive(Deserialize)]
+struct EmptyResponse {}
 
 const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
 	account_information: "accountinformation.roblox.com",

@@ -3,6 +3,9 @@ name = "robolt"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+http = []
+
 [dependencies]
 serde = "1.0.152"
 serde_repr = "0.1.10"
