@@ -1,21 +1,28 @@
 [package]
 name = "robolt"
+description = "A Rust library for interacting with the Roblox API"
 version = "0.1.0"
 edition = "2021"
+authors = ["Archasion"]
+repository = "https://github.com/archasion/robolt"
+readme = "README.md"
+keywords = ["roblox", "api"]
+publish = false
 
 [features]
 http = []
+default = []
 
 [dependencies]
-serde = "1.0.152"
-serde_repr = "0.1.10"
+serde = "1.0.160"
+serde_repr = "0.1.12"
 
 [dependencies.reqwest]
-version = "0.11.14"
+version = "0.11.16"
 features = ["json", "cookies", "blocking"]
 
 [dependencies.serde_json]
-version = "1.0.91"
+version = "1.0.96"
 features = ["std"]
 
 [dev-dependencies]
