@@ -293,7 +293,7 @@ pub struct OutfitFilterBuilder<'a, State> {
 #[serde(rename_all = "camelCase")]
 pub struct FilteredOutfitResponse {
 	pub filtered_count: u32,
-	pub data: Vec<OutfitDetails>,
+	pub data: Vec<OutfitInfo>,
 	pub total: u64,
 }
 
@@ -317,7 +317,7 @@ pub enum AvatarItemType {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OutfitDetails {
+pub struct OutfitInfo {
 	pub id: u64,
 	pub name: String,
 	pub is_editable: bool,
@@ -372,7 +372,7 @@ pub struct AvatarEmotes {
 pub struct AvatarAsset {
 	pub id: u64,
 	pub name: String,
-	pub asset_type: AvatarAssetDetails,
+	pub asset_type: AvatarAssetInfo,
 	pub meta: Option<AvatarAssetMeta>,
 	pub current_version_id: u64,
 }
@@ -384,11 +384,11 @@ pub struct RecentAvatarItem {
 	pub name: String,
 	#[serde(rename = "type")]
 	pub item_type: AvatarItemType,
-	pub asset_type: AvatarAssetDetails,
+	pub asset_type: AvatarAssetInfo,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct AvatarAssetDetails {
+pub struct AvatarAssetInfo {
 	pub id: u64,
 	pub name: String,
 }

@@ -210,13 +210,13 @@ pub struct OnlineFriend {
 pub struct FriendRequest {
 	#[serde(flatten)]
 	pub user: User,
-	pub friend_request: FriendRequestDetails,
+	pub friend_request: FriendRequestInfo,
 	pub mutual_friends_list: Vec<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct FriendRequestDetails {
+pub struct FriendRequestInfo {
 	pub sent_at: String,
 	pub sender_id: u64,
 	pub source_universe_id: Option<u64>,
