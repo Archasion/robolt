@@ -51,6 +51,11 @@ impl Robolt<Unauthenticated> {
 
 impl Robolt<Authenticated> {
 	pub fn logout(self) -> Robolt<Unauthenticated> {
-		Robolt::new()
+		Robolt {
+			state: PhantomData::<Unauthenticated>,
+			client: self.client,
+			cookie: None,
+			xcsrf: None,
+		}
 	}
 }
