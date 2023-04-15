@@ -10,7 +10,7 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
-	pub async fn my_avatar(&self) -> Result<Avatar, RoboltError> {
+	pub async fn avatar_auth(&self) -> Result<Avatar, RoboltError> {
 		self.request_builder(format!("{}/v1/avatar", ENDPOINTS.avatar))
 			.send()
 			.await
@@ -155,19 +155,19 @@ impl Robolt<Authenticated> {
 }
 
 impl<State> Robolt<State> {
-	pub async fn fetch_avatar_metadata(&self) -> Result<AvatarMetadata, RoboltError> {
+	pub async fn avatar_metadata(&self) -> Result<AvatarMetadata, RoboltError> {
 		self.request_builder(format!("{}/v1/avatar/metadata", ENDPOINTS.avatar))
 			.send()
 			.await
 	}
 
-	pub async fn fetch_avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
+	pub async fn avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}/avatar", ENDPOINTS.avatar, user_id))
 			.send()
 			.await
 	}
 
-	pub async fn fetch_currently_wearing(&self, user_id: u64) -> Result<Vec<u64>, RoboltError> {
+	pub async fn currently_wearing(&self, user_id: u64) -> Result<Vec<u64>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/currently-wearing",
 			ENDPOINTS.avatar, user_id
@@ -177,11 +177,11 @@ impl<State> Robolt<State> {
 		.map(|res| res.asset_ids)
 	}
 
-	pub fn fetch_outfits(&self, user_id: u64) -> OutfitFilterBuilder<State> {
+	pub fn outfits(&self, user_id: u64) -> OutfitFilterBuilder<State> {
 		OutfitFilterBuilder::new(user_id, self)
 	}
 
-	pub async fn fetch_game_start_info(
+	pub async fn game_start_info(
 		&self,
 		universe_id: u64,
 	) -> Result<GameStartAvatarInfo, RoboltError> {
@@ -193,7 +193,7 @@ impl<State> Robolt<State> {
 		.await
 	}
 
-	pub async fn fetch_outfit(&self, outfit_id: u64) -> Result<DetailedOutfit, RoboltError> {
+	pub async fn outfit(&self, outfit_id: u64) -> Result<DetailedOutfit, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/outfits/{}/details",
 			ENDPOINTS.avatar, outfit_id

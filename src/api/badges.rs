@@ -7,13 +7,13 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub async fn fetch_badge(&self, badge_id: u64) -> Result<Badge, RoboltError> {
+	pub async fn badge(&self, badge_id: u64) -> Result<Badge, RoboltError> {
 		self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, badge_id))
 			.send()
 			.await
 	}
 
-	pub async fn fetch_universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, RoboltError> {
+	pub async fn universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/universes/{}/badges?limit=100",
 			ENDPOINTS.badges, universe_id
@@ -23,7 +23,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub async fn fetch_user_badges(&self, user_id: u64) -> Result<Vec<Badge>, RoboltError> {
+	pub async fn user_badges(&self, user_id: u64) -> Result<Vec<Badge>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/badges?limit=100",
 			ENDPOINTS.badges, user_id
@@ -33,7 +33,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub async fn fetch_awarded_badge_timestamps(
+	pub async fn awarded_badge_timestamps(
 		&self,
 		user_id: u64,
 		badge_ids: Vec<u64>,

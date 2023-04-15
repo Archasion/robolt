@@ -10,13 +10,13 @@ use crate::utils::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub async fn fetch_user(&self, user_id: u64) -> Result<User, RoboltError> {
+	pub async fn user(&self, user_id: u64) -> Result<User, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
 			.send()
 			.await
 	}
 
-	pub async fn fetch_partial_user(&self, user_id: u64) -> Result<PartialUser, RoboltError> {
+	pub async fn partial_user(&self, user_id: u64) -> Result<PartialUser, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
 			.send()
 			.await
@@ -36,7 +36,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub async fn fetch_users_by_ids(
+	pub async fn users_from_ids(
 		&self,
 		user_ids: Vec<u64>,
 		exclude_banned: bool,
@@ -53,7 +53,7 @@ impl<State> Robolt<State> {
 			.map(|res| res.data)
 	}
 
-	pub async fn fetch_username_history(&self, user_id: u64) -> Result<Vec<String>, RoboltError> {
+	pub async fn username_history(&self, user_id: u64) -> Result<Vec<String>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/username-history",
 			ENDPOINTS.users, user_id
@@ -80,13 +80,13 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Authenticated> {
-	pub async fn fetch_my_user(&self) -> Result<PartialUser, RoboltError> {
+	pub async fn me(&self) -> Result<PartialUser, RoboltError> {
 		self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
 			.send()
 			.await
 	}
 
-	pub async fn fetch_users_by_usernames(
+	pub async fn users_from_usernames(
 		&self,
 		usernames: Vec<&str>,
 		exclude_banned: bool,

@@ -9,7 +9,7 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub async fn fetch_follower_count(&self, user_id: u64) -> Result<u64, RoboltError> {
+	pub async fn follower_count(&self, user_id: u64) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followers/count",
 			ENDPOINTS.friends, user_id
@@ -19,7 +19,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.count)
 	}
 
-	pub async fn fetch_following_count(&self, user_id: u64) -> Result<u64, RoboltError> {
+	pub async fn following_count(&self, user_id: u64) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followings/count",
 			ENDPOINTS.friends, user_id
@@ -29,7 +29,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.count)
 	}
 
-	pub async fn fetch_friend_count(&self, user_id: u64) -> Result<u64, RoboltError> {
+	pub async fn friend_count(&self, user_id: u64) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/friends/count",
 			ENDPOINTS.friends, user_id
@@ -39,7 +39,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.count)
 	}
 
-	pub async fn fetch_friends(&self, user_id: u64) -> Result<Vec<User>, RoboltError> {
+	pub async fn friends(&self, user_id: u64) -> Result<Vec<User>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/friends",
 			ENDPOINTS.friends, user_id
@@ -49,7 +49,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub async fn fetch_followers(&self, user_id: u64, limit: u8) -> Result<Vec<User>, RoboltError> {
+	pub async fn followers(&self, user_id: u64, limit: u8) -> Result<Vec<User>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followers?limit={}",
 			ENDPOINTS.friends, user_id, limit
@@ -59,11 +59,7 @@ impl<State> Robolt<State> {
 		.map(|res| res.data)
 	}
 
-	pub async fn fetch_followings(
-		&self,
-		user_id: u64,
-		limit: u8,
-	) -> Result<Vec<User>, RoboltError> {
+	pub async fn followings(&self, user_id: u64, limit: u8) -> Result<Vec<User>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/followings?limit={}",
 			ENDPOINTS.friends, user_id, limit
@@ -75,7 +71,7 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Authenticated> {
-	pub async fn my_friend_requests(&self, limit: u8) -> Result<Vec<FriendRequest>, RoboltError> {
+	pub async fn friend_requests(&self, limit: u8) -> Result<Vec<FriendRequest>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/my/friends/requests?limit={}",
 			ENDPOINTS.friends, limit
@@ -85,7 +81,7 @@ impl Robolt<Authenticated> {
 		.map(|res| res.data)
 	}
 
-	pub async fn my_friend_request_count(&self) -> Result<u64, RoboltError> {
+	pub async fn friend_request_count(&self) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/user/friend-requests/count",
 			ENDPOINTS.friends
@@ -95,7 +91,7 @@ impl Robolt<Authenticated> {
 		.map(|res| res.count)
 	}
 
-	pub async fn my_friend_count(&self) -> Result<u64, RoboltError> {
+	pub async fn friend_count_auth(&self) -> Result<u64, RoboltError> {
 		self.request_builder(format!("{}/v1/my/friends/count", ENDPOINTS.friends))
 			.send::<CountResponse<u64>>()
 			.await
@@ -162,8 +158,8 @@ impl Robolt<Authenticated> {
 		Ok(())
 	}
 
-	pub async fn my_online_friends(&self) -> Result<Vec<OnlineFriend>, RoboltError> {
-		let user_id = self.fetch_my_user().await?.id;
+	pub async fn online_friends(&self) -> Result<Vec<OnlineFriend>, RoboltError> {
+		let user_id = self.me().await?.id;
 
 		self.request_builder(format!(
 			"{}/v1/users/{}/friends/online",
@@ -175,11 +171,11 @@ impl Robolt<Authenticated> {
 		.map(|res| res.data)
 	}
 
-	pub async fn my_friendship_statuses(
+	pub async fn friendship_statuses(
 		&self,
 		user_ids: Vec<u64>,
 	) -> Result<Vec<UserRelationship>, RoboltError> {
-		let user_id = self.fetch_my_user().await?.id;
+		let user_id = self.me().await?.id;
 		let user_ids = user_ids
 			.iter()
 			.map(|id| id.to_string())

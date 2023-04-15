@@ -3,21 +3,21 @@ use tokio_test::assert_ok;
 use robolt::Robolt;
 
 #[tokio::test]
-async fn fetch_user() {
+async fn user() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_user(1).await);
+	assert_ok!(client.user(1).await);
 }
 
 #[tokio::test]
-async fn fetch_partial_user() {
+async fn partial_user() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_partial_user(1).await);
+	assert_ok!(client.partial_user(1).await);
 }
 
 #[tokio::test]
-async fn fetch_username_history() {
+async fn username_history() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_username_history(1).await);
+	assert_ok!(client.username_history(1).await);
 }
 
 #[tokio::test]
@@ -27,9 +27,9 @@ async fn search_users() {
 }
 
 #[tokio::test]
-async fn fetch_users_by_ids() {
+async fn users_from_ids() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_users_by_ids(vec![1, 2, 3], false).await);
+	assert_ok!(client.users_from_ids(vec![1, 2, 3], false).await);
 }
 
 #[tokio::test]

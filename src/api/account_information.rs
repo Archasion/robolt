@@ -7,7 +7,7 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub async fn fetch_roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, RoboltError> {
+	pub async fn roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/roblox-badges",
 			ENDPOINTS.account_information, user_id
@@ -16,7 +16,7 @@ impl<State> Robolt<State> {
 		.await
 	}
 
-	pub async fn fetch_user_socials(&self, user_id: u64) -> Result<UserSocials, RoboltError> {
+	pub async fn user_socials(&self, user_id: u64) -> Result<UserSocials, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/promotion-channels",
 			ENDPOINTS.account_information, user_id
@@ -27,7 +27,7 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Authenticated> {
-	pub async fn my_socials(&self) -> Result<AuthenticatedUserSocials, RoboltError> {
+	pub async fn socials_auth(&self) -> Result<AuthenticatedUserSocials, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/promotion-channels",
 			ENDPOINTS.account_information
@@ -36,27 +36,27 @@ impl Robolt<Authenticated> {
 		.await
 	}
 
-	pub async fn my_birthdate(&self) -> Result<Birthdate, RoboltError> {
+	pub async fn birthdate(&self) -> Result<Birthdate, RoboltError> {
 		self.request_builder(format!("{}/v1/birthdate", ENDPOINTS.account_information))
 			.send()
 			.await
 	}
 
-	pub async fn my_description(&self) -> Result<String, RoboltError> {
+	pub async fn blurb(&self) -> Result<String, RoboltError> {
 		self.request_builder(format!("{}/v1/description", ENDPOINTS.account_information))
 			.send::<ProfileDescription>()
 			.await
 			.map(|res| res.description)
 	}
 
-	pub async fn my_gender(&self) -> Result<Gender, RoboltError> {
+	pub async fn gender(&self) -> Result<Gender, RoboltError> {
 		self.request_builder(format!("{}/v1/gender", ENDPOINTS.account_information))
 			.send::<GenderResponse>()
 			.await
 			.map(|res| res.gender)
 	}
 
-	pub async fn my_consecutive_xbox_logins(&self) -> Result<u16, RoboltError> {
+	pub async fn consecutive_xbox_logins(&self) -> Result<u16, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/xbox-live/consecutive-login-days",
 			ENDPOINTS.account_information
@@ -66,7 +66,7 @@ impl Robolt<Authenticated> {
 		.map(|res| res.count)
 	}
 
-	pub async fn my_phone_number(&self) -> Result<PhoneNumber, RoboltError> {
+	pub async fn phone_number(&self) -> Result<PhoneNumber, RoboltError> {
 		self.request_builder(format!("{}/v1/phone", ENDPOINTS.account_information))
 			.send()
 			.await

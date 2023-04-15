@@ -3,37 +3,37 @@ use tokio_test::assert_ok;
 use robolt::Robolt;
 
 #[tokio::test]
-async fn fetch_followers() {
+async fn followers() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_followers(1, 10).await);
+	assert_ok!(client.followers(1, 10).await);
 }
 
 #[tokio::test]
-async fn fetch_followings() {
+async fn followings() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_followings(1, 10).await);
+	assert_ok!(client.followings(1, 10).await);
 }
 
 #[tokio::test]
-async fn fetch_friends() {
+async fn friends() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_friends(1).await);
+	assert_ok!(client.friends(1).await);
 }
 
 #[tokio::test]
-async fn fetch_friend_count() {
+async fn friend_count() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_friend_count(1).await);
+	assert_ok!(client.friend_count(1).await);
 }
 
 #[tokio::test]
-async fn fetch_follower_count() {
+async fn follower_count() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_follower_count(1).await);
+	assert_ok!(client.follower_count(1).await);
 }
 
 #[tokio::test]
-async fn fetch_following_count() {
+async fn following_count() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_following_count(1).await);
+	assert_ok!(client.following_count(1).await);
 }
