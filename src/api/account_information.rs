@@ -1,26 +1,27 @@
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
-use crate::api::{CountResponse, ENDPOINTS};
+use crate::api::routes::RobloxApi;
 use crate::errors::RoboltError;
 use crate::utils::client::Authenticated;
+use crate::utils::response::CountResponse;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
 	pub async fn roblox_badges(&self, user_id: u64) -> Result<Vec<RobloxBadge>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/roblox-badges",
-			ENDPOINTS.account_information, user_id
-		))
+		self.request(
+			RobloxApi::AccountInformation,
+			format!("/v1/users/{user_id}/roblox-badges"),
+		)
 		.send()
 		.await
 	}
 
 	pub async fn user_socials(&self, user_id: u64) -> Result<UserSocials, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/promotion-channels",
-			ENDPOINTS.account_information, user_id
-		))
+		self.request(
+			RobloxApi::AccountInformation,
+			format!("/v1/users/{user_id}/promotion-channels"),
+		)
 		.send()
 		.await
 	}
@@ -28,48 +29,40 @@ impl<State> Robolt<State> {
 
 impl Robolt<Authenticated> {
 	pub async fn socials_auth(&self) -> Result<AuthenticatedUserSocials, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/promotion-channels",
-			ENDPOINTS.account_information
-		))
-		.send()
-		.await
+		self.request(RobloxApi::AccountInformation, "/v1/promotion-channels")
+			.send()
+			.await
 	}
 
 	pub async fn birthdate(&self) -> Result<Birthdate, RoboltError> {
-		self.request_builder(format!("{}/v1/birthdate", ENDPOINTS.account_information))
+		self.request(RobloxApi::AccountInformation, "/v1/birthdate")
 			.send()
 			.await
 	}
 
 	pub async fn blurb(&self) -> Result<String, RoboltError> {
-		self.request_builder(format!("{}/v1/description", ENDPOINTS.account_information))
+		self.request(RobloxApi::AccountInformation, "/v1/description")
 			.send::<ProfileDescription>()
 			.await
 			.map(|res| res.description)
 	}
 
 	pub async fn gender(&self) -> Result<Gender, RoboltError> {
-		self.request_builder(format!("{}/v1/gender", ENDPOINTS.account_information))
+		self.request(RobloxApi::AccountInformation, "/v1/gender")
 			.send::<GenderResponse>()
 			.await
 			.map(|res| res.gender)
 	}
 
 	pub async fn consecutive_xbox_logins(&self) -> Result<u16, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/xbox-live/consecutive-login-days",
-			ENDPOINTS.account_information
-		))
-		.send::<CountResponse<u16>>()
-		.await
-		.map(|res| res.count)
+		self.request(RobloxApi::AccountInformation, "/v1/xbox-live/consecutive-login-days")
+			.send::<CountResponse<u16>>()
+			.await
+			.map(|res| res.count)
 	}
 
 	pub async fn phone_number(&self) -> Result<PhoneNumber, RoboltError> {
-		self.request_builder(format!("{}/v1/phone", ENDPOINTS.account_information))
-			.send()
-			.await
+		self.request(RobloxApi::AccountInformation, "/v1/phone").send().await
 	}
 }
 

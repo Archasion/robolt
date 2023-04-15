@@ -1,12 +1,13 @@
 use std::error::Error;
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::marker::PhantomData;
 
-use reqwest::header::{HeaderMap, CONTENT_TYPE, COOKIE, USER_AGENT};
+use reqwest::header::{HeaderMap, ACCEPT, CONTENT_TYPE, COOKIE, USER_AGENT};
 use reqwest::{Client, Method};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
+use crate::api::routes::RobloxApi;
 use crate::utils::errors::{RobloxAPIErrors, RoboltError};
 
 impl Default for Robolt {
@@ -24,24 +25,23 @@ impl Robolt {
 
 		Self {
 			state: PhantomData::<Unauthenticated>,
-			client,
+			http: client,
 			cookie: None,
 			xcsrf: None,
 		}
 	}
 
 	pub async fn from(roblox_cookie: String) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
-		Self::new().login(roblox_cookie).await
+		Self::new().set_cookie(roblox_cookie).await
 	}
 }
 
 impl<State> Robolt<State> {
-	#[doc(cfg(feature = "http"))]
-	pub fn request_builder(&self, endpoint: String) -> RequestBuilder<'_, State> {
-		RequestBuilder::new(endpoint, self)
+	pub(crate) fn request<S: ToString + Display>(&self, domain: RobloxApi, path: S) -> RequestBuilder<'_, State> {
+		RequestBuilder::new(domain.url(), path, self)
 	}
 
-	async fn request<U, T>(
+	async fn inner_request<U, T>(
 		&self,
 		method: Method,
 		endpoint: String,
@@ -54,7 +54,7 @@ impl<State> Robolt<State> {
 		let url = format!("https://{endpoint}");
 
 		let builder = {
-			let mut builder = self.client.request(method, url);
+			let mut builder = self.http.request(method, url);
 
 			if let Some(body) = &body {
 				builder = builder.json(body);
@@ -93,6 +93,7 @@ impl<State> Robolt<State> {
 pub(crate) fn default_client_headers() -> HeaderMap {
 	let mut headers = HeaderMap::new();
 	headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+	headers.insert(ACCEPT, "application/json".parse().unwrap());
 	headers.insert(
 		USER_AGENT,
 		format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
@@ -103,10 +104,10 @@ pub(crate) fn default_client_headers() -> HeaderMap {
 }
 
 impl<'a, State> RequestBuilder<'a, State> {
-	fn new(endpoint: String, robolt: &'a Robolt<State>) -> Self {
+	fn new<S: ToString + Display>(domain: &str, path: S, robolt: &'a Robolt<State>) -> Self {
 		Self {
 			method: Method::GET,
-			endpoint,
+			endpoint: format!("{domain}{path}"),
 			robolt,
 		}
 	}
@@ -121,9 +122,7 @@ impl<'a, State> RequestBuilder<'a, State> {
 		T: Serialize,
 		U: DeserializeOwned,
 	{
-		self.robolt
-			.request(self.method, self.endpoint, Some(body))
-			.await
+		self.robolt.inner_request(self.method, self.endpoint, Some(body)).await
 	}
 
 	pub(crate) async fn send<T>(self) -> Result<T, RoboltError>
@@ -131,7 +130,7 @@ impl<'a, State> RequestBuilder<'a, State> {
 		T: DeserializeOwned,
 	{
 		self.robolt
-			.request::<(), T>(self.method, self.endpoint, None)
+			.inner_request::<(), T>(self.method, self.endpoint, None)
 			.await
 	}
 }
@@ -144,15 +143,17 @@ pub struct Authenticated;
 
 #[derive(Debug, Clone)]
 pub struct Robolt<State = Unauthenticated> {
-	pub(crate) client: Client,
+	#[cfg(feature = "http")]
+	pub http: Client,
+	#[cfg(not(feature = "http"))]
+	pub(crate) http: Client,
 	pub(crate) state: PhantomData<State>,
 	pub(crate) cookie: Option<String>,
 	pub(crate) xcsrf: Option<String>,
 }
 
 #[derive(Debug, Clone)]
-#[doc(cfg(feature = "http"))]
-pub struct RequestBuilder<'a, State> {
+pub(crate) struct RequestBuilder<'a, State> {
 	robolt: &'a Robolt<State>,
 	method: Method,
 	endpoint: String,

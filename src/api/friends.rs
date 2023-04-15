@@ -2,68 +2,58 @@ use reqwest::Method;
 use serde::Deserialize;
 
 use crate::api::presence::UserPresence;
+use crate::api::routes::RobloxApi;
 use crate::api::users::{PartialUser, User};
-use crate::api::{CountResponse, DataResponse, EmptyResponse, ENDPOINTS};
+use crate::api::Limit;
 use crate::errors::RoboltError;
 use crate::utils::client::Authenticated;
+use crate::utils::response::{CountResponse, DataResponse, EmptyResponse};
 use crate::Robolt;
 
 impl<State> Robolt<State> {
 	pub async fn follower_count(&self, user_id: u64) -> Result<u64, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/followers/count",
-			ENDPOINTS.friends, user_id
-		))
-		.send::<CountResponse<u64>>()
-		.await
-		.map(|res| res.count)
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/followers/count"))
+			.send::<CountResponse<u64>>()
+			.await
+			.map(|res| res.count)
 	}
 
 	pub async fn following_count(&self, user_id: u64) -> Result<u64, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/followings/count",
-			ENDPOINTS.friends, user_id
-		))
-		.send::<CountResponse<u64>>()
-		.await
-		.map(|res| res.count)
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/followings/count"))
+			.send::<CountResponse<u64>>()
+			.await
+			.map(|res| res.count)
 	}
 
 	pub async fn friend_count(&self, user_id: u64) -> Result<u64, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/friends/count",
-			ENDPOINTS.friends, user_id
-		))
-		.send::<CountResponse<u64>>()
-		.await
-		.map(|res| res.count)
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/friends/count"))
+			.send::<CountResponse<u64>>()
+			.await
+			.map(|res| res.count)
 	}
 
 	pub async fn friends(&self, user_id: u64) -> Result<Vec<User>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/friends",
-			ENDPOINTS.friends, user_id
-		))
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/friends"))
+			.send::<DataResponse<User>>()
+			.await
+			.map(|res| res.data)
+	}
+
+	pub async fn followers(&self, user_id: u64, limit: Limit) -> Result<Vec<User>, RoboltError> {
+		self.request(
+			RobloxApi::Friends,
+			format!("/v1/users/{user_id}/followers?limit={}", limit as u8),
+		)
 		.send::<DataResponse<User>>()
 		.await
 		.map(|res| res.data)
 	}
 
-	pub async fn followers(&self, user_id: u64, limit: u8) -> Result<Vec<User>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/followers?limit={}",
-			ENDPOINTS.friends, user_id, limit
-		))
-		.send::<DataResponse<User>>()
-		.await
-		.map(|res| res.data)
-	}
-
-	pub async fn followings(&self, user_id: u64, limit: u8) -> Result<Vec<User>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/followings?limit={}",
-			ENDPOINTS.friends, user_id, limit
-		))
+	pub async fn followings(&self, user_id: u64, limit: Limit) -> Result<Vec<User>, RoboltError> {
+		self.request(
+			RobloxApi::Friends,
+			format!("/v1/users/{user_id}/followings?limit={}", limit as u8),
+		)
 		.send::<DataResponse<User>>()
 		.await
 		.map(|res| res.data)
@@ -71,62 +61,53 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Authenticated> {
-	pub async fn friend_requests(&self, limit: u8) -> Result<Vec<FriendRequest>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/my/friends/requests?limit={}",
-			ENDPOINTS.friends, limit
-		))
+	pub async fn friend_requests(&self, limit: Limit) -> Result<Vec<FriendRequest>, RoboltError> {
+		self.request(
+			RobloxApi::Friends,
+			format!("/v1/my/friends/requests?limit={}", limit as u8),
+		)
 		.send::<DataResponse<FriendRequest>>()
 		.await
 		.map(|res| res.data)
 	}
 
 	pub async fn friend_request_count(&self) -> Result<u64, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/user/friend-requests/count",
-			ENDPOINTS.friends
-		))
-		.send::<CountResponse<u64>>()
-		.await
-		.map(|res| res.count)
+		self.request(RobloxApi::Friends, "/v1/user/friend-requests/count")
+			.send::<CountResponse<u64>>()
+			.await
+			.map(|res| res.count)
 	}
 
 	pub async fn friend_count_auth(&self) -> Result<u64, RoboltError> {
-		self.request_builder(format!("{}/v1/my/friends/count", ENDPOINTS.friends))
+		self.request(RobloxApi::Friends, "/v1/my/friends/count")
 			.send::<CountResponse<u64>>()
 			.await
 			.map(|res| res.count)
 	}
 
 	pub async fn unfriend(&self, user_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/unfriend",
-			ENDPOINTS.friends, user_id
-		))
-		.method(Method::POST)
-		.send::<EmptyResponse>()
-		.await?;
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/unfriend"))
+			.method(Method::POST)
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
 
 	pub async fn unfollow(&self, user_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/unfollow",
-			ENDPOINTS.friends, user_id
-		))
-		.method(Method::POST)
-		.send::<EmptyResponse>()
-		.await?;
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/unfollow"))
+			.method(Method::POST)
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
 
 	pub async fn decline_friend_request(&self, user_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/decline-friend-request",
-			ENDPOINTS.friends, user_id
-		))
+		self.request(
+			RobloxApi::Friends,
+			format!("/v1/users/{user_id}/decline-friend-request"),
+		)
 		.method(Method::POST)
 		.send::<EmptyResponse>()
 		.await?;
@@ -135,25 +116,19 @@ impl Robolt<Authenticated> {
 	}
 
 	pub async fn accept_friend_request(&self, user_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/accept-friend-request",
-			ENDPOINTS.friends, user_id
-		))
-		.method(Method::POST)
-		.send::<EmptyResponse>()
-		.await?;
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/accept-friend-request"))
+			.method(Method::POST)
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
 
 	pub async fn decline_all_friend_requests(&self) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/user/friend-requests/decline-all",
-			ENDPOINTS.friends
-		))
-		.method(Method::POST)
-		.send::<EmptyResponse>()
-		.await?;
+		self.request(RobloxApi::Friends, "/v1/user/friend-requests/decline-all")
+			.method(Method::POST)
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
@@ -161,20 +136,14 @@ impl Robolt<Authenticated> {
 	pub async fn online_friends(&self) -> Result<Vec<OnlineFriend>, RoboltError> {
 		let user_id = self.me().await?.id;
 
-		self.request_builder(format!(
-			"{}/v1/users/{}/friends/online",
-			ENDPOINTS.friends, user_id
-		))
-		.method(Method::GET)
-		.send::<DataResponse<OnlineFriend>>()
-		.await
-		.map(|res| res.data)
+		self.request(RobloxApi::Friends, format!("/v1/users/{user_id}/friends/online"))
+			.method(Method::GET)
+			.send::<DataResponse<OnlineFriend>>()
+			.await
+			.map(|res| res.data)
 	}
 
-	pub async fn friendship_statuses(
-		&self,
-		user_ids: Vec<u64>,
-	) -> Result<Vec<UserRelationship>, RoboltError> {
+	pub async fn friendship_statuses(&self, user_ids: Vec<u64>) -> Result<Vec<UserRelationship>, RoboltError> {
 		let user_id = self.me().await?.id;
 		let user_ids = user_ids
 			.iter()
@@ -182,10 +151,10 @@ impl Robolt<Authenticated> {
 			.collect::<Vec<String>>()
 			.join(",");
 
-		self.request_builder(format!(
-			"{}/v1/users/{}/friends/statuses?userIds={}",
-			ENDPOINTS.friends, user_id, user_ids
-		))
+		self.request(
+			RobloxApi::Friends,
+			format!("/v1/users/{user_id}/friends/statuses?userIds={user_ids}"),
+		)
 		.method(Method::GET)
 		.send::<DataResponse<UserRelationship>>()
 		.await

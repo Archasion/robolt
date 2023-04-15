@@ -1,33 +1,35 @@
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
-use crate::api::{DataResponse, ENDPOINTS};
+use crate::api::routes::RobloxApi;
+use crate::api::Limit;
 use crate::errors::RoboltError;
 use crate::utils::client::Authenticated;
+use crate::utils::response::DataResponse;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
 	pub async fn badge(&self, badge_id: u64) -> Result<Badge, RoboltError> {
-		self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, badge_id))
+		self.request(RobloxApi::Badges, format!("/v1/badges/{badge_id}"))
 			.send()
 			.await
 	}
 
-	pub async fn universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/universes/{}/badges?limit=100",
-			ENDPOINTS.badges, universe_id
-		))
+	pub async fn universe_badges(&self, universe_id: u64, limit: Limit) -> Result<Vec<Badge>, RoboltError> {
+		self.request(
+			RobloxApi::Badges,
+			format!("/v1/universes/{universe_id}/badges?limit={}", limit as u8),
+		)
 		.send::<DataResponse<Badge>>()
 		.await
 		.map(|res| res.data)
 	}
 
-	pub async fn user_badges(&self, user_id: u64) -> Result<Vec<Badge>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/badges?limit=100",
-			ENDPOINTS.badges, user_id
-		))
+	pub async fn user_badges(&self, user_id: u64, limit: Limit) -> Result<Vec<Badge>, RoboltError> {
+		self.request(
+			RobloxApi::Badges,
+			format!("/v1/users/{user_id}/badges?limit={}", limit as u8),
+		)
 		.send::<DataResponse<Badge>>()
 		.await
 		.map(|res| res.data)
@@ -44,10 +46,10 @@ impl<State> Robolt<State> {
 			.collect::<Vec<String>>()
 			.join(",");
 
-		self.request_builder(format!(
-			"{}/v1/users/{}/badges/awarded-dates?badgeIds={}",
-			ENDPOINTS.badges, user_id, badge_ids
-		))
+		self.request(
+			RobloxApi::Badges,
+			format!("/v1/users/{user_id}/badges/awarded-dates?badgeIds={badge_ids}"),
+		)
 		.send::<DataResponse<AwardedBadgeTimestamp>>()
 		.await
 		.map(|res| res.data)
@@ -60,7 +62,7 @@ impl Robolt<Authenticated> {
 	}
 
 	pub async fn remove_badge(&self, badge_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, badge_id))
+		self.request(RobloxApi::Badges, format!("/v1/user/badges/{badge_id}"))
 			.method(Method::DELETE)
 			.send()
 			.await
@@ -95,7 +97,7 @@ impl<'a> BadgeUpdateBuilder<'a> {
 
 	pub async fn update(self) -> Result<(), RoboltError> {
 		self.client
-			.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
+			.request(RobloxApi::Badges, format!("/v1/badges/{}", self.id))
 			.method(Method::PATCH)
 			.send_body(self)
 			.await

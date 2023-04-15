@@ -1,17 +1,18 @@
 use tokio_test::assert_ok;
 
+use robolt::api::Limit;
 use robolt::Robolt;
 
 #[tokio::test]
 async fn followers() {
 	let client = Robolt::new();
-	assert_ok!(client.followers(1, 10).await);
+	assert_ok!(client.followers(1, Limit::Min).await);
 }
 
 #[tokio::test]
 async fn followings() {
 	let client = Robolt::new();
-	assert_ok!(client.followings(1, 10).await);
+	assert_ok!(client.followings(1, Limit::Min).await);
 }
 
 #[tokio::test]

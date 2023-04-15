@@ -1,63 +1,31 @@
-use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
 pub mod account_information;
 pub mod account_settings;
-mod auth;
 pub mod avatar;
 pub mod badges;
-pub mod economy;
 pub mod friends;
-pub mod points;
-pub mod premium_features;
 pub mod presence;
+pub mod routes;
 pub mod users;
 
-struct RobloxAPIEndpoints<T = &'static str> {
-	account_information: T,
-	account_settings: T,
-	premium_features: T,
-	presence: T,
-	economy: T,
-	friends: T,
-	points: T,
-	badges: T,
-	avatar: T,
-	users: T,
-}
+// Nothing to export
+mod auth;
+mod economy;
+mod points;
+mod premium_features;
 
-#[derive(Default, Debug, Deserialize_repr)]
+#[derive(Default, Debug, Deserialize_repr, Clone, PartialEq)]
 #[repr(u8)]
+/// Limits the number of items returned by the API
 pub enum Limit {
 	#[default]
+	/// Return up to 10 items
 	Min = 10,
+	/// Return up to 25 items
 	Low = 25,
+	/// Return up to 50 items
 	High = 50,
+	/// Return up to 100 items
 	Max = 100,
 }
-
-#[derive(Deserialize)]
-struct DataResponse<T> {
-	data: Vec<T>,
-}
-
-#[derive(Deserialize)]
-struct CountResponse<T> {
-	count: T,
-}
-
-#[derive(Deserialize)]
-struct EmptyResponse {}
-
-const ENDPOINTS: RobloxAPIEndpoints = RobloxAPIEndpoints {
-	account_information: "accountinformation.roblox.com",
-	account_settings: "accountsettings.roblox.com",
-	premium_features: "premiumfeatures.roblox.com",
-	presence: "presence.roblox.com",
-	economy: "economy.roblox.com",
-	friends: "friends.roblox.com",
-	points: "points.roblox.com",
-	badges: "badges.roblox.com",
-	avatar: "avatar.roblox.com",
-	users: "users.roblox.com",
-};

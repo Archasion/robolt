@@ -1,5 +1,6 @@
 use tokio_test::assert_ok;
 
+use robolt::api::Limit;
 use robolt::Robolt;
 
 #[tokio::test]
@@ -11,13 +12,13 @@ async fn badge_by_id() {
 #[tokio::test]
 async fn universe_badges() {
 	let client = Robolt::new();
-	assert_ok!(client.universe_badges(2680623874).await);
+	assert_ok!(client.universe_badges(2680623874, Limit::Min).await);
 }
 
 #[tokio::test]
 async fn user_badges() {
 	let client = Robolt::new();
-	assert_ok!(client.user_badges(1).await);
+	assert_ok!(client.user_badges(1, Limit::Min).await);
 }
 
 #[tokio::test]

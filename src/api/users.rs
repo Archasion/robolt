@@ -4,33 +4,31 @@ use reqwest::Method;
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::api::{DataResponse, EmptyResponse, ENDPOINTS};
+use crate::api::routes::RobloxApi;
+use crate::api::Limit;
 use crate::utils::client::Authenticated;
 use crate::utils::errors::RoboltError;
+use crate::utils::response::{DataResponse, EmptyResponse};
 use crate::Robolt;
 
 impl<State> Robolt<State> {
 	pub async fn user(&self, user_id: u64) -> Result<User, RoboltError> {
-		self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
+		self.request(RobloxApi::Users, format!("/v1/users/{user_id}"))
 			.send()
 			.await
 	}
 
 	pub async fn partial_user(&self, user_id: u64) -> Result<PartialUser, RoboltError> {
-		self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
+		self.request(RobloxApi::Users, format!("/v1/users/{user_id}"))
 			.send()
 			.await
 	}
 
-	pub async fn search_users(
-		&self,
-		keyword: &str,
-		limit: u8,
-	) -> Result<Vec<PartialUser>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/search?keyword={}&limit={}",
-			ENDPOINTS.users, keyword, limit
-		))
+	pub async fn search_users(&self, keyword: &str, limit: Limit) -> Result<Vec<PartialUser>, RoboltError> {
+		self.request(
+			RobloxApi::Users,
+			format!("/v1/users/search?keyword={keyword}&limit={}", limit as u8),
+		)
 		.send::<DataResponse<PartialUser>>()
 		.await
 		.map(|res| res.data)
@@ -46,7 +44,7 @@ impl<State> Robolt<State> {
 			("userIds", Value::from(user_ids)),
 		]);
 
-		self.request_builder(format!("{}/v1/users", ENDPOINTS.users))
+		self.request(RobloxApi::Users, "/v1/users")
 			.method(Method::POST)
 			.send_body::<_, DataResponse<PartialUser>>(body)
 			.await
@@ -54,24 +52,17 @@ impl<State> Robolt<State> {
 	}
 
 	pub async fn username_history(&self, user_id: u64) -> Result<Vec<String>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/username-history",
-			ENDPOINTS.users, user_id
-		))
-		.send::<DataResponse<String>>()
-		.await
-		.map(|res| res.data)
+		self.request(RobloxApi::Users, format!("/v1/users/{user_id}/username-history"))
+			.send::<DataResponse<String>>()
+			.await
+			.map(|res| res.data)
 	}
 
-	pub async fn validate_display_name(
-		&self,
-		display_name: &str,
-		date_of_birth: &str,
-	) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/display-names/validate?displayName={}&birthdate={}",
-			ENDPOINTS.users, display_name, date_of_birth
-		))
+	pub async fn validate_display_name(&self, display_name: &str, date_of_birth: &str) -> Result<(), RoboltError> {
+		self.request(
+			RobloxApi::Users,
+			format!("/v1/display-names/validate?displayName={display_name}&birthdate={date_of_birth}"),
+		)
 		.send::<EmptyResponse>()
 		.await?;
 
@@ -81,9 +72,7 @@ impl<State> Robolt<State> {
 
 impl Robolt<Authenticated> {
 	pub async fn me(&self) -> Result<PartialUser, RoboltError> {
-		self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
-			.send()
-			.await
+		self.request(RobloxApi::Users, "/v1/users/authenticated").send().await
 	}
 
 	pub async fn users_from_usernames(
@@ -96,7 +85,7 @@ impl Robolt<Authenticated> {
 			("usernames", Value::from(usernames)),
 		]);
 
-		self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
+		self.request(RobloxApi::Users, "/v1/usernames/users")
 			.method(Method::POST)
 			.send_body::<_, DataResponse<PartialUser>>(body)
 			.await

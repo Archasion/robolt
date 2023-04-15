@@ -1,6 +1,7 @@
 use tokio_test::assert_ok;
 
-use robolt::{Limit, Robolt};
+use robolt::api::Limit;
+use robolt::Robolt;
 
 #[tokio::test]
 async fn avatar() {

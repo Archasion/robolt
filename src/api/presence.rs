@@ -4,7 +4,7 @@ use reqwest::Method;
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
-use crate::api::ENDPOINTS;
+use crate::api::routes::RobloxApi;
 use crate::errors::RoboltError;
 use crate::Robolt;
 
@@ -12,20 +12,17 @@ impl<State> Robolt<State> {
 	pub async fn presences(&self, user_ids: Vec<u64>) -> Result<Vec<UserPresence>, RoboltError> {
 		let body = HashMap::from([("userIds", user_ids)]);
 
-		self.request_builder(format!("{}/v1/presence/users", ENDPOINTS.presence))
+		self.request(RobloxApi::Presence, "/v1/presence/users")
 			.method(Method::POST)
 			.send_body::<_, UserPresences>(body)
 			.await
 			.map(|res| res.user_presences)
 	}
 
-	pub async fn partial_presences(
-		&self,
-		user_ids: Vec<u64>,
-	) -> Result<Vec<PartialUserPresence>, RoboltError> {
+	pub async fn partial_presences(&self, user_ids: Vec<u64>) -> Result<Vec<PartialUserPresence>, RoboltError> {
 		let body = HashMap::from([("userIds", user_ids)]);
 
-		self.request_builder(format!("{}/v1/presence/last-online", ENDPOINTS.presence))
+		self.request(RobloxApi::Presence, "/v1/presence/last-online")
 			.method(Method::POST)
 			.send_body::<_, LastOnlineTimestamps>(body)
 			.await

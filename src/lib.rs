@@ -1,8 +1,7 @@
 #![feature(doc_cfg, core_intrinsics)]
 
-pub use api::*;
-pub use utils::client::*;
+pub use utils::client::Robolt;
 pub use utils::errors;
 
-mod api;
+pub mod api;
 mod utils;

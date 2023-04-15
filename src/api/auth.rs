@@ -2,9 +2,10 @@ use std::error::Error;
 use std::intrinsics::type_name;
 use std::marker::PhantomData;
 
-use reqwest::header::COOKIE;
+use reqwest::header::{CONTENT_LENGTH, COOKIE};
 use reqwest::StatusCode;
 
+use crate::api::routes::RobloxApi;
 use crate::utils::client::{default_client_headers, Authenticated, Unauthenticated};
 use crate::Robolt;
 
@@ -15,18 +16,16 @@ impl<State> Robolt<State> {
 }
 
 impl Robolt<Unauthenticated> {
-	pub async fn login(
-		self,
-		roblox_cookie: String,
-	) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
+	pub async fn set_cookie(self, roblox_cookie: String) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
 		let cookie = format!(".ROBLOSECURITY={roblox_cookie}");
 		let mut headers = default_client_headers();
 
 		headers.insert(COOKIE, cookie.parse()?);
+		headers.insert(CONTENT_LENGTH, "0".parse()?);
 
 		let res = self
-			.client
-			.post("https://auth.roblox.com/v2/logout")
+			.http
+			.post(format!("https://{}/v2/logout", RobloxApi::Auth.url()))
 			.headers(headers.clone())
 			.send()
 			.await?;
@@ -35,14 +34,11 @@ impl Robolt<Unauthenticated> {
 			return Err("Invalid cookie".into());
 		}
 
-		let csrf_token = res
-			.headers()
-			.get("x-csrf-token")
-			.ok_or("No CSRF token found")?;
+		let csrf_token = res.headers().get("x-csrf-token").ok_or("No CSRF token found")?;
 
 		Ok(Robolt {
 			state: PhantomData::<Authenticated>,
-			client: self.client,
+			http: self.http,
 			cookie: Some(cookie),
 			xcsrf: Some(csrf_token.to_str()?.to_string()),
 		})
@@ -50,10 +46,10 @@ impl Robolt<Unauthenticated> {
 }
 
 impl Robolt<Authenticated> {
-	pub fn logout(self) -> Robolt<Unauthenticated> {
+	pub fn remove_cookie(self) -> Robolt<Unauthenticated> {
 		Robolt {
 			state: PhantomData::<Unauthenticated>,
-			client: self.client,
+			http: self.http,
 			cookie: None,
 			xcsrf: None,
 		}

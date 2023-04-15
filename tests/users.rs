@@ -1,5 +1,6 @@
 use tokio_test::assert_ok;
 
+use robolt::api::Limit;
 use robolt::Robolt;
 
 #[tokio::test]
@@ -23,7 +24,7 @@ async fn username_history() {
 #[tokio::test]
 async fn search_users() {
 	let client = Robolt::new();
-	assert_ok!(client.search_users("test", 10).await);
+	assert_ok!(client.search_users("test", Limit::Min).await);
 }
 
 #[tokio::test]

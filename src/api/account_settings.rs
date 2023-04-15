@@ -1,46 +1,42 @@
 use serde::Deserialize;
 
+use crate::api::routes::RobloxApi;
 use crate::api::users::PartialUser;
-use crate::api::ENDPOINTS;
 use crate::errors::RoboltError;
 use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
 	pub async fn privacy(&self, setting: PrivacySetting) -> Result<PrivacyState, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/{}",
-			ENDPOINTS.account_settings,
-			match setting {
+		self.request(
+			RobloxApi::AccountSettings,
+			format!("/v1/{}", match setting {
 				PrivacySetting::AppChat => "app-chat-privacy",
 				PrivacySetting::GameChat => "game-chat-privacy",
 				PrivacySetting::Trade => "trade-privacy",
 				PrivacySetting::Inventory => "inventory-privacy",
 				PrivacySetting::PrivateMessage => "private-message-privacy",
-			}
-		))
+			}),
+		)
 		.send::<PrivacySettingResponse>()
 		.await
 		.map(|res| res.value)
 	}
 
 	pub async fn blocked_users(&self) -> Result<BlockedUsers, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/get-detailed-blocked-users",
-			ENDPOINTS.account_settings
-		))
-		.send::<BlockedUsers>()
-		.await
+		self.request(RobloxApi::AccountSettings, "/v1/users/get-detailed-blocked-users")
+			.send::<BlockedUsers>()
+			.await
 	}
 
 	pub async fn email(&self) -> Result<Email, RoboltError> {
-		self.request_builder(format!("{}/v1/email", ENDPOINTS.account_settings))
+		self.request(RobloxApi::AccountSettings, "/v1/email")
 			.send::<Email>()
 			.await
 	}
 
 	pub async fn trade_value(&self) -> Result<TradeValue, RoboltError> {
-		self.request_builder(format!("{}/v1/trade-value", ENDPOINTS.account_settings))
+		self.request(RobloxApi::AccountSettings, "/v1/trade-value")
 			.send::<TradeValueResponse>()
 			.await
 			.map(|res| res.trade_value)

@@ -4,56 +4,47 @@ use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::api::{DataResponse, EmptyResponse, Limit, ENDPOINTS};
+use crate::api::routes::RobloxApi;
+use crate::api::Limit;
 use crate::errors::RoboltError;
 use crate::utils::client::Authenticated;
+use crate::utils::response::{DataResponse, EmptyResponse};
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
 	pub async fn avatar_auth(&self) -> Result<Avatar, RoboltError> {
-		self.request_builder(format!("{}/v1/avatar", ENDPOINTS.avatar))
-			.send()
-			.await
+		self.request(RobloxApi::Avatar, "/v1/avatar").send().await
 	}
 
 	pub async fn add_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/avatar/assets/{}/wear",
-			ENDPOINTS.avatar, asset_id
-		))
-		.method(Method::POST)
-		.send::<EmptyResponse>()
-		.await?;
+		self.request(RobloxApi::Avatar, format!("/v1/avatar/assets/{asset_id}/wear"))
+			.method(Method::POST)
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
 
-	pub async fn set_wearing_assets(
-		&self,
-		asset_ids: Vec<u64>,
-	) -> Result<InvalidAssets, RoboltError> {
+	pub async fn set_wearing_assets(&self, asset_ids: Vec<u64>) -> Result<InvalidAssets, RoboltError> {
 		let body = HashMap::from([("assetIds", asset_ids)]);
 
-		self.request_builder(format!("{}/v1/avatar/set-wearing-assets", ENDPOINTS.avatar))
+		self.request(RobloxApi::Avatar, "/v1/avatar/set-wearing-assets")
 			.method(Method::POST)
 			.send_body(body)
 			.await
 	}
 
 	pub async fn remove_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/avatar/assets/{}/remove",
-			ENDPOINTS.avatar, asset_id
-		))
-		.method(Method::POST)
-		.send::<EmptyResponse>()
-		.await?;
+		self.request(RobloxApi::Avatar, format!("/v1/avatar/assets/{asset_id}/remove"))
+			.method(Method::POST)
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
 
 	pub async fn redraw_avatar_thumbnail(&self) -> Result<(), RoboltError> {
-		self.request_builder(format!("{}/v1/avatar/redraw-thumbnail", ENDPOINTS.avatar))
+		self.request(RobloxApi::Avatar, "/v1/avatar/redraw-thumbnail")
 			.method(Method::POST)
 			.send::<EmptyResponse>()
 			.await?;
@@ -64,19 +55,16 @@ impl Robolt<Authenticated> {
 	pub async fn set_avatar_type(&self, avatar_type: BodyType) -> Result<(), RoboltError> {
 		let body = HashMap::from([("avatarType", avatar_type as u8)]);
 
-		self.request_builder(format!(
-			"{}/v1/avatar/set-player-avatar-type",
-			ENDPOINTS.avatar
-		))
-		.method(Method::POST)
-		.send_body::<_, EmptyResponse>(body)
-		.await?;
+		self.request(RobloxApi::Avatar, "/v1/avatar/set-player-avatar-type")
+			.method(Method::POST)
+			.send_body::<_, EmptyResponse>(body)
+			.await?;
 
 		Ok(())
 	}
 
 	pub async fn set_body_colors(&self, body_colors: BodyColors) -> Result<(), RoboltError> {
-		self.request_builder(format!("{}/v1/avatar/set-body-colors", ENDPOINTS.avatar))
+		self.request(RobloxApi::Avatar, "/v1/avatar/set-body-colors")
 			.method(Method::POST)
 			.send_body::<_, EmptyResponse>(body_colors)
 			.await?;
@@ -85,7 +73,7 @@ impl Robolt<Authenticated> {
 	}
 
 	pub async fn set_scales(&self, scales: BodyScale) -> Result<(), RoboltError> {
-		self.request_builder(format!("{}/v1/avatar/set-scales", ENDPOINTS.avatar))
+		self.request(RobloxApi::Avatar, "/v1/avatar/set-scales")
 			.method(Method::POST)
 			.send_body::<_, EmptyResponse>(scales)
 			.await?;
@@ -94,29 +82,23 @@ impl Robolt<Authenticated> {
 	}
 
 	pub async fn delete_outfit(&self, outfit_id: u64) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/outfits/{}/delete",
-			ENDPOINTS.avatar, outfit_id
-		))
-		.method(Method::POST)
-		.send::<EmptyResponse>()
-		.await?;
+		self.request(RobloxApi::Avatar, format!("/v1/outfits/{outfit_id}/delete"))
+			.method(Method::POST)
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
 
 	pub async fn wear_outfit(&self, outfit_id: u64) -> Result<InvalidAssets, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/outfits/{}/wear",
-			ENDPOINTS.avatar, outfit_id
-		))
-		.method(Method::POST)
-		.send()
-		.await
+		self.request(RobloxApi::Avatar, format!("/v1/outfits/{outfit_id}/wear"))
+			.method(Method::POST)
+			.send()
+			.await
 	}
 
 	pub async fn create_outfit(&self, new_outfit: OutfitV1) -> Result<(), RoboltError> {
-		self.request_builder(format!("{}/v1/outfits/create", ENDPOINTS.avatar))
+		self.request(RobloxApi::Avatar, "/v1/outfits/create")
 			.method(Method::POST)
 			.send_body::<_, EmptyResponse>(new_outfit)
 			.await?;
@@ -124,18 +106,11 @@ impl Robolt<Authenticated> {
 		Ok(())
 	}
 
-	pub async fn update_outfit(
-		&self,
-		outfit_id: u64,
-		updated_outfit: OutfitV2,
-	) -> Result<(), RoboltError> {
-		self.request_builder(format!(
-			"{}/v2/outfits/{}/update",
-			ENDPOINTS.avatar, outfit_id
-		))
-		.method(Method::POST)
-		.send_body::<_, EmptyResponse>(updated_outfit)
-		.await?;
+	pub async fn update_outfit(&self, outfit_id: u64, updated_outfit: OutfitV2) -> Result<(), RoboltError> {
+		self.request(RobloxApi::Avatar, format!("/v2/outfits/{outfit_id}/update"))
+			.method(Method::POST)
+			.send_body::<_, EmptyResponse>(updated_outfit)
+			.await?;
 
 		Ok(())
 	}
@@ -144,62 +119,48 @@ impl Robolt<Authenticated> {
 		&self,
 		item_type: AvatarItemFilter,
 	) -> Result<Vec<RecentAvatarItem>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/recent-items/{}/list",
-			ENDPOINTS.avatar, item_type as u8
-		))
-		.send::<DataResponse<RecentAvatarItem>>()
-		.await
-		.map(|res| res.data)
+		self.request(RobloxApi::Avatar, format!("/v1/recent-items/{}/list", item_type as u8))
+			.send::<DataResponse<RecentAvatarItem>>()
+			.await
+			.map(|res| res.data)
 	}
 }
 
 impl<State> Robolt<State> {
 	pub async fn avatar_metadata(&self) -> Result<AvatarMetadata, RoboltError> {
-		self.request_builder(format!("{}/v1/avatar/metadata", ENDPOINTS.avatar))
-			.send()
-			.await
+		self.request(RobloxApi::Avatar, "/v1/avatar/metadata").send().await
 	}
 
 	pub async fn avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
-		self.request_builder(format!("{}/v1/users/{}/avatar", ENDPOINTS.avatar, user_id))
+		self.request(RobloxApi::Avatar, format!("/v1/users/{user_id}/avatar"))
 			.send()
 			.await
 	}
 
 	pub async fn currently_wearing(&self, user_id: u64) -> Result<Vec<u64>, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/users/{}/currently-wearing",
-			ENDPOINTS.avatar, user_id
-		))
-		.send::<AssetIdsResponse>()
-		.await
-		.map(|res| res.asset_ids)
+		self.request(RobloxApi::Avatar, format!("/v1/users/{user_id}/currently-wearing"))
+			.send::<AssetIdsResponse>()
+			.await
+			.map(|res| res.asset_ids)
 	}
 
 	pub fn outfits(&self, user_id: u64) -> OutfitFilterBuilder<State> {
 		OutfitFilterBuilder::new(user_id, self)
 	}
 
-	pub async fn game_start_info(
-		&self,
-		universe_id: u64,
-	) -> Result<GameStartAvatarInfo, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/game-start-info?universeId={universe_id}",
-			ENDPOINTS.avatar
-		))
+	pub async fn game_start_info(&self, universe_id: u64) -> Result<GameStartAvatarInfo, RoboltError> {
+		self.request(
+			RobloxApi::Avatar,
+			format!("/v1/game-start-info?universeId={universe_id}",),
+		)
 		.send()
 		.await
 	}
 
 	pub async fn outfit(&self, outfit_id: u64) -> Result<DetailedOutfit, RoboltError> {
-		self.request_builder(format!(
-			"{}/v1/outfits/{}/details",
-			ENDPOINTS.avatar, outfit_id
-		))
-		.send()
-		.await
+		self.request(RobloxApi::Avatar, format!("/v1/outfits/{outfit_id}/details"))
+			.send()
+			.await
 	}
 }
 
@@ -231,14 +192,13 @@ impl<'a, State> OutfitFilterBuilder<'a, State> {
 
 	pub async fn send(self) -> Result<FilteredOutfitResponse, RoboltError> {
 		self.client
-			.request_builder(format!(
-				"{}/v1/users/{}/outfits?page={}&itemsPerPage={}&isEditable={}",
-				ENDPOINTS.avatar,
-				self.user_id,
-				self.page,
-				self.items_per_page as u8,
-				self.is_editable
-			))
+			.request(
+				RobloxApi::Avatar,
+				format!(
+					"/v1/users/{}/outfits?page={}&itemsPerPage={}&isEditable={}",
+					self.user_id, self.page, self.items_per_page as u8, self.is_editable
+				),
+			)
 			.send()
 			.await
 	}
