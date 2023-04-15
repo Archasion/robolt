@@ -18,6 +18,13 @@ mod premium_features;
 #[derive(Default, Debug, Deserialize_repr, Clone, PartialEq)]
 #[repr(u8)]
 /// Limits the number of items returned by the API
+///
+/// ### Return up to...
+///
+/// * **10** items (Min)
+/// * **25** items (Low)
+/// * **50** items (High)
+/// * **100** items (Max)
 pub enum Limit {
 	#[default]
 	/// Return up to 10 items

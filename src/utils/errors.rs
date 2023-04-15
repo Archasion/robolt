@@ -3,6 +3,7 @@ use std::fmt;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
+/// An error associated with either the Roblox API or a HTTP request.
 pub struct RoboltError {
 	pub message: String,
 	#[serde(default = "default_error_code")]
@@ -21,7 +22,7 @@ pub(crate) struct RobloxAPIErrors {
 }
 
 #[derive(Debug, Default)]
-pub(crate) enum RoboltErrorKind {
+enum RoboltErrorKind {
 	#[default]
 	Api,
 	Unknown,
