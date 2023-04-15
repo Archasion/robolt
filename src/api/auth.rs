@@ -2,7 +2,7 @@ use std::error::Error;
 use std::intrinsics::type_name;
 use std::marker::PhantomData;
 
-use reqwest::header::{self, HeaderMap};
+use reqwest::header::COOKIE;
 use reqwest::StatusCode;
 
 use crate::utils::client::{default_client_headers, Authenticated, Unauthenticated};
@@ -20,9 +20,9 @@ impl Robolt<Unauthenticated> {
 		roblox_cookie: String,
 	) -> Result<Robolt<Authenticated>, Box<dyn Error>> {
 		let cookie = format!(".ROBLOSECURITY={roblox_cookie}");
-		let mut headers = HeaderMap::from(default_client_headers());
+		let mut headers = default_client_headers();
 
-		headers.insert(header::COOKIE, cookie.parse()?);
+		headers.insert(COOKIE, cookie.parse()?);
 
 		let res = self
 			.client
