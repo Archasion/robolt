@@ -9,16 +9,20 @@ use crate::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub fn fetch_presences(&self, user_ids: Vec<u64>) -> Result<Vec<UserPresence>, RoboltError> {
+	pub async fn fetch_presences(
+		&self,
+		user_ids: Vec<u64>,
+	) -> Result<Vec<UserPresence>, RoboltError> {
 		let body = HashMap::from([("userIds", user_ids)]);
 
 		self.request_builder(format!("{}/v1/presence/users", ENDPOINTS.presence))
 			.method(Method::POST)
 			.send_body::<_, UserPresences>(body)
+			.await
 			.map(|res| res.user_presences)
 	}
 
-	pub fn fetch_partial_presences(
+	pub async fn fetch_partial_presences(
 		&self,
 		user_ids: Vec<u64>,
 	) -> Result<Vec<PartialUserPresence>, RoboltError> {
@@ -27,6 +31,7 @@ impl<State> Robolt<State> {
 		self.request_builder(format!("{}/v1/presence/last-online", ENDPOINTS.presence))
 			.method(Method::POST)
 			.send_body::<_, LastOnlineTimestamps>(body)
+			.await
 			.map(|res| res.last_online_timestamps)
 	}
 }

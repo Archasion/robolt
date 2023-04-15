@@ -41,11 +41,22 @@ impl fmt::Display for RoboltError {
 
 #[doc(hidden)]
 impl From<String> for RoboltError {
-	fn from(message: String) -> Self {
+	fn from(error: String) -> Self {
 		Self {
 			kind: RoboltErrorKind::Unknown,
 			code: default_error_code(),
-			message,
+			message: error,
+		}
+	}
+}
+
+#[doc(hidden)]
+impl From<reqwest::Error> for RoboltError {
+	fn from(error: reqwest::Error) -> Self {
+		Self {
+			kind: RoboltErrorKind::Unknown,
+			code: default_error_code(),
+			message: error.to_string(),
 		}
 	}
 }

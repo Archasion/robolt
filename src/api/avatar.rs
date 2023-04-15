@@ -10,50 +10,58 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
-	pub fn my_avatar(&self) -> Result<Avatar, RoboltError> {
+	pub async fn my_avatar(&self) -> Result<Avatar, RoboltError> {
 		self.request_builder(format!("{}/v1/avatar", ENDPOINTS.avatar))
 			.send()
+			.await
 	}
 
-	pub fn add_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
+	pub async fn add_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/avatar/assets/{}/wear",
 			ENDPOINTS.avatar, asset_id
 		))
 		.method(Method::POST)
-		.send::<EmptyResponse>()?;
+		.send::<EmptyResponse>()
+		.await?;
 
 		Ok(())
 	}
 
-	pub fn set_wearing_assets(&self, asset_ids: Vec<u64>) -> Result<InvalidAssets, RoboltError> {
+	pub async fn set_wearing_assets(
+		&self,
+		asset_ids: Vec<u64>,
+	) -> Result<InvalidAssets, RoboltError> {
 		let body = HashMap::from([("assetIds", asset_ids)]);
 
 		self.request_builder(format!("{}/v1/avatar/set-wearing-assets", ENDPOINTS.avatar))
 			.method(Method::POST)
 			.send_body(body)
+			.await
 	}
 
-	pub fn remove_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
+	pub async fn remove_wearing_asset(&self, asset_id: u64) -> Result<(), RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/avatar/assets/{}/remove",
 			ENDPOINTS.avatar, asset_id
 		))
 		.method(Method::POST)
-		.send::<EmptyResponse>()?;
+		.send::<EmptyResponse>()
+		.await?;
 
 		Ok(())
 	}
 
-	pub fn redraw_avatar_thumbnail(&self) -> Result<(), RoboltError> {
+	pub async fn redraw_avatar_thumbnail(&self) -> Result<(), RoboltError> {
 		self.request_builder(format!("{}/v1/avatar/redraw-thumbnail", ENDPOINTS.avatar))
 			.method(Method::POST)
-			.send::<EmptyResponse>()?;
+			.send::<EmptyResponse>()
+			.await?;
 
 		Ok(())
 	}
 
-	pub fn set_avatar_type(&self, avatar_type: BodyType) -> Result<(), RoboltError> {
+	pub async fn set_avatar_type(&self, avatar_type: BodyType) -> Result<(), RoboltError> {
 		let body = HashMap::from([("avatarType", avatar_type as u8)]);
 
 		self.request_builder(format!(
@@ -61,56 +69,62 @@ impl Robolt<Authenticated> {
 			ENDPOINTS.avatar
 		))
 		.method(Method::POST)
-		.send_body::<_, EmptyResponse>(body)?;
+		.send_body::<_, EmptyResponse>(body)
+		.await?;
 
 		Ok(())
 	}
 
-	pub fn set_body_colors(&self, body_colors: BodyColors) -> Result<(), RoboltError> {
+	pub async fn set_body_colors(&self, body_colors: BodyColors) -> Result<(), RoboltError> {
 		self.request_builder(format!("{}/v1/avatar/set-body-colors", ENDPOINTS.avatar))
 			.method(Method::POST)
-			.send_body::<_, EmptyResponse>(body_colors)?;
+			.send_body::<_, EmptyResponse>(body_colors)
+			.await?;
 
 		Ok(())
 	}
 
-	pub fn set_scales(&self, scales: BodyScale) -> Result<(), RoboltError> {
+	pub async fn set_scales(&self, scales: BodyScale) -> Result<(), RoboltError> {
 		self.request_builder(format!("{}/v1/avatar/set-scales", ENDPOINTS.avatar))
 			.method(Method::POST)
-			.send_body::<_, EmptyResponse>(scales)?;
+			.send_body::<_, EmptyResponse>(scales)
+			.await?;
 
 		Ok(())
 	}
 
-	pub fn delete_outfit(&self, outfit_id: u64) -> Result<(), RoboltError> {
+	pub async fn delete_outfit(&self, outfit_id: u64) -> Result<(), RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/outfits/{}/delete",
 			ENDPOINTS.avatar, outfit_id
 		))
 		.method(Method::POST)
-		.send::<EmptyResponse>()?;
+		.send::<EmptyResponse>()
+		.await?;
 
 		Ok(())
 	}
 
-	pub fn wear_outfit(&self, outfit_id: u64) -> Result<InvalidAssets, RoboltError> {
+	pub async fn wear_outfit(&self, outfit_id: u64) -> Result<InvalidAssets, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/outfits/{}/wear",
 			ENDPOINTS.avatar, outfit_id
 		))
 		.method(Method::POST)
 		.send()
+		.await
 	}
 
-	pub fn create_outfit(&self, new_outfit: OutfitV1) -> Result<(), RoboltError> {
+	pub async fn create_outfit(&self, new_outfit: OutfitV1) -> Result<(), RoboltError> {
 		self.request_builder(format!("{}/v1/outfits/create", ENDPOINTS.avatar))
 			.method(Method::POST)
-			.send_body::<_, EmptyResponse>(new_outfit)?;
+			.send_body::<_, EmptyResponse>(new_outfit)
+			.await?;
 
 		Ok(())
 	}
 
-	pub fn update_outfit(
+	pub async fn update_outfit(
 		&self,
 		outfit_id: u64,
 		updated_outfit: OutfitV2,
@@ -120,12 +134,13 @@ impl Robolt<Authenticated> {
 			ENDPOINTS.avatar, outfit_id
 		))
 		.method(Method::POST)
-		.send_body::<_, EmptyResponse>(updated_outfit)?;
+		.send_body::<_, EmptyResponse>(updated_outfit)
+		.await?;
 
 		Ok(())
 	}
 
-	pub fn recent_avatar_items(
+	pub async fn recent_avatar_items(
 		&self,
 		item_type: AvatarItemFilter,
 	) -> Result<Vec<RecentAvatarItem>, RoboltError> {
@@ -134,27 +149,31 @@ impl Robolt<Authenticated> {
 			ENDPOINTS.avatar, item_type as u8
 		))
 		.send::<DataResponse<RecentAvatarItem>>()
+		.await
 		.map(|res| res.data)
 	}
 }
 
 impl<State> Robolt<State> {
-	pub fn fetch_avatar_metadata(&self) -> Result<AvatarMetadata, RoboltError> {
+	pub async fn fetch_avatar_metadata(&self) -> Result<AvatarMetadata, RoboltError> {
 		self.request_builder(format!("{}/v1/avatar/metadata", ENDPOINTS.avatar))
 			.send()
+			.await
 	}
 
-	pub fn fetch_avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
+	pub async fn fetch_avatar(&self, user_id: u64) -> Result<Avatar, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}/avatar", ENDPOINTS.avatar, user_id))
 			.send()
+			.await
 	}
 
-	pub fn fetch_currently_wearing(&self, user_id: u64) -> Result<Vec<u64>, RoboltError> {
+	pub async fn fetch_currently_wearing(&self, user_id: u64) -> Result<Vec<u64>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/currently-wearing",
 			ENDPOINTS.avatar, user_id
 		))
 		.send::<AssetIdsResponse>()
+		.await
 		.map(|res| res.asset_ids)
 	}
 
@@ -162,7 +181,7 @@ impl<State> Robolt<State> {
 		OutfitFilterBuilder::new(user_id, self)
 	}
 
-	pub fn fetch_game_start_info(
+	pub async fn fetch_game_start_info(
 		&self,
 		universe_id: u64,
 	) -> Result<GameStartAvatarInfo, RoboltError> {
@@ -171,14 +190,16 @@ impl<State> Robolt<State> {
 			ENDPOINTS.avatar
 		))
 		.send()
+		.await
 	}
 
-	pub fn fetch_outfit(&self, outfit_id: u64) -> Result<DetailedOutfit, RoboltError> {
+	pub async fn fetch_outfit(&self, outfit_id: u64) -> Result<DetailedOutfit, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/outfits/{}/details",
 			ENDPOINTS.avatar, outfit_id
 		))
 		.send()
+		.await
 	}
 }
 
@@ -208,7 +229,7 @@ impl<'a, State> OutfitFilterBuilder<'a, State> {
 		self
 	}
 
-	pub fn send(self) -> Result<FilteredOutfitResponse, RoboltError> {
+	pub async fn send(self) -> Result<FilteredOutfitResponse, RoboltError> {
 		self.client
 			.request_builder(format!(
 				"{}/v1/users/{}/outfits?page={}&itemsPerPage={}&isEditable={}",
@@ -219,6 +240,7 @@ impl<'a, State> OutfitFilterBuilder<'a, State> {
 				self.is_editable
 			))
 			.send()
+			.await
 	}
 }
 

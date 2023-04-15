@@ -5,12 +5,13 @@ use crate::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub fn fetch_points(&self, user_id: u64, universe_id: u64) -> Result<u64, RoboltError> {
+	pub async fn fetch_points(&self, user_id: u64, universe_id: u64) -> Result<u64, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/universes/{}/users/{}/all-time",
 			ENDPOINTS.points, user_id, universe_id
 		))
 		.send::<AllTimeScore>()
+		.await
 		.map(|res| res.all_time_score)
 	}
 }

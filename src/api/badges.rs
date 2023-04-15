@@ -7,30 +7,33 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub fn fetch_badge(&self, badge_id: u64) -> Result<Badge, RoboltError> {
+	pub async fn fetch_badge(&self, badge_id: u64) -> Result<Badge, RoboltError> {
 		self.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, badge_id))
 			.send()
+			.await
 	}
 
-	pub fn fetch_universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, RoboltError> {
+	pub async fn fetch_universe_badges(&self, universe_id: u64) -> Result<Vec<Badge>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/universes/{}/badges?limit=100",
 			ENDPOINTS.badges, universe_id
 		))
 		.send::<DataResponse<Badge>>()
+		.await
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_user_badges(&self, user_id: u64) -> Result<Vec<Badge>, RoboltError> {
+	pub async fn fetch_user_badges(&self, user_id: u64) -> Result<Vec<Badge>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/badges?limit=100",
 			ENDPOINTS.badges, user_id
 		))
 		.send::<DataResponse<Badge>>()
+		.await
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_awarded_badge_timestamps(
+	pub async fn fetch_awarded_badge_timestamps(
 		&self,
 		user_id: u64,
 		badge_ids: Vec<u64>,
@@ -46,6 +49,7 @@ impl<State> Robolt<State> {
 			ENDPOINTS.badges, user_id, badge_ids
 		))
 		.send::<DataResponse<AwardedBadgeTimestamp>>()
+		.await
 		.map(|res| res.data)
 	}
 }
@@ -55,10 +59,11 @@ impl Robolt<Authenticated> {
 		BadgeUpdateBuilder::new(badge_id, self)
 	}
 
-	pub fn remove_badge(&self, badge_id: u64) -> Result<(), RoboltError> {
+	pub async fn remove_badge(&self, badge_id: u64) -> Result<(), RoboltError> {
 		self.request_builder(format!("{}/v1/user/badges/{}", ENDPOINTS.badges, badge_id))
 			.method(Method::DELETE)
 			.send()
+			.await
 	}
 }
 
@@ -88,11 +93,12 @@ impl<'a> BadgeUpdateBuilder<'a> {
 		self
 	}
 
-	pub fn update(self) -> Result<(), RoboltError> {
+	pub async fn update(self) -> Result<(), RoboltError> {
 		self.client
 			.request_builder(format!("{}/v1/badges/{}", ENDPOINTS.badges, self.id))
 			.method(Method::PATCH)
 			.send_body(self)
+			.await
 	}
 }
 
