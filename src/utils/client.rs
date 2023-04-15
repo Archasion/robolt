@@ -19,7 +19,6 @@ impl Robolt {
 	pub fn new() -> Self {
 		let client = Client::builder()
 			.default_headers(default_client_headers())
-			.cookie_store(true)
 			.build()
 			.expect("Failed to build client");
 
