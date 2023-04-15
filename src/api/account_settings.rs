@@ -7,7 +7,7 @@ use crate::utils::client::Authenticated;
 use crate::Robolt;
 
 impl Robolt<Authenticated> {
-	pub fn my_privacy(&self, setting: PrivacySetting) -> Result<PrivacyState, RoboltError> {
+	pub async fn my_privacy(&self, setting: PrivacySetting) -> Result<PrivacyState, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/{}",
 			ENDPOINTS.account_settings,
@@ -20,25 +20,29 @@ impl Robolt<Authenticated> {
 			}
 		))
 		.send::<PrivacySettingResponse>()
+		.await
 		.map(|res| res.value)
 	}
 
-	pub fn my_blocked_users(&self) -> Result<BlockedUsers, RoboltError> {
+	pub async fn my_blocked_users(&self) -> Result<BlockedUsers, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/get-detailed-blocked-users",
 			ENDPOINTS.account_settings
 		))
 		.send::<BlockedUsers>()
+		.await
 	}
 
-	pub fn my_email(&self) -> Result<Email, RoboltError> {
+	pub async fn my_email(&self) -> Result<Email, RoboltError> {
 		self.request_builder(format!("{}/v1/email", ENDPOINTS.account_settings))
 			.send::<Email>()
+			.await
 	}
 
-	pub fn my_trade_value(&self) -> Result<TradeValue, RoboltError> {
+	pub async fn my_trade_value(&self) -> Result<TradeValue, RoboltError> {
 		self.request_builder(format!("{}/v1/trade-value", ENDPOINTS.account_settings))
 			.send::<TradeValueResponse>()
+			.await
 			.map(|res| res.trade_value)
 	}
 }

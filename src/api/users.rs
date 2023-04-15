@@ -10,26 +10,33 @@ use crate::utils::errors::RoboltError;
 use crate::Robolt;
 
 impl<State> Robolt<State> {
-	pub fn fetch_user(&self, user_id: u64) -> Result<User, RoboltError> {
+	pub async fn fetch_user(&self, user_id: u64) -> Result<User, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
 			.send()
+			.await
 	}
 
-	pub fn fetch_partial_user(&self, user_id: u64) -> Result<PartialUser, RoboltError> {
+	pub async fn fetch_partial_user(&self, user_id: u64) -> Result<PartialUser, RoboltError> {
 		self.request_builder(format!("{}/v1/users/{}", ENDPOINTS.users, user_id))
 			.send()
+			.await
 	}
 
-	pub fn search_users(&self, keyword: &str, limit: u8) -> Result<Vec<PartialUser>, RoboltError> {
+	pub async fn search_users(
+		&self,
+		keyword: &str,
+		limit: u8,
+	) -> Result<Vec<PartialUser>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/search?keyword={}&limit={}",
 			ENDPOINTS.users, keyword, limit
 		))
 		.send::<DataResponse<PartialUser>>()
+		.await
 		.map(|res| res.data)
 	}
 
-	pub fn fetch_users_by_ids(
+	pub async fn fetch_users_by_ids(
 		&self,
 		user_ids: Vec<u64>,
 		exclude_banned: bool,
@@ -42,19 +49,21 @@ impl<State> Robolt<State> {
 		self.request_builder(format!("{}/v1/users", ENDPOINTS.users))
 			.method(Method::POST)
 			.send_body::<_, DataResponse<PartialUser>>(body)
+			.await
 			.map(|res| res.data)
 	}
 
-	pub fn fetch_username_history(&self, user_id: u64) -> Result<Vec<String>, RoboltError> {
+	pub async fn fetch_username_history(&self, user_id: u64) -> Result<Vec<String>, RoboltError> {
 		self.request_builder(format!(
 			"{}/v1/users/{}/username-history",
 			ENDPOINTS.users, user_id
 		))
 		.send::<DataResponse<String>>()
+		.await
 		.map(|res| res.data)
 	}
 
-	pub fn validate_display_name(
+	pub async fn validate_display_name(
 		&self,
 		display_name: &str,
 		date_of_birth: &str,
@@ -63,19 +72,21 @@ impl<State> Robolt<State> {
 			"{}/v1/display-names/validate?displayName={}&birthdate={}",
 			ENDPOINTS.users, display_name, date_of_birth
 		))
-		.send::<EmptyResponse>()?;
+		.send::<EmptyResponse>()
+		.await?;
 
 		Ok(())
 	}
 }
 
 impl Robolt<Authenticated> {
-	pub fn fetch_my_user(&self) -> Result<PartialUser, RoboltError> {
+	pub async fn fetch_my_user(&self) -> Result<PartialUser, RoboltError> {
 		self.request_builder(format!("{}/v1/users/authenticated", ENDPOINTS.users))
 			.send()
+			.await
 	}
 
-	pub fn fetch_users_by_usernames(
+	pub async fn fetch_users_by_usernames(
 		&self,
 		usernames: Vec<&str>,
 		exclude_banned: bool,
@@ -88,6 +99,7 @@ impl Robolt<Authenticated> {
 		self.request_builder(format!("{}/v1/usernames/users", ENDPOINTS.users))
 			.method(Method::POST)
 			.send_body::<_, DataResponse<PartialUser>>(body)
+			.await
 			.map(|res| res.data)
 	}
 }

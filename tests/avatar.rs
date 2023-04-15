@@ -2,45 +2,46 @@ use tokio_test::assert_ok;
 
 use robolt::{Limit, Robolt};
 
-#[test]
-fn fetch_avatar() {
+#[tokio::test]
+async fn fetch_avatar() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_avatar(1));
+	assert_ok!(client.fetch_avatar(1).await);
 }
 
-#[test]
-fn fetch_currently_wearing() {
+#[tokio::test]
+async fn fetch_currently_wearing() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_currently_wearing(1));
+	assert_ok!(client.fetch_currently_wearing(1).await);
 }
 
-#[test]
-fn fetch_outfits() {
+#[tokio::test]
+async fn fetch_outfits() {
 	let client = Robolt::new();
 	let res = client
 		.fetch_outfits(1)
 		.items_per_page(Limit::default())
 		.page(1)
 		.editable(true)
-		.send();
+		.send()
+		.await;
 
 	assert_ok!(res);
 }
 
-#[test]
-fn fetch_avatar_metadata() {
+#[tokio::test]
+async fn fetch_avatar_metadata() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_avatar_metadata());
+	assert_ok!(client.fetch_avatar_metadata().await);
 }
 
-#[test]
-fn fetch_game_start_info() {
+#[tokio::test]
+async fn fetch_game_start_info() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_game_start_info(2124789031));
+	assert_ok!(client.fetch_game_start_info(2124789031).await);
 }
 
-#[test]
-fn fetch_outfit() {
+#[tokio::test]
+async fn fetch_outfit() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_outfit(11675594890));
+	assert_ok!(client.fetch_outfit(11675594890).await);
 }

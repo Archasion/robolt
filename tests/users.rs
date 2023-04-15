@@ -2,38 +2,38 @@ use tokio_test::assert_ok;
 
 use robolt::Robolt;
 
-#[test]
-fn fetch_user() {
+#[tokio::test]
+async fn fetch_user() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_user(1));
+	assert_ok!(client.fetch_user(1).await);
 }
 
-#[test]
-fn fetch_partial_user() {
+#[tokio::test]
+async fn fetch_partial_user() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_partial_user(1));
+	assert_ok!(client.fetch_partial_user(1).await);
 }
 
-#[test]
-fn fetch_username_history() {
+#[tokio::test]
+async fn fetch_username_history() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_username_history(1));
+	assert_ok!(client.fetch_username_history(1).await);
 }
 
-#[test]
-fn search_users() {
+#[tokio::test]
+async fn search_users() {
 	let client = Robolt::new();
-	assert_ok!(client.search_users("test", 10));
+	assert_ok!(client.search_users("test", 10).await);
 }
 
-#[test]
-fn fetch_users_by_ids() {
+#[tokio::test]
+async fn fetch_users_by_ids() {
 	let client = Robolt::new();
-	assert_ok!(client.fetch_users_by_ids(vec![1, 2, 3], false));
+	assert_ok!(client.fetch_users_by_ids(vec![1, 2, 3], false).await);
 }
 
-#[test]
-fn validate_display_name() {
+#[tokio::test]
+async fn validate_display_name() {
 	let client = Robolt::new();
-	assert_ok!(client.validate_display_name("test", "01-01-1999"));
+	assert_ok!(client.validate_display_name("test", "01-01-1999").await);
 }
