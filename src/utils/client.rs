@@ -51,10 +51,8 @@ impl<State> Robolt<State> {
 		T: DeserializeOwned,
 		U: Serialize,
 	{
-		let url = format!("https://{endpoint}");
-
 		let builder = {
-			let mut builder = self.http.request(method, url);
+			let mut builder = self.http.request(method, format!("https://{endpoint}"));
 
 			if let Some(body) = &body {
 				builder = builder.json(body);
