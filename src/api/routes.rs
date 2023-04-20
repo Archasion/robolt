@@ -12,6 +12,7 @@ pub enum RobloxApi {
 	Avatar,
 	PremiumFeatures,
 	Auth,
+	Catalog,
 	Custom(&'static str),
 }
 
@@ -29,6 +30,7 @@ impl RobloxApi {
 			RobloxApi::Avatar => "avatar.roblox.com",
 			RobloxApi::PremiumFeatures => "premiumfeatures.roblox.com",
 			RobloxApi::Auth => "auth.roblox.com",
+			RobloxApi::Catalog => "catalog.roblox.com",
 			RobloxApi::Custom(s) => s.deref(),
 		}
 	}
