@@ -23,6 +23,12 @@ impl<State> Robolt<State> {
 			.await
 	}
 
+	/// Fetches [Bundle] recommendation list based on a bundle associated with
+	/// the provided ID
+	///
+	/// ### Arguments
+	/// * `bundle_id` - The ID of the bundle to base recommendations on
+	/// * `amount` - The amount of recommendations to fetch (amount <= 50)
 	pub async fn bundle_recommendations(&self, bundle_id: u64, amount: u8) -> Result<Vec<Bundle>, RoboltError> {
 		self.request(
 			RobloxApi::Catalog,
