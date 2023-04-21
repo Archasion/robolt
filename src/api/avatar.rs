@@ -382,8 +382,7 @@ pub struct AvatarAssetMeta {
 	pub version: u32,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize_repr, Serialize)]
-#[repr(u8)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub enum BodyType {
 	#[default]
 	R6 = 1,
