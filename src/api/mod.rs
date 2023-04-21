@@ -1,9 +1,8 @@
-use serde_repr::Deserialize_repr;
-
 pub mod account_information;
 pub mod account_settings;
 pub mod avatar;
 pub mod badges;
+pub mod catalog;
 pub mod friends;
 pub mod presence;
 pub mod routes;
@@ -15,7 +14,7 @@ mod economy;
 mod points;
 mod premium_features;
 
-#[derive(Default, Debug, Deserialize_repr, Clone, PartialEq)]
+#[derive(Default, Debug, Clone, PartialEq)]
 #[repr(u8)]
 /// Limits the number of items returned by the API
 ///

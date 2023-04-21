@@ -53,7 +53,7 @@ impl Robolt<Authenticated> {
 	}
 
 	pub async fn set_avatar_type(&self, avatar_type: BodyType) -> Result<(), RoboltError> {
-		let body = HashMap::from([("avatarType", avatar_type as u8)]);
+		let body = HashMap::from([("playerAvatarType", avatar_type as u8)]);
 
 		self.request(RobloxApi::Avatar, "/v1/avatar/set-player-avatar-type")
 			.method(Method::POST)

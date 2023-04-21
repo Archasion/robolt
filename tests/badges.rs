@@ -22,7 +22,7 @@ async fn user_badges() {
 }
 
 #[tokio::test]
-async fn user_awarded_badge_dates() {
+async fn awarded_badge_timestamps() {
 	let client = Robolt::new();
 	let badges = vec![276292005, 275629737, 276292089];
 
