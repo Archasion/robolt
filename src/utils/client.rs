@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fmt::{Debug, Display};
 use std::marker::PhantomData;
 
-use reqwest::header::{HeaderMap, ACCEPT, CONTENT_TYPE, COOKIE, USER_AGENT};
+use reqwest::header::{HeaderMap, ACCEPT, CONTENT_LENGTH, CONTENT_TYPE, COOKIE, USER_AGENT};
 use reqwest::{Client, Method};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -53,15 +53,22 @@ impl<State> Robolt<State> {
 	{
 		let builder = {
 			let mut builder = self.http.request(method, format!("https://{endpoint}"));
+			let mut has_body = false;
 
 			if let Some(body) = &body {
 				builder = builder.json(body);
+				has_body = true;
 			}
 
 			if let (Some(cookie), Some(xcsrf)) = (&self.cookie, &self.xcsrf) {
 				let mut headers = HeaderMap::new();
 				headers.insert(COOKIE, cookie.parse().unwrap());
 				headers.insert("x-csrf-token", xcsrf.parse().unwrap());
+
+				if !has_body {
+					headers.insert(CONTENT_LENGTH, "0".parse().unwrap());
+				}
+
 				builder = builder.headers(headers);
 			}
 
