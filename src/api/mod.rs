@@ -3,6 +3,7 @@ pub mod account_settings;
 pub mod avatar;
 pub mod badges;
 pub mod catalog;
+pub mod chat;
 pub mod friends;
 pub mod presence;
 pub mod routes;
